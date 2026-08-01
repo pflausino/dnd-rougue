@@ -1,4 +1,4 @@
-# Referência da loja
+# A Última Dungeon — referência da loja
 
 Este documento reunirá as informações usadas para manter a loja dos jogadores.
 

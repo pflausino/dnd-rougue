@@ -1,8 +1,8 @@
-# Handoff: one-shot roguelike de D&D 5e
+# A Última Dungeon — referência da aventura
 
 ## 1. Visão geral
 
-Este projeto é uma one-shot de D&D 5e inspirada em roguelikes.
+**A Última Dungeon** é uma one-shot de D&D 5e inspirada em roguelikes.
 
 - Grupo: 6 jogadores de nível 3.
 - Duração pretendida: aproximadamente 4 horas.
