@@ -547,6 +547,24 @@ Os links abaixo foram usados ou são adequados para consultar as fichas. O proje
 - [Magic Items A-Z, Basic Rules 2024](https://www.dndbeyond.com/sources/dnd/br-2024/magic-items-a-z)
 - [Sun Blade](https://www.dndbeyond.com/sources/dnd/br-2024/magic-items-a-z#SunBlade)
 
+### Modelos STL escolhidos
+
+Seleção feita para impressão FDM em uma impressora Bambu Lab. Quando disponível, deve-se priorizar o perfil indicado no MakerWorld e abri-lo diretamente no Bambu Studio.
+
+- **Ghast — 5 miniaturas:** [Ghast Set (3 Variants) — Undead Beasts](https://makerworld.com/en/models/2360934-dnd-ghast-set-3-variants-undead-beasts) — MakerWorld; três variantes em placas separadas e uma placa com o conjunto completo.
+- **Wraith — 1 miniatura:** [The Wraith Pack — 4 Miniatures FDM Dungeon Masters](https://makerworld.com/en/models/1442891-the-wraith-pack-4-miniatures-fdm-dungeon-masters) — MakerWorld; conjunto projetado para FDM.
+- **Bone Devil — 1 miniatura:** [DnD Bone Devil — D&D Monster Manual, Day 53](https://makerworld.com/en/models/2506759-dnd-bone-devil-d-d-monster-manual-day-53) — MakerWorld; possui perfis com e sem base.
+- **Flameskull — 2 miniaturas:** [Flameskull | Demilich](https://makerworld.com/en/models/2681283-flameskull-demilich) — MakerWorld; perfil de `0,08 mm`, 2 paredes e 15% de preenchimento, com duração estimada de 53 minutos por placa.
+- **Young Gold Dragon — 1 miniatura:** [Gold Dragon 2025](https://www.printables.com/model/1243302-gold-dragon-2025/files) — Printables, por MZ4250; usar o arquivo do Young Gold Dragon e preferir a versão dividida em peças para FDM.
+- **Mimic — 1 miniatura:** [Mimic & Treasure Chests Set](https://makerworld.com/en/models/2157348-mimic-treasure-chests-set#profileId-2338719) — MakerWorld; conjunto sem suportes com um Mimic e dois baús, perfil de `0,1 mm`, 2 paredes e 15% de preenchimento.
+- **Flying Sword — 4 miniaturas:** [DnD Flying Sword Construct — D&D Monster Manual](https://makerworld.com/en/models/2257261) — MakerWorld; perfil de `0,12 mm`, 4 paredes e 10% de preenchimento.
+- **Goblin — 12 miniaturas:** [Fast 5 Goblin Supportless Miniature Pack](https://makerworld.com/en/models/1642172-fast-5-goblin-supportless-miniature-pack) — MakerWorld; cinco variantes sem suportes, otimizadas para FDM e bicos de 0,2 ou 0,4 mm.
+- **Goblin Boss — 1 miniatura:** [Goblin King with Crown and Staff](https://makerworld.com/en/models/2518398-goblin-king-with-crown-and-staff) — MakerWorld; perfil de `0,2 mm`, 2 paredes e 15% de preenchimento.
+- **Hobgoblin — 6 miniaturas:** [Dungeons & Dragons — Hobgoblin Warlord](https://makerworld.com/en/models/2066234-dungeons-dragons-d-d-hobgoblin-warlord#profileId-2231363) — MakerWorld; modelo dividido em duas partes, perfil de `0,08 mm`, 2 paredes e 10% de preenchimento.
+- **Hobgoblin Captain — 1 miniatura:** [D&D Hobgoblin Captain](https://makerworld.com/en/models/2720746-d-d-hobgoblin-captain) — MakerWorld; a página inclui fotografias da impressão real.
+- **Shambling Mound — 1 miniatura:** [Vine Blight | Shambling Mound](https://makerworld.com/en/models/2579068-vine-blight-shambling-mound#profileId-2844269) — MakerWorld; modelo testado em FDM, perfil de `0,12 mm`, 2 paredes e 15% de preenchimento.
+- **Dracohydra — 1 miniatura:** [Five-Headed Dragon — RPG Boss](https://makerworld.com/en/models/2722219-five-headed-dragon-rpg-boss) — MakerWorld; modelo gratuito de cinco cabeças usado como Dracohydra, com impressão real em PLA numa Bambu Lab e perfil de `0,2 mm`, 2 paredes e 15% de preenchimento, com duração estimada de 5,1 horas em uma placa.
+
 ## 16. Decisões substituídas
 
 Estas ideias apareceram anteriormente, mas foram substituídas e não fazem parte da versão atual:
