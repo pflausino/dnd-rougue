@@ -1,0 +1,261 @@
+/* A Última Dungeon — tokens visuais e base compartilhada pelas três telas. */
+
+:root {
+  /* Paleta: dungeon em roxo escuro, com ouro para destaques de recompensa. */
+  --abismo: #08040f;
+  --cripta: #100a1c;
+  --pedra: #180f2a;
+  --pedra-clara: #21153a;
+  --borda: #34204f;
+  --borda-forte: #4a2d6e;
+  --brilho: #7b3fbf;
+  --brilho-forte: #9d5cf0;
+  --lilas: #c3a2f7;
+  --ouro: #d9a95c;
+  --ouro-fraco: #8a6b34;
+  --sangue: #b23a4d;
+  --pocao: #4fb98a;
+
+  --texto: #ece5f7;
+  --texto-fraco: #9b8ab8;
+  --texto-tenue: #6d5c8a;
+
+  --fonte-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --fonte-corpo: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --fonte-mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+
+  --raio: 10px;
+  --raio-g: 16px;
+  --transicao: 160ms ease;
+
+  --sombra-painel: 0 18px 48px rgba(0, 0, 0, 0.55);
+  --glow: 0 0 0 1px rgba(157, 92, 240, 0.25), 0 0 28px rgba(123, 63, 191, 0.18);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+/* Vence os `display` dos componentes, que sobrepõem o estilo padrão de [hidden]. */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  background-color: var(--abismo);
+  background-image:
+    radial-gradient(900px 520px at 12% -10%, rgba(123, 63, 191, 0.24), transparent 70%),
+    radial-gradient(760px 480px at 92% 4%, rgba(72, 34, 122, 0.28), transparent 72%),
+    radial-gradient(1100px 700px at 50% 110%, rgba(40, 18, 70, 0.5), transparent 70%);
+  background-attachment: fixed;
+  color: var(--texto);
+  font-family: var(--fonte-corpo);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Textura de pedra sutil por cima do fundo. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0 1px, transparent 1px 4px);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--fonte-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+a {
+  color: var(--lilas);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(195, 162, 247, 0.3);
+  transition: var(--transicao);
+}
+
+a:hover {
+  color: var(--texto);
+  border-bottom-color: var(--brilho-forte);
+}
+
+.rotulo {
+  font-family: var(--fonte-corpo);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--fonte-display);
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+}
+
+.marca::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brilho-forte);
+  box-shadow: 0 0 12px var(--brilho-forte);
+}
+
+.painel {
+  background: linear-gradient(180deg, var(--pedra-clara), var(--pedra));
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-g);
+  box-shadow: var(--sombra-painel), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Botões */
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.95rem;
+  min-height: 40px;
+  font-family: var(--fonte-corpo);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--texto);
+  background: linear-gradient(180deg, rgba(123, 63, 191, 0.22), rgba(60, 30, 100, 0.28));
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  cursor: pointer;
+  transition: var(--transicao);
+}
+
+.btn:hover {
+  background: linear-gradient(180deg, rgba(157, 92, 240, 0.34), rgba(80, 40, 130, 0.34));
+  border-color: var(--brilho-forte);
+  box-shadow: var(--glow);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--brilho-forte);
+  outline-offset: 2px;
+}
+
+.btn--primario {
+  background: linear-gradient(180deg, var(--brilho-forte), var(--brilho));
+  border-color: var(--brilho-forte);
+}
+
+.btn--primario:hover {
+  background: linear-gradient(180deg, #ae74f7, #8548cd);
+}
+
+.btn--ouro {
+  color: #1a1206;
+  background: linear-gradient(180deg, #e8bd73, var(--ouro));
+  border-color: var(--ouro);
+}
+
+.btn--ouro:hover {
+  background: linear-gradient(180deg, #f0cb8b, #dcb069);
+  border-color: #f0cb8b;
+}
+
+.btn--perigo {
+  color: #ffe9ed;
+  background: linear-gradient(180deg, rgba(178, 58, 77, 0.5), rgba(120, 32, 48, 0.5));
+  border-color: rgba(178, 58, 77, 0.7);
+}
+
+.btn--perigo:hover {
+  background: linear-gradient(180deg, rgba(200, 68, 90, 0.65), rgba(140, 38, 56, 0.65));
+  border-color: var(--sangue);
+  box-shadow: 0 0 0 1px rgba(178, 58, 77, 0.35), 0 0 24px rgba(178, 58, 77, 0.22);
+}
+
+.btn--fantasma {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--borda);
+}
+
+.btn--pequeno {
+  min-height: 32px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.78rem;
+}
+
+.btn--largo {
+  width: 100%;
+}
+
+.btn[aria-pressed="true"] {
+  background: linear-gradient(180deg, var(--brilho-forte), var(--brilho));
+  border-color: var(--brilho-forte);
+  box-shadow: var(--glow);
+}
+
+/* Campos */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  font-family: var(--fonte-corpo);
+  font-size: 0.9rem;
+  color: var(--texto);
+  background: rgba(8, 4, 15, 0.6);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  transition: var(--transicao);
+}
+
+textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--brilho-forte);
+  box-shadow: var(--glow);
+}
+
+.mono {
+  font-family: var(--fonte-mono);
+  font-variant-numeric: tabular-nums;
+}

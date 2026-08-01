@@ -1,0 +1,506 @@
+/* Layouts das telas: hub, Mestre, Jogadores e Relógio. */
+
+/* --- estrutura comum ----------------------------------------------------- */
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--borda);
+  background: rgba(8, 4, 15, 0.55);
+  backdrop-filter: blur(6px);
+}
+
+.topo__titulo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.topo__titulo h1 {
+  font-size: 1.15rem;
+}
+
+.nav {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.nav a {
+  border-bottom: none;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+  border: 1px solid transparent;
+  border-radius: var(--raio);
+}
+
+.nav a:hover {
+  color: var(--texto);
+  border-color: var(--borda-forte);
+  background: rgba(123, 63, 191, 0.14);
+}
+
+.nav a[aria-current="page"] {
+  color: var(--texto);
+  border-color: var(--brilho-forte);
+  background: rgba(123, 63, 191, 0.22);
+}
+
+.conteudo {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  border: 1px solid var(--borda-forte);
+  color: var(--lilas);
+  background: rgba(123, 63, 191, 0.16);
+}
+
+.selo--ativo {
+  color: #d8ffe9;
+  border-color: rgba(79, 185, 138, 0.6);
+  background: rgba(79, 185, 138, 0.16);
+}
+
+.selo--ativo::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pocao);
+  box-shadow: 0 0 10px var(--pocao);
+  animation: pulso 1.8s ease-in-out infinite;
+}
+
+@keyframes pulso {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* --- hub ----------------------------------------------------------------- */
+
+.hub {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.5rem;
+}
+
+.hub__caixa {
+  width: min(940px, 100%);
+  text-align: center;
+}
+
+.hub__caixa h1 {
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: 1.05;
+  margin: 0.8rem 0 0.4rem;
+  background: linear-gradient(180deg, #f4ecff, var(--lilas));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hub__sub {
+  color: var(--texto-fraco);
+  margin: 0 0 2.2rem;
+}
+
+.hub__grade {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  text-align: left;
+}
+
+.cartao {
+  display: block;
+  padding: 1.3rem;
+  border-bottom: none;
+  color: inherit;
+  background: linear-gradient(180deg, var(--pedra-clara), var(--pedra));
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-g);
+  box-shadow: var(--sombra-painel);
+  transition: var(--transicao);
+}
+
+.cartao:hover {
+  transform: translateY(-3px);
+  border-color: var(--brilho-forte);
+  box-shadow: var(--sombra-painel), var(--glow);
+  color: inherit;
+}
+
+.cartao h2 {
+  font-size: 1.35rem;
+  margin: 0.5rem 0 0.35rem;
+}
+
+.cartao p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--texto-fraco);
+}
+
+.hub__nota {
+  margin-top: 2rem;
+  font-size: 0.82rem;
+  color: var(--texto-tenue);
+}
+
+/* --- grade do Mestre ----------------------------------------------------- */
+
+.mestre {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: start;
+}
+
+.bloco {
+  padding: 1.15rem 1.2rem 1.3rem;
+}
+
+.bloco__cabeca {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.7rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--borda);
+}
+
+.bloco__cabeca h2 {
+  font-size: 1.05rem;
+}
+
+.linha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.linha--fim {
+  justify-content: flex-end;
+}
+
+/* Campos dentro de uma linha compartilham o espaço com o botão ao lado. */
+.linha > input {
+  flex: 1 1 110px;
+  width: auto;
+}
+
+.pilha {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.contador {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(8, 4, 15, 0.45);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+.contador__valor {
+  font-family: var(--fonte-mono);
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.contador__valor--ouro {
+  color: var(--ouro);
+}
+
+.relogio-mini {
+  font-family: var(--fonte-mono);
+  font-size: clamp(2.2rem, 7vw, 3.4rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin: 0.2rem 0 0.9rem;
+}
+
+.relogio-mini--critico {
+  color: var(--sangue);
+}
+
+/* --- tela dos Jogadores -------------------------------------------------- */
+
+.jogadores {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.jogadores__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--borda);
+  background: rgba(8, 4, 15, 0.5);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.stat__valor {
+  font-family: var(--fonte-mono);
+  font-size: 1.6rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.stat__valor--ouro {
+  color: var(--ouro);
+}
+
+.stat__valor--tempo {
+  font-size: 2rem;
+}
+
+.jogadores__palco {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.palco__sala {
+  font-family: var(--fonte-display);
+  font-size: clamp(2.4rem, 8vw, 5rem);
+  line-height: 1.05;
+  margin: 0.6rem 0 0.5rem;
+  text-shadow: 0 0 42px rgba(157, 92, 240, 0.45);
+}
+
+.palco__sub {
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  color: var(--texto-fraco);
+  margin: 0;
+}
+
+/* Escolha e contagem da pausa, no palco dos jogadores. */
+.pausa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.6rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--borda);
+}
+
+.pausa__opcoes {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn--pausa {
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 150px;
+  padding: 0.9rem 1.4rem;
+}
+
+.btn--pausa strong {
+  font-family: var(--fonte-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.btn--pausa small {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+}
+
+.btn--pausa:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+  border-color: var(--borda);
+}
+
+.pausa__contagem {
+  font-size: clamp(3rem, 12vw, 7rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin: 0;
+  color: #f6efff;
+  text-shadow: 0 0 50px rgba(157, 92, 240, 0.45);
+}
+
+.pausa__contagem--fim {
+  color: var(--sangue);
+  animation: pulso 1.4s ease-in-out infinite;
+}
+
+/* Cotas de pausa, no painel do Mestre. */
+.cotas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cotas li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.88rem;
+  background: rgba(8, 4, 15, 0.45);
+  border: 1px solid var(--borda);
+  border-radius: 6px;
+}
+
+.cotas__esgotada {
+  color: var(--texto-tenue);
+  border-color: rgba(178, 58, 77, 0.4);
+}
+
+/* Acampamento: luz de fogueira em vez do brilho arcano da dungeon. */
+.palco--acampamento .palco__sala {
+  color: #ffeccc;
+  text-shadow: 0 0 48px rgba(217, 169, 92, 0.45);
+}
+
+.palco--acampamento .palco__sub {
+  color: var(--ouro);
+}
+
+/* --- tela do Relógio ----------------------------------------------------- */
+
+.relogio {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+  padding: 2rem 1.5rem 2.5rem;
+  text-align: center;
+}
+
+.relogio__digitos {
+  font-family: var(--fonte-mono);
+  font-size: clamp(4rem, 20vw, 13rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin: 0;
+  color: #f6efff;
+  text-shadow: 0 0 60px rgba(157, 92, 240, 0.5);
+}
+
+.relogio--critico .relogio__digitos {
+  color: #ffdde3;
+  text-shadow: 0 0 60px rgba(178, 58, 77, 0.55);
+}
+
+.relogio--estourado .relogio__digitos {
+  color: var(--sangue);
+  animation: pulso 1.4s ease-in-out infinite;
+}
+
+.relogio__meta {
+  display: flex;
+  gap: 2.4rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.stat__valor--texto {
+  font-family: var(--fonte-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.relogio__barra {
+  width: min(880px, 92vw);
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid var(--borda);
+  background: rgba(8, 4, 15, 0.6);
+  overflow: hidden;
+}
+
+.relogio__barra span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--brilho), var(--brilho-forte));
+  box-shadow: 0 0 18px rgba(157, 92, 240, 0.6);
+  transition: width 400ms linear;
+}
+
+.relogio--critico .relogio__barra span {
+  background: linear-gradient(90deg, #8e2c3c, var(--sangue));
+  box-shadow: 0 0 18px rgba(178, 58, 77, 0.6);
+}
+
+.relogio__rodape {
+  position: fixed;
+  top: 1rem;
+  right: 1.2rem;
+}
+
+@media (max-width: 640px) {
+  .conteudo,
+  .jogadores__barra,
+  .jogadores__palco {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .topo {
+    padding: 0.85rem 1rem;
+  }
+}

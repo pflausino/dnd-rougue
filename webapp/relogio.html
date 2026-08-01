@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Relógio | A Última Dungeon</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="relogio" data-relogio>
+    <nav class="nav relogio__rodape">
+      <a href="index.html">Painel</a>
+      <a href="mestre.html">Mestre</a>
+    </nav>
+
+    <span class="rotulo" data-estado>Pausado</span>
+    <p class="relogio__digitos mono" data-digitos>04:00:00</p>
+
+    <div class="relogio__barra"><span data-barra></span></div>
+
+    <div class="relogio__meta">
+      <div class="stat">
+        <span class="rotulo">Decorrido</span>
+        <span class="stat__valor mono" data-decorrido>00:00:00</span>
+      </div>
+      <div class="stat">
+        <span class="rotulo">Run</span>
+        <span class="stat__valor" data-run>1</span>
+      </div>
+      <div class="stat">
+        <span class="rotulo">Sessão</span>
+        <span class="stat__valor mono" data-duracao>04:00:00</span>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/state.js"></script>
+  <script src="js/relogio.js"></script>
+</body>
+</html>

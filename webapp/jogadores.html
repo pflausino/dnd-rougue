@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jogadores | A Última Dungeon</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="jogadores">
+    <header class="jogadores__barra">
+      <span class="marca">A Última Dungeon</span>
+
+      <div class="stat">
+        <span class="rotulo">Run</span>
+        <span class="stat__valor" data-run>1</span>
+      </div>
+
+      <div class="stat">
+        <span class="rotulo">Ouro do grupo</span>
+        <span class="stat__valor stat__valor--ouro"><span data-ouro>0</span> PO</span>
+      </div>
+
+      <div class="stat">
+        <span class="rotulo">Tempo restante</span>
+        <span class="stat__valor stat__valor--tempo mono" data-tempo>04:00:00</span>
+      </div>
+
+      <nav class="nav">
+        <a href="index.html">Painel</a>
+        <a href="../loja/index.html">Loja</a>
+      </nav>
+    </header>
+
+    <main class="jogadores__palco" data-palco>
+      <div>
+        <span class="rotulo" data-etapa>Entre as runs</span>
+        <h1 class="palco__sala" data-titulo>Acampamento</h1>
+        <p class="palco__sub" data-subtitulo>Lojas abertas</p>
+
+        <section class="pausa" data-pausa hidden>
+          <span class="rotulo" data-pausa-rotulo>Escolham a pausa desta morte</span>
+          <p class="pausa__contagem mono" data-pausa-contagem hidden>05:00</p>
+          <div class="pausa__opcoes" data-pausa-opcoes></div>
+          <button class="btn btn--primario" type="button" data-pausa-encerrar hidden>
+            Retomar a aventura
+          </button>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/jogadores.js"></script>
+</body>
+</html>
