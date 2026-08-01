@@ -35,3 +35,11 @@ Bênçãos são efeitos especiais que alteram regras específicas da expedição
 > Poder, memória e instinto convergem em sua forma definitiva.
 
 **Efeito:** todos os personagens do grupo avançam imediatamente para o **nível 6**.
+
+## Pedra de Íria
+
+> Sete véus se abrem diante daqueles reconhecidos pela pedra.
+
+**Preço:** **100 PO**.
+
+**Efeito:** ao adquirir a pedra, o grupo desbloqueia permanentemente **O Véu Entre Vidas**, obtendo acesso à loja de Íria Sete-Véus e às suas mercadorias arcanas.
