@@ -19,6 +19,11 @@
 
     <div class="relogio__barra"><span data-barra></span></div>
 
+    <div class="pausa-mini" data-pausa hidden>
+      <span class="rotulo" data-pausa-rotulo>Pausa em andamento</span>
+      <span class="pausa-mini__contagem mono" data-pausa-contagem>05:00</span>
+    </div>
+
     <div class="relogio__meta">
       <div class="stat">
         <span class="rotulo">Decorrido</span>
@@ -33,9 +38,22 @@
         <span class="stat__valor mono" data-duracao>04:00:00</span>
       </div>
     </div>
+
+    <!-- Tabela que o mestre escolher projetar -->
+    <section class="painel exibicao" data-exibicao hidden>
+      <span class="rotulo" data-exibicao-versao></span>
+      <h2 data-exibicao-titulo></h2>
+      <p class="exibicao__instrucao" data-exibicao-instrucao></p>
+      <table class="tabela tabela--projetada">
+        <thead><tr data-exibicao-cabeca></tr></thead>
+        <tbody data-exibicao-corpo></tbody>
+      </table>
+      <p class="exibicao__nota" data-exibicao-nota></p>
+    </section>
   </main>
 
   <script src="js/state.js"></script>
+  <script src="data/tabelas.js"></script>
   <script src="js/relogio.js"></script>
 </body>
 </html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A Última Provisão | A Última Dungeon</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo__titulo">
+      <span class="marca">A Última Provisão</span>
+      <h1>Bram Barbacobre</h1>
+    </div>
+    <div class="linha" style="align-items:center;gap:1.2rem">
+      <div class="stat">
+        <span class="rotulo">Ouro do grupo</span>
+        <span class="stat__valor stat__valor--ouro"><span data-ouro>0</span> PO</span>
+      </div>
+      <nav class="nav">
+        <a href="jogadores.html">Voltar ao acampamento</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="conteudo">
+    <!-- Balcão: as três opções da loja -->
+    <section class="balcao" data-balcao>
+      <button class="balcao__opcao" type="button" data-secao="equipamentos">
+        <span class="rotulo">Prateleiras</span>
+        <strong>Equipamentos</strong>
+        <small>Armas, armaduras, munições e poções</small>
+      </button>
+
+      <button class="balcao__opcao" type="button" data-secao="bau">
+        <span class="rotulo">Aposta</span>
+        <strong>Baú de Itens Mágicos</strong>
+        <small><span data-preco-bau>300</span> PO por rolagem na tabela</small>
+      </button>
+
+      <button class="balcao__opcao" type="button" data-secao="bencao">
+        <span class="rotulo">Oferta da run</span>
+        <strong>Bênção</strong>
+        <small data-chamada-bencao>Uma bênção por tentativa</small>
+      </button>
+    </section>
+
+    <!-- Equipamentos -->
+    <section class="secao" data-painel="equipamentos" hidden>
+      <div class="secao__cabeca">
+        <h2>Equipamentos</h2>
+        <button class="btn btn--fantasma btn--pequeno" type="button" data-voltar>Voltar ao balcão</button>
+      </div>
+      <div data-catalogo></div>
+    </section>
+
+    <!-- Baú de itens mágicos -->
+    <section class="secao" data-painel="bau" hidden>
+      <div class="secao__cabeca">
+        <h2>Baú de Itens Mágicos</h2>
+        <button class="btn btn--fantasma btn--pequeno" type="button" data-voltar>Voltar ao balcão</button>
+      </div>
+
+      <div class="painel bloco bau">
+        <p class="bau__texto">
+          Bram destranca o baú e afasta as mãos: o que sair, saiu. Cada rolagem na
+          tabela custa <strong><span data-preco-bau>300</span> PO</strong> e é feita na
+          mesa, pelo mestre. A loja só cobra o ouro.
+        </p>
+        <div class="linha">
+          <button class="btn btn--ouro" type="button" data-comprar-bau>
+            Pagar rolagem — <span data-preco-bau>300</span> PO
+          </button>
+        </div>
+        <p class="vazio" data-aviso-bau hidden></p>
+      </div>
+    </section>
+
+    <!-- Bênção -->
+    <section class="secao" data-painel="bencao" hidden>
+      <div class="secao__cabeca">
+        <h2>Bênção</h2>
+        <button class="btn btn--fantasma btn--pequeno" type="button" data-voltar>Voltar ao balcão</button>
+      </div>
+      <div class="bencao-grade" data-bencao></div>
+    </section>
+  </main>
+
+  <div class="recado" data-recado role="status" aria-live="polite"></div>
+
+  <script src="js/state.js"></script>
+  <script src="js/guarda-loja.js"></script>
+  <script src="data/equipamentos.js"></script>
+  <script src="data/bencaos.js"></script>
+  <script src="js/bram.js"></script>
+</body>
+</html>

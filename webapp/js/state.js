@@ -9,8 +9,11 @@
 (function (global) {
   "use strict";
 
-  var CHAVE = "ultima-dungeon:estado";
-  var NOME_CANAL = "ultima-dungeon";
+  /* A versão entra na chave e no canal: telas de versões diferentes (uma aba
+   * antiga que ficou aberta, por exemplo) não disputam o mesmo estado. */
+  var VERSAO = 6;
+  var CHAVE = "ultima-dungeon:estado:v" + VERSAO;
+  var NOME_CANAL = "ultima-dungeon:v" + VERSAO;
   var INTERVALO_POLL = 500;
 
   var MINUTO = 60 * 1000;
@@ -22,6 +25,43 @@
     { id: "dungeon", nome: "Dungeon" },
     { id: "acampamento", nome: "Acampamento" }
   ];
+
+  /* Lojas do acampamento, conforme referencias/loja.md. A imagem é opcional:
+   * sem o arquivo, a tela cai no retrato de reserva com a inicial. */
+  var LOJAS = [
+    {
+      id: "bram",
+      mercador: "Bram Barbacobre",
+      nome: "A Última Provisão",
+      chamada: "Armas, armaduras, poções e equipamento",
+      imagem: "../loja/assets/personagens/bram-barbacobre.png",
+      pagina: "bram.html"
+    },
+    {
+      id: "iria",
+      mercador: "Íria Sete-Véus",
+      nome: "O Véu Entre Vidas",
+      chamada: "Itens mágicos, bênçãos e encantamentos",
+      imagem: "../loja/assets/personagens/iria-sete-veus.png",
+      pagina: "catalogo.html?loja=iria",
+      /* Só abre depois que o grupo comprar a Pedra de Íria. */
+      exigeAcesso: "lojaIria"
+    }
+  ];
+
+  /* Preço da rolagem no baú de itens mágicos de Bram. O item em si é sorteado
+   * na mesa, à mão; o app apenas cobra o ouro. */
+  var PRECO_BAU = 300;
+
+  /* Desconto nas bênçãos de Bram quando o grupo já tem acesso à loja de Íria. */
+  var DESCONTO_BENCAO = 0.25;
+
+  function lojaPorId(id) {
+    for (var i = 0; i < LOJAS.length; i += 1) {
+      if (LOJAS[i].id === id) return LOJAS[i];
+    }
+    return null;
+  }
 
   var DURACAO_PADRAO_MS = 4 * HORA;
 
@@ -35,7 +75,7 @@
 
   function estadoInicial() {
     return {
-      versao: 3,
+      versao: VERSAO,
       atualizadoEm: 0,
       run: 1,
       mortes: 0,
@@ -47,6 +87,24 @@
         duracaoMs: DURACAO_PADRAO_MS
       },
       modo: "acampamento",
+      /* Interruptores que o mestre liga na mesa conforme o grupo progride. */
+      mecanicas: {
+        lojaIria: false
+      },
+      /* O que o mestre está projetando na tela do Relógio, além do cronômetro.
+       * id nulo = só o relógio. */
+      exibicao: {
+        id: null,
+        variante: null
+      },
+      /* Bênçãos que o grupo já conquistou, por id, na ordem de aquisição. */
+      bencaos: [],
+      /* Bênção que Bram oferece nesta run. Sorteada uma vez por run. */
+      ofertaBencao: {
+        run: 0,
+        id: null,
+        comprada: false
+      },
       pausa: {
         /* pendente: houve um TPK e o grupo ainda não escolheu a pausa. */
         pendente: false,
@@ -65,7 +123,7 @@
       var bruto = global.localStorage.getItem(CHAVE);
       if (!bruto) return estadoInicial();
       var salvo = JSON.parse(bruto);
-      if (!salvo || salvo.versao !== 3) return estadoInicial();
+      if (!salvo || salvo.versao !== VERSAO) return estadoInicial();
       return mesclar(estadoInicial(), salvo);
     } catch (erro) {
       return estadoInicial();
@@ -141,9 +199,14 @@
     return estado;
   }
 
-  /* Compara o conteúdo, não só o carimbo: é a garantia final de convergência. */
+  /* Compara o conteúdo, não só o carimbo: é a garantia final de convergência.
+   *
+   * Estados de outra versão são ignorados. Sem essa trava, uma aba com o código
+   * antigo ainda aberta mesclaria o estado novo sobre o formato dela e, na
+   * primeira gravação, apagaria os campos que ela não conhece. */
   function receberExterno(novo) {
-    if (!novo || JSON.stringify(novo) === JSON.stringify(estado)) return;
+    if (!novo || novo.versao !== estado.versao) return;
+    if (JSON.stringify(novo) === JSON.stringify(estado)) return;
     estado = mesclar(estadoInicial(), novo);
     ultimoCarimbo = Math.max(ultimoCarimbo, estado.atualizadoEm || 0);
     notificar("remoto");
@@ -273,6 +336,38 @@
     definirOuro: function (valor) {
       atualizar({ ouro: Math.max(0, Math.round(valor) || 0) });
     },
+    /* Cobra uma compra. Devolve false, sem gastar nada, se o ouro não cobrir. */
+    gastarOuro: function (valor) {
+      if (valor > estado.ouro) return false;
+      atualizar({ ouro: estado.ouro - valor });
+      return true;
+    },
+    /* id nulo devolve a tela do Relógio ao cronômetro puro. */
+    definirExibicao: function (id, variante) {
+      atualizar({ exibicao: { id: id || null, variante: variante || null } });
+    },
+    definirMecanica: function (chave, ligada) {
+      var patch = {};
+      patch[chave] = !!ligada;
+      atualizar({ mecanicas: patch });
+    },
+    definirOfertaBencao: function (id, run) {
+      atualizar({ ofertaBencao: { id: id, run: run, comprada: false } });
+    },
+    adicionarBencao: function (id) {
+      if (!id || estado.bencaos.indexOf(id) >= 0) return;
+      atualizar({ bencaos: estado.bencaos.concat([id]) });
+    },
+    removerBencao: function (id) {
+      atualizar({
+        bencaos: estado.bencaos.filter(function (item) {
+          return item !== id;
+        })
+      });
+    },
+    marcarBencaoComprada: function () {
+      atualizar({ ofertaBencao: { comprada: true } });
+    },
     ajustarRun: function (delta) {
       atualizar(function (atual) {
         return { run: Math.max(1, atual.run + delta) };
@@ -324,7 +419,14 @@
       atualizar({ pausa: { pendente: false } });
     },
     definirModo: function (id) {
-      atualizar({ modo: id === "acampamento" ? "acampamento" : "dungeon" });
+      var alvo = id === "acampamento" ? "acampamento" : "dungeon";
+      atualizar({ modo: alvo });
+      if (alvo !== "dungeon") return;
+
+      /* Mandar o grupo de volta à dungeon encerra a pausa em andamento e
+       * descarta uma escolha de pausa que ainda não foi feita. */
+      if (pausaAtiva()) acoes.encerrarPausa();
+      else if (estado.pausa.pendente) acoes.pularPausa();
     },
     reiniciarTudo: function () {
       estado = estadoInicial();
@@ -337,6 +439,10 @@
   global.Dungeon = {
     MODOS_PAINEL: MODOS_PAINEL,
     PAUSAS: PAUSAS,
+    LOJAS: LOJAS,
+    PRECO_BAU: PRECO_BAU,
+    DESCONTO_BENCAO: DESCONTO_BENCAO,
+    lojaPorId: lojaPorId,
     DURACAO_PADRAO_MS: DURACAO_PADRAO_MS,
     get: function () {
       return estado;

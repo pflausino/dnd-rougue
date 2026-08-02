@@ -294,6 +294,95 @@
   font-size: 2rem;
 }
 
+/* --- tira de bênçãos conquistadas ---------------------------------------- */
+
+.tira-bencaos {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 2rem;
+  border-bottom: 1px solid var(--borda);
+  background: rgba(8, 4, 15, 0.3);
+}
+
+.tira-bencaos__lista {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.bencao-ficha {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.8rem 0.35rem 0.4rem;
+  font-family: var(--fonte-corpo);
+  color: var(--texto);
+  cursor: pointer;
+  background: linear-gradient(180deg, rgba(33, 21, 58, 0.9), rgba(24, 15, 42, 0.9));
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  transition: var(--transicao);
+}
+
+.bencao-ficha:hover {
+  border-color: var(--brilho-forte);
+  box-shadow: var(--glow);
+}
+
+.bencao-ficha:focus-visible {
+  outline: 2px solid var(--brilho-forte);
+  outline-offset: 2px;
+}
+
+.bencao-ficha__icone {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, rgba(123, 63, 191, 0.35), rgba(8, 4, 15, 0.9));
+}
+
+.bencao-ficha__icone img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bencao-ficha__texto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.15;
+}
+
+.bencao-ficha__texto strong {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.bencao-ficha__texto small {
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+}
+
+.modal__caixa.modal__caixa--bencao {
+  flex-direction: row;
+  gap: 1.2rem;
+  width: min(600px, 92vw);
+}
+
+.bencao__icone--modal {
+  width: 110px;
+  height: 110px;
+  flex: 0 0 auto;
+}
+
 .jogadores__palco {
   flex: 1;
   display: grid;
@@ -375,6 +464,586 @@
 .pausa__contagem--fim {
   color: var(--sangue);
   animation: pulso 1.4s ease-in-out infinite;
+}
+
+/* Seleção de lojas, no acampamento. */
+.lojas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 1.8rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--borda);
+}
+
+/* Com as lojas em cena o título cede espaço, para a tela não precisar rolar. */
+.palco--acampamento .palco__sala {
+  font-size: clamp(1.9rem, 5vw, 3.2rem);
+}
+
+.lojas__grade {
+  display: flex;
+  gap: 1.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.loja-cartao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  width: 230px;
+  padding: 0.9rem 0.9rem 1.2rem;
+  border-bottom: none;
+  color: inherit;
+  background: linear-gradient(180deg, var(--pedra-clara), var(--pedra));
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-g);
+  box-shadow: var(--sombra-painel);
+  transition: var(--transicao);
+}
+
+.loja-cartao:hover {
+  transform: translateY(-4px);
+  color: inherit;
+  border-color: var(--brilho-forte);
+  box-shadow: var(--sombra-painel), var(--glow);
+}
+
+.loja-cartao strong {
+  margin-top: 0.7rem;
+  font-family: var(--fonte-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.loja-cartao__mercador {
+  font-size: 0.9rem;
+  color: var(--lilas);
+}
+
+.loja-cartao small {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: var(--texto-fraco);
+}
+
+/* Retrato do mercador: moldura vertical, arte alinhada ao topo e dissolvida
+ * na base para fundir com o cartão. */
+.loja-cartao__retrato {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 210px;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--borda-forte);
+  background: radial-gradient(circle at 50% 25%, rgba(123, 63, 191, 0.35), rgba(8, 4, 15, 0.95));
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.65);
+}
+
+.loja-cartao__retrato::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 38%;
+  background: linear-gradient(180deg, transparent, var(--pedra));
+  pointer-events: none;
+}
+
+.loja-cartao__retrato--grande {
+  width: 220px;
+  height: 280px;
+  flex: 0 0 auto;
+}
+
+.loja-cartao__retrato img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.loja-cartao__inicial {
+  font-family: var(--fonte-display);
+  font-size: 3.2rem;
+  font-weight: 600;
+  color: var(--lilas);
+  opacity: 0.65;
+}
+
+.loja-cartao:hover .loja-cartao__retrato {
+  border-color: var(--brilho-forte);
+}
+
+.vazio {
+  margin: 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--texto-tenue);
+}
+
+/* Loja ainda inacessível: moldura vazia, sem retrato nem nome — apenas a
+ * dica de que existe outra loja no acampamento. */
+.loja-cartao--travada {
+  cursor: default;
+  border-style: dashed;
+  background: rgba(8, 4, 15, 0.35);
+  box-shadow: none;
+}
+
+.loja-cartao--travada:hover {
+  transform: none;
+  border-color: var(--borda);
+  box-shadow: none;
+}
+
+.loja-cartao--travada .loja-cartao__retrato {
+  border-style: dashed;
+  background: rgba(8, 4, 15, 0.55);
+  box-shadow: none;
+}
+
+.loja-cartao--travada .loja-cartao__inicial {
+  font-size: 4rem;
+  opacity: 0.22;
+}
+
+.loja-cartao--travada strong {
+  color: var(--texto-tenue);
+  opacity: 0.55;
+}
+
+.loja-cartao__trava {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--texto-tenue);
+}
+
+/* --- interruptor de mecânica, no painel do Mestre ------------------------ */
+
+.toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.7rem 0.8rem;
+  cursor: pointer;
+  background: rgba(8, 4, 15, 0.45);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  transition: var(--transicao);
+}
+
+.toggle:hover {
+  border-color: var(--borda-forte);
+}
+
+.toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle__marca {
+  position: relative;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 22px;
+  margin-top: 2px;
+  border-radius: 999px;
+  border: 1px solid var(--borda-forte);
+  background: rgba(0, 0, 0, 0.5);
+  transition: var(--transicao);
+}
+
+.toggle__marca::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--texto-tenue);
+  transition: var(--transicao);
+}
+
+.toggle input:checked + .toggle__marca {
+  background: linear-gradient(180deg, var(--brilho-forte), var(--brilho));
+  border-color: var(--brilho-forte);
+  box-shadow: var(--glow);
+}
+
+.toggle input:checked + .toggle__marca::after {
+  left: 21px;
+  background: #fff;
+}
+
+.toggle input:focus-visible + .toggle__marca {
+  outline: 2px solid var(--brilho-forte);
+  outline-offset: 2px;
+}
+
+.toggle__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.toggle__texto strong {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.toggle__texto small {
+  font-size: 0.78rem;
+  color: var(--texto-fraco);
+}
+
+/* --- loja de Bram -------------------------------------------------------- */
+
+.balcao {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.balcao__opcao {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.6rem 1.4rem 1.8rem;
+  text-align: left;
+  font-family: var(--fonte-corpo);
+  color: var(--texto);
+  cursor: pointer;
+  background: linear-gradient(180deg, var(--pedra-clara), var(--pedra));
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-g);
+  box-shadow: var(--sombra-painel);
+  transition: var(--transicao);
+}
+
+.balcao__opcao:hover {
+  transform: translateY(-3px);
+  border-color: var(--brilho-forte);
+  box-shadow: var(--sombra-painel), var(--glow);
+}
+
+.balcao__opcao strong {
+  font-family: var(--fonte-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.balcao__opcao small {
+  font-size: 0.85rem;
+  color: var(--texto-fraco);
+}
+
+.secao__cabeca {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.secao__cabeca h2 {
+  font-size: 1.5rem;
+}
+
+.categoria {
+  margin-bottom: 1rem;
+}
+
+.categoria .bloco__cabeca h3 {
+  font-family: var(--fonte-display);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Tabelas largas rolam dentro do próprio bloco. */
+.tabela-rolagem {
+  overflow-x: auto;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tabela th {
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+  border-bottom: 1px solid var(--borda);
+  white-space: nowrap;
+}
+
+.tabela td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid rgba(52, 32, 79, 0.5);
+  vertical-align: middle;
+}
+
+.tabela tbody tr:hover {
+  background: rgba(123, 63, 191, 0.1);
+}
+
+.tabela__nome {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tabela__traducao {
+  display: block;
+  font-size: 0.74rem;
+  color: var(--lilas);
+  opacity: 0.75;
+}
+
+.tabela__preco {
+  text-align: right;
+  color: var(--ouro);
+  white-space: nowrap;
+}
+
+.tabela td:last-child {
+  text-align: right;
+}
+
+.bau {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.4rem 1.5rem 1.6rem;
+  max-width: 620px;
+}
+
+.bau__texto {
+  margin: 0;
+  color: var(--texto-fraco);
+}
+
+.bencao-grade {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  align-items: start;
+}
+
+.bencao {
+  display: flex;
+  gap: 1.2rem;
+  padding: 1.3rem 1.4rem 1.4rem;
+}
+
+.bencao--destaque {
+  border-color: var(--ouro-fraco);
+  box-shadow: var(--sombra-painel), 0 0 26px rgba(217, 169, 92, 0.14);
+}
+
+.bencao__icone {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: var(--raio);
+  border: 1px solid var(--borda-forte);
+  background: radial-gradient(circle at 50% 40%, rgba(123, 63, 191, 0.3), rgba(8, 4, 15, 0.9));
+}
+
+.bencao__icone img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bencao__corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.bencao__corpo h3 {
+  font-size: 1.35rem;
+}
+
+.bencao__lema {
+  margin: 0;
+  font-family: var(--fonte-display);
+  font-style: italic;
+  color: var(--lilas);
+}
+
+.bencao__efeito {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--texto-fraco);
+}
+
+.bencao__restricao {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--sangue);
+}
+
+.bencao__rodape {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.bencao__preco {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ouro);
+}
+
+.bencao__preco s {
+  margin-right: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--texto-tenue);
+}
+
+/* --- botão discreto de canto e modal ------------------------------------- */
+
+.botao-canto {
+  position: fixed;
+  left: 1.2rem;
+  bottom: 1.2rem;
+  padding: 0.45rem 0.85rem;
+  font-family: var(--fonte-corpo);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--texto-tenue);
+  background: rgba(8, 4, 15, 0.5);
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: var(--transicao);
+}
+
+.botao-canto:hover {
+  opacity: 1;
+  color: var(--ouro);
+  border-color: var(--ouro-fraco);
+}
+
+.botao-canto:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--brilho-forte);
+  outline-offset: 2px;
+}
+
+.modal {
+  padding: 0;
+  color: var(--texto);
+  background: transparent;
+  border: none;
+}
+
+.modal::backdrop {
+  background: rgba(4, 2, 8, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.modal__caixa {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: min(420px, 90vw);
+  padding: 1.5rem 1.6rem 1.6rem;
+  background: linear-gradient(180deg, var(--pedra-clara), var(--pedra));
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio-g);
+  box-shadow: var(--sombra-painel), var(--glow);
+}
+
+.modal__caixa h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.modal__saldo {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--texto-fraco);
+}
+
+.modal__saldo strong {
+  color: var(--ouro);
+}
+
+/* Recado de compra. */
+.recado {
+  position: fixed;
+  left: 50%;
+  bottom: 2rem;
+  transform: translateX(-50%) translateY(14px);
+  padding: 0.7rem 1.3rem;
+  font-size: 0.92rem;
+  border-radius: 999px;
+  border: 1px solid var(--brilho-forte);
+  background: rgba(30, 15, 55, 0.96);
+  box-shadow: var(--glow);
+  opacity: 0;
+  pointer-events: none;
+  transition: var(--transicao);
+  z-index: 10;
+}
+
+.recado--visivel {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.recado--falha {
+  border-color: var(--sangue);
+  box-shadow: 0 0 0 1px rgba(178, 58, 77, 0.4), 0 0 24px rgba(178, 58, 77, 0.25);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Catálogo de uma loja. */
+.catalogo__vitrine {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+  flex-wrap: wrap;
+  padding: 1.6rem 1.8rem;
+}
+
+.catalogo__vitrine h2 {
+  font-size: 1.8rem;
+  margin: 0.3rem 0 0.5rem;
 }
 
 /* Cotas de pausa, no painel do Mestre. */
@@ -484,6 +1153,94 @@
 .relogio--critico .relogio__barra span {
   background: linear-gradient(90deg, #8e2c3c, var(--sangue));
   box-shadow: 0 0 18px rgba(178, 58, 77, 0.6);
+}
+
+/* Pausa na tela do Relógio: presente, mas menor que o cronômetro da sessão. */
+.pausa-mini {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.5rem 1.2rem;
+  border: 1px solid var(--borda-forte);
+  border-radius: 999px;
+  background: rgba(123, 63, 191, 0.14);
+  box-shadow: var(--glow);
+}
+
+.pausa-mini__contagem {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--lilas);
+}
+
+.pausa-mini__contagem--fim {
+  color: var(--sangue);
+  animation: pulso 1.4s ease-in-out infinite;
+}
+
+/* Com uma tabela projetada, o cronômetro cede o palco. */
+.relogio--com-exibicao {
+  justify-content: flex-start;
+  gap: 0.8rem;
+  padding-top: 2rem;
+}
+
+.relogio--com-exibicao .relogio__digitos {
+  font-size: clamp(2.6rem, 8vw, 5rem);
+}
+
+.exibicao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: min(760px, 92vw);
+  padding: 1.1rem 1.6rem 1.2rem;
+  text-align: center;
+}
+
+.exibicao h2 {
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  margin: 0;
+}
+
+.exibicao__instrucao {
+  margin: 0 0 0.6rem;
+  font-size: 0.95rem;
+  color: var(--texto-fraco);
+}
+
+.exibicao__nota {
+  margin: 0.7rem 0 0;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--texto-tenue);
+}
+
+.tabela--projetada {
+  width: 100%;
+  font-size: clamp(0.95rem, 2vw, 1.35rem);
+}
+
+.tabela--projetada th {
+  font-size: 0.72rem;
+  text-align: center;
+}
+
+.tabela--projetada td {
+  padding: 0.38rem 0.7rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.tabela--projetada tbody tr:hover {
+  background: none;
+}
+
+.tabela--projetada__faixa {
+  color: var(--ouro);
 }
 
 .relogio__rodape {

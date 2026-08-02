@@ -29,9 +29,14 @@
 
       <nav class="nav">
         <a href="index.html">Painel</a>
-        <a href="../loja/index.html">Loja</a>
       </nav>
     </header>
+
+    <!-- Bênçãos conquistadas, sempre à vista durante a run -->
+    <section class="tira-bencaos" data-tira-bencaos hidden>
+      <span class="rotulo">Bênçãos do grupo</span>
+      <div class="tira-bencaos__lista" data-tira-lista></div>
+    </section>
 
     <main class="jogadores__palco" data-palco>
       <div>
@@ -47,11 +52,62 @@
             Retomar a aventura
           </button>
         </section>
+
+        <section class="lojas" data-lojas hidden>
+          <span class="rotulo">Lojas do acampamento</span>
+          <div class="lojas__grade" data-lojas-grade></div>
+        </section>
       </div>
     </main>
+
+    <button class="botao-canto" type="button" data-abrir-ouro>+ Ouro do loot</button>
   </div>
 
+  <dialog class="modal" data-modal-ouro>
+    <form method="dialog" class="modal__caixa" data-form-ouro>
+      <span class="rotulo">Registrar loot</span>
+      <h2>Ouro encontrado</h2>
+
+      <div class="linha" data-atalhos-ouro></div>
+
+      <label class="campo">
+        <span class="rotulo">Quanto o grupo recolheu</span>
+        <input type="number" min="1" step="1" inputmode="numeric" data-valor-ouro placeholder="0">
+      </label>
+
+      <p class="modal__saldo">
+        Ouro do grupo: <strong class="mono"><span data-ouro-atual>0</span> PO</strong>
+      </p>
+
+      <div class="linha linha--fim">
+        <button class="btn btn--fantasma" type="button" data-fechar-ouro>Cancelar</button>
+        <button class="btn btn--ouro" type="submit">Adicionar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" data-modal-bencao>
+    <div class="modal__caixa modal__caixa--bencao">
+      <span class="bencao__icone bencao__icone--modal" data-bencao-icone></span>
+      <div class="bencao__corpo">
+        <span class="rotulo" data-bencao-tipo></span>
+        <h2 data-bencao-nome></h2>
+        <p class="bencao__lema" data-bencao-lema></p>
+        <p class="bencao__efeito" data-bencao-efeito></p>
+        <p class="bencao__restricao" data-bencao-restricao hidden></p>
+        <p class="vazio" data-bencao-tipo-nota></p>
+        <div class="linha linha--fim">
+          <button class="btn btn--fantasma" type="button" data-fechar-bencao>Fechar</button>
+          <button class="btn btn--ouro" type="button" data-consumir-bencao hidden>Consumir</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="recado" data-recado role="status" aria-live="polite"></div>
+
   <script src="js/state.js"></script>
+  <script src="data/bencaos.js"></script>
   <script src="js/jogadores.js"></script>
 </body>
 </html>

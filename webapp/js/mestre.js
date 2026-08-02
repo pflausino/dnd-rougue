@@ -21,7 +21,12 @@
     pausaContagem: document.querySelector("[data-pausa-contagem]"),
     pausaEncerrar: document.querySelector("[data-pausa-encerrar]"),
     pausaPular: document.querySelector("[data-pausa-pular]"),
-    cotas: document.querySelector("[data-cotas]")
+    cotas: document.querySelector("[data-cotas]"),
+    ofertaBencao: document.querySelector("[data-oferta-bencao]"),
+    exibicoes: document.querySelector("[data-exibicoes]"),
+    exibicaoEstado: document.querySelector("[data-exibicao-estado]"),
+    variantes: document.querySelector("[data-variantes]"),
+    variantesCampo: document.querySelector("[data-variantes-campo]")
   };
 
   var LIMITE_CRITICO_MS = 15 * 60 * 1000;
@@ -53,6 +58,83 @@
     el.alternar.textContent = atual.relogio.rodando ? "Pausar" : "Iniciar";
     el.estadoRelogio.textContent = atual.relogio.rodando ? "Em andamento" : "Pausado";
     el.estadoRelogio.classList.toggle("selo--ativo", atual.relogio.rodando);
+  }
+
+  /* --- o que projetar na tela do Relógio --------------------------------- */
+
+  /* "Só o cronômetro" é a primeira opção; as demais vêm de data/tabelas.js. */
+  var botoesExibicao = [{ id: null, nome: "Só o cronômetro", exibicao: null }]
+    .concat(
+      window.EXIBICOES.map(function (exibicao) {
+        return { id: exibicao.id, nome: exibicao.nome, exibicao: exibicao };
+      })
+    )
+    .map(function (opcao) {
+      var botao = document.createElement("button");
+      botao.type = "button";
+      botao.className = "btn btn--pequeno";
+      botao.textContent = opcao.nome;
+      botao.setAttribute("aria-pressed", "false");
+      botao.addEventListener("click", function () {
+        /* Ao escolher uma tabela, já entra na primeira versão dela. */
+        var variante = opcao.exibicao && opcao.exibicao.variantes ? opcao.exibicao.variantes[0].id : null;
+        D.acoes.definirExibicao(opcao.id, variante);
+      });
+      el.exibicoes.appendChild(botao);
+      return Object.assign({ botao: botao }, opcao);
+    });
+
+  var botoesVariante = [];
+
+  function montarVariantes(exibicao, atual) {
+    el.variantes.innerHTML = "";
+    botoesVariante = (exibicao && exibicao.variantes ? exibicao.variantes : []).map(function (variante) {
+      var botao = document.createElement("button");
+      botao.type = "button";
+      botao.className = "btn btn--pequeno";
+      botao.textContent = variante.nome;
+      botao.setAttribute("aria-pressed", variante.id === atual ? "true" : "false");
+      botao.addEventListener("click", function () {
+        D.acoes.definirExibicao(exibicao.id, variante.id);
+      });
+      el.variantes.appendChild(botao);
+      return { id: variante.id, botao: botao };
+    });
+  }
+
+  var exibicaoMontada = null;
+
+  function renderizarExibicao(estado) {
+    var escolhida = estado.exibicao.id;
+
+    botoesExibicao.forEach(function (opcao) {
+      opcao.botao.setAttribute("aria-pressed", opcao.id === escolhida ? "true" : "false");
+    });
+
+    var exibicao = escolhida ? window.exibicaoPorId(escolhida) : null;
+
+    if (exibicaoMontada !== escolhida) {
+      montarVariantes(exibicao, estado.exibicao.variante);
+      exibicaoMontada = escolhida;
+    }
+
+    botoesVariante.forEach(function (item) {
+      item.botao.setAttribute("aria-pressed", item.id === estado.exibicao.variante ? "true" : "false");
+    });
+
+    el.variantesCampo.hidden = botoesVariante.length === 0;
+
+    if (!exibicao) {
+      el.exibicaoEstado.textContent = "Só o cronômetro";
+      el.exibicaoEstado.classList.remove("selo--ativo");
+      return;
+    }
+
+    var variante = (exibicao.variantes || []).filter(function (item) {
+      return item.id === estado.exibicao.variante;
+    })[0];
+    el.exibicaoEstado.textContent = exibicao.nome + (variante ? " · " + variante.nome : "");
+    el.exibicaoEstado.classList.add("selo--ativo");
   }
 
   /* Uma linha por duração: usadas e cota restante na sessão. */
@@ -95,9 +177,32 @@
     });
   }
 
+  function renderizarMecanicas(estado) {
+    document.querySelectorAll("[data-mecanica]").forEach(function (caixa) {
+      caixa.checked = Boolean(estado.mecanicas[caixa.getAttribute("data-mecanica")]);
+    });
+
+    var oferta = window.BENCAOS.filter(function (bencao) {
+      return bencao.id === estado.ofertaBencao.id;
+    })[0];
+
+    if (!oferta || estado.ofertaBencao.run !== estado.run) {
+      el.ofertaBencao.textContent = "sorteada quando abrirem a loja";
+      return;
+    }
+
+    var desconto = estado.mecanicas.lojaIria
+      ? Math.round(oferta.preco * (1 - D.DESCONTO_BENCAO))
+      : oferta.preco;
+    el.ofertaBencao.textContent =
+      oferta.nome + " — " + desconto + " PO" + (estado.ofertaBencao.comprada ? " (adquirida)" : "");
+  }
+
   function renderizar(estado) {
     renderizarTempo(estado);
     renderizarPausa(estado);
+    renderizarExibicao(estado);
+    renderizarMecanicas(estado);
 
     el.runValor.textContent = String(estado.run);
     el.mortes.textContent = estado.mortes === 1 ? "1 TPK" : estado.mortes + " TPKs";
@@ -151,6 +256,18 @@
     if (window.confirm("Registrar TPK? O grupo volta ao acampamento e escolhe a pausa.")) {
       D.acoes.registrarTpk();
     }
+  });
+
+  document.querySelectorAll("[data-mecanica]").forEach(function (caixa) {
+    caixa.addEventListener("change", function () {
+      D.acoes.definirMecanica(caixa.getAttribute("data-mecanica"), caixa.checked);
+    });
+  });
+
+  document.querySelector("[data-sortear-bencao]").addEventListener("click", function () {
+    var disponiveis = window.bencaosDeBram();
+    var sorteada = disponiveis[Math.floor(Math.random() * disponiveis.length)];
+    D.acoes.definirOfertaBencao(sorteada.id, D.get().run);
   });
 
   el.pausaEncerrar.addEventListener("click", function () {
