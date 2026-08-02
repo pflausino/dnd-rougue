@@ -45,6 +45,28 @@ toques (o segundo confirma) e some sozinho depois de cinco segundos sem
 confirmação. Ao consumir, a bênção sai do inventário e a ficha desaparece da
 tira. As permanentes não têm esse botão.
 
+### Loot da run (ferramenta do mestre)
+
+[`webapp/loot.html`](webapp/loot.html) acumula o que o grupo derrubou e fecha a
+conta no fim do ciclo. Os inimigos e as faixas de recompensa vêm da seção 13 de
+[`referencias/aventura.md`](referencias/aventura.md), em
+[`webapp/data/loot.js`](webapp/data/loot.js).
+
+Cada linha tem contador (−/+, valor digitável e "Todos" para marcar o encontro
+inteiro), a expressão daquele grupo (`5d8 + 40`) e a média. O resumo lateral
+junta tudo por tipo de dado — `19d4 + 8d8 + 2d20 + 180` — com média, mínimo e
+máximo. É essa expressão que o mestre anuncia à mesa.
+
+Cada sala tem um botão **Ouro dobrado**, para efeitos como o Contrato da Fortuna.
+Marcado, a sala dobra os próprios dados (`5d8 + 40` vira `10d8 + 80`) e o resumo
+avisa quantas salas estão dobradas. É controle manual do mestre — nenhuma bênção
+liga isso sozinha.
+
+"Rolar por eles" sorteia quando ninguém quer rolar; o campo de resultado aceita
+o valor rolado na mesa e "Somar ao ouro" joga no ouro do grupo. "Zerar contagem"
+limpa para a próxima run. A contagem fica no estado compartilhado, então
+sobrevive a recarregar a página.
+
 ### Ouro do loot
 
 No canto inferior esquerdo da tela dos jogadores há um botão discreto
