@@ -35,7 +35,7 @@ Bênçãos são efeitos especiais que alteram regras específicas da expedição
 
 **Preço:** **1.000 PO**.
 
-**Tipo:** **Consumível** — o pergaminho desaparece após ser lido.
+**Tipo:** **Permanente** — o nível conquistado permanece nas runs futuras.
 
 **Efeito:** todos os personagens do grupo avançam imediatamente para o **nível 4**.
 
@@ -45,7 +45,7 @@ Bênçãos são efeitos especiais que alteram regras específicas da expedição
 
 **Preço:** **2.500 PO**.
 
-**Tipo:** **Consumível** — o pergaminho desaparece após ser lido.
+**Tipo:** **Permanente** — o nível conquistado permanece nas runs futuras.
 
 **Efeito:** todos os personagens do grupo avançam imediatamente para o **nível 5**.
 
@@ -55,7 +55,7 @@ Bênçãos são efeitos especiais que alteram regras específicas da expedição
 
 **Preço:** **5.000 PO**.
 
-**Tipo:** **Consumível** — o pergaminho desaparece após ser lido.
+**Tipo:** **Permanente** — o nível conquistado permanece nas runs futuras.
 
 **Efeito:** todos os personagens do grupo avançam imediatamente para o **nível 6**.
 

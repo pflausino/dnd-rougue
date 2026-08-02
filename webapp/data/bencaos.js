@@ -59,8 +59,8 @@ window.BENCAOS = [
   },
   {
     id: "pergaminho-experiencia",
-    tipo: "Consumível",
-    tipoNota: "O pergaminho desaparece após ser lido.",
+    tipo: "Permanente",
+    tipoNota: "O nível conquistado permanece nas runs futuras.",
     nome: "Pergaminho da Experiência",
     mercador: "iria",
     preco: 1000,
@@ -82,8 +82,8 @@ window.BENCAOS = [
     id: "pergaminho-alta-experiencia",
     /* Os pergaminhos formam uma escada: o nível 5 exige ter passado pelo 4. */
     requer: "pergaminho-experiencia",
-    tipo: "Consumível",
-    tipoNota: "O pergaminho desaparece após ser lido.",
+    tipo: "Permanente",
+    tipoNota: "O nível conquistado permanece nas runs futuras.",
     nome: "Pergaminho da Alta Experiência",
     mercador: "iria",
     preco: 2500,
@@ -94,8 +94,8 @@ window.BENCAOS = [
   {
     id: "pergaminho-experiencia-suprema",
     requer: "pergaminho-alta-experiencia",
-    tipo: "Consumível",
-    tipoNota: "O pergaminho desaparece após ser lido.",
+    tipo: "Permanente",
+    tipoNota: "O nível conquistado permanece nas runs futuras.",
     nome: "Pergaminho da Experiência Suprema",
     mercador: "iria",
     preco: 5000,
