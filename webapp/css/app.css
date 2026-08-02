@@ -741,6 +741,27 @@
   box-shadow: var(--sombra-painel), var(--glow);
 }
 
+/* A arte fica no canto do card, sem empurrar o texto. */
+.balcao__opcao--ilustrada {
+  position: relative;
+  overflow: hidden;
+}
+
+.balcao__arte {
+  position: absolute;
+  right: -0.6rem;
+  bottom: -0.8rem;
+  width: 108px;
+  opacity: 0.85;
+  pointer-events: none;
+  transition: var(--transicao);
+}
+
+.balcao__opcao--ilustrada:hover .balcao__arte {
+  transform: scale(1.06) rotate(-3deg);
+  opacity: 1;
+}
+
 .balcao__opcao strong {
   font-family: var(--fonte-display);
   font-size: 1.6rem;
@@ -830,11 +851,18 @@
 }
 
 .bau {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.4rem 1.5rem;
   padding: 1.4rem 1.5rem 1.6rem;
-  max-width: 620px;
+  max-width: 680px;
+}
+
+.bau__arte {
+  grid-row: 1 / span 3;
+  width: 150px;
+  filter: drop-shadow(0 0 26px rgba(123, 63, 191, 0.35));
 }
 
 .bau__texto {
@@ -1044,6 +1072,68 @@
 .catalogo__vitrine h2 {
   font-size: 1.8rem;
   margin: 0.3rem 0 0.5rem;
+}
+
+/* --- vitrine de Íria ----------------------------------------------------- */
+
+.iria__fala {
+  max-width: 62ch;
+  margin: 0 0 1.4rem;
+  font-family: var(--fonte-display);
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--lilas);
+}
+
+.vitrine {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  align-items: start;
+}
+
+.vitrine__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.1rem 1.2rem 1.2rem;
+}
+
+.vitrine__item--bloqueado {
+  opacity: 0.62;
+  border-style: dashed;
+}
+
+.vitrine__topo {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.vitrine__topo h2 {
+  font-size: 1.15rem;
+  margin: 0.1rem 0 0;
+}
+
+.vitrine__item .bencao__icone {
+  width: 62px;
+  height: 62px;
+}
+
+.vitrine__item .bencao__rodape {
+  margin-top: auto;
+  padding-top: 0.6rem;
+}
+
+.vitrine__item .bencao__preco {
+  font-size: 1.05rem;
+}
+
+.vitrine__aviso {
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ouro);
 }
 
 /* Cotas de pausa, no painel do Mestre. */

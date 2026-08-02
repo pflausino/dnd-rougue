@@ -80,6 +80,8 @@ window.BENCAOS = [
   },
   {
     id: "pergaminho-alta-experiencia",
+    /* Os pergaminhos formam uma escada: o nível 5 exige ter passado pelo 4. */
+    requer: "pergaminho-experiencia",
     tipo: "Consumível",
     tipoNota: "O pergaminho desaparece após ser lido.",
     nome: "Pergaminho da Alta Experiência",
@@ -91,6 +93,7 @@ window.BENCAOS = [
   },
   {
     id: "pergaminho-experiencia-suprema",
+    requer: "pergaminho-alta-experiencia",
     tipo: "Consumível",
     tipoNota: "O pergaminho desaparece após ser lido.",
     nome: "Pergaminho da Experiência Suprema",

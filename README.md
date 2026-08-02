@@ -18,6 +18,20 @@ Este repositório reúne o aplicativo web e as referências de **A Última Dunge
 Cada tela deve ficar em uma janela ou monitor diferente. As três compartilham o
 mesmo estado e se atualizam entre si automaticamente.
 
+### O Véu Entre Vidas (Íria)
+
+Íria vende as nove bênçãos do catálogo, ao preço cheio. Diferente de Bram, não
+há balcões: todos os cards aparecem já na entrada da loja.
+
+Os Pergaminhos de Experiência formam uma escada — o de nível 5 exige que o grupo
+já tenha comprado o de nível 4, e o de nível 6 exige o de nível 5. O card
+bloqueado mostra "Exige &lt;pergaminho anterior&gt;" e não tem botão. O
+pré-requisito olha o histórico de compras (`bencaosAdquiridas`), não o
+inventário, então consumir um pergaminho não retranca o próximo.
+
+Bênçãos permanentes já em posse do grupo não podem ser recompradas; consumíveis
+podem ser comprados de novo depois de usados.
+
 ### Bênçãos do grupo
 
 Toda bênção comprada entra no inventário do grupo (`estado.bencaos`). Durante a

@@ -11,7 +11,7 @@
 
   /* A versão entra na chave e no canal: telas de versões diferentes (uma aba
    * antiga que ficou aberta, por exemplo) não disputam o mesmo estado. */
-  var VERSAO = 6;
+  var VERSAO = 7;
   var CHAVE = "ultima-dungeon:estado:v" + VERSAO;
   var NOME_CANAL = "ultima-dungeon:v" + VERSAO;
   var INTERVALO_POLL = 500;
@@ -43,7 +43,7 @@
       nome: "O Véu Entre Vidas",
       chamada: "Itens mágicos, bênçãos e encantamentos",
       imagem: "../loja/assets/personagens/iria-sete-veus.png",
-      pagina: "catalogo.html?loja=iria",
+      pagina: "iria.html",
       /* Só abre depois que o grupo comprar a Pedra de Íria. */
       exigeAcesso: "lojaIria"
     }
@@ -97,8 +97,12 @@
         id: null,
         variante: null
       },
-      /* Bênçãos que o grupo já conquistou, por id, na ordem de aquisição. */
+      /* Bênçãos em posse do grupo, por id, na ordem de aquisição. */
       bencaos: [],
+      /* Tudo que já foi comprado alguma vez. Os consumíveis saem de `bencaos`
+       * ao serem usados, mas seguem aqui — é o histórico que libera os
+       * pergaminhos em escada. */
+      bencaosAdquiridas: [],
       /* Bênção que Bram oferece nesta run. Sorteada uma vez por run. */
       ofertaBencao: {
         run: 0,
@@ -355,8 +359,14 @@
       atualizar({ ofertaBencao: { id: id, run: run, comprada: false } });
     },
     adicionarBencao: function (id) {
-      if (!id || estado.bencaos.indexOf(id) >= 0) return;
-      atualizar({ bencaos: estado.bencaos.concat([id]) });
+      if (!id) return;
+      atualizar({
+        bencaos: estado.bencaos.indexOf(id) >= 0 ? estado.bencaos : estado.bencaos.concat([id]),
+        bencaosAdquiridas:
+          estado.bencaosAdquiridas.indexOf(id) >= 0
+            ? estado.bencaosAdquiridas
+            : estado.bencaosAdquiridas.concat([id])
+      });
     },
     removerBencao: function (id) {
       atualizar({
