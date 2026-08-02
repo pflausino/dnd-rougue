@@ -11,7 +11,7 @@
 
   /* A versão entra na chave e no canal: telas de versões diferentes (uma aba
    * antiga que ficou aberta, por exemplo) não disputam o mesmo estado. */
-  var VERSAO = 7;
+  var VERSAO = 9;
   var CHAVE = "ultima-dungeon:estado:v" + VERSAO;
   var NOME_CANAL = "ultima-dungeon:v" + VERSAO;
   var INTERVALO_POLL = 500;
@@ -103,6 +103,10 @@
        * ao serem usados, mas seguem aqui — é o histórico que libera os
        * pergaminhos em escada. */
       bencaosAdquiridas: [],
+      /* Contagem de abates da run, por id de inimigo, para o cálculo do loot. */
+      abates: {},
+      /* Salas com o ouro dobrado nesta run, marcadas à mão pelo mestre. */
+      lootDobrado: {},
       /* Bênção que Bram oferece nesta run. Sorteada uma vez por run. */
       ofertaBencao: {
         run: 0,
@@ -357,6 +361,34 @@
     },
     definirOfertaBencao: function (id, run) {
       atualizar({ ofertaBencao: { id: id, run: run, comprada: false } });
+    },
+    ajustarAbate: function (id, delta) {
+      var abates = Object.assign({}, estado.abates);
+      abates[id] = Math.max(0, (abates[id] || 0) + delta);
+      atualizar({ abates: abates });
+    },
+    definirAbate: function (id, valor) {
+      var abates = Object.assign({}, estado.abates);
+      abates[id] = Math.max(0, Math.round(valor) || 0);
+      atualizar({ abates: abates });
+    },
+    alternarLootDobrado: function (idEncontro) {
+      var dobrado = Object.assign({}, estado.lootDobrado);
+      dobrado[idEncontro] = !dobrado[idEncontro];
+      atualizar({ lootDobrado: dobrado });
+    },
+    /* Zera cada chave em vez de trocar o objeto: `mesclar` funde objetos,
+     * então um {} vazio deixaria os valores antigos de pé. */
+    zerarAbates: function () {
+      var abates = {};
+      Object.keys(estado.abates).forEach(function (id) {
+        abates[id] = 0;
+      });
+      var dobrado = {};
+      Object.keys(estado.lootDobrado).forEach(function (id) {
+        dobrado[id] = false;
+      });
+      atualizar({ abates: abates, lootDobrado: dobrado });
     },
     adicionarBencao: function (id) {
       if (!id) return;

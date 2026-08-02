@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loot da run | A Última Dungeon</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="topo__titulo">
+      <span class="marca">A Última Dungeon</span>
+      <h1>Loot da run</h1>
+    </div>
+    <nav class="nav">
+      <a href="index.html">Painel</a>
+      <a href="mestre.html">Mestre</a>
+      <a href="loot.html" aria-current="page">Loot</a>
+    </nav>
+  </header>
+
+  <main class="conteudo loot">
+    <div class="loot__tabelas" data-encontros></div>
+
+    <aside class="painel bloco loot__resumo" data-resumo>
+      <div class="bloco__cabeca">
+        <h2>Fechamento do ciclo</h2>
+        <span class="selo" data-total-abates>0 abates</span>
+      </div>
+
+      <div class="pilha">
+        <div class="campo">
+          <span class="rotulo">Dados a rolar</span>
+          <p class="loot__expressao mono" data-expressao>—</p>
+          <span class="selo selo--ouro" data-dobradas hidden></span>
+        </div>
+
+        <div class="contador">
+          <span class="rotulo">Média</span>
+          <span class="contador__valor contador__valor--ouro"><span data-media>0</span> PO</span>
+        </div>
+
+        <div class="contador">
+          <span class="rotulo">Mínimo — máximo</span>
+          <span class="mono"><span data-minimo>0</span> — <span data-maximo>0</span> PO</span>
+        </div>
+
+        <div class="linha">
+          <button class="btn btn--fantasma btn--largo" type="button" data-rolar>Rolar por eles</button>
+        </div>
+
+        <label class="campo">
+          <span class="rotulo">Resultado da rolagem</span>
+          <div class="linha">
+            <input type="number" min="0" step="1" data-resultado placeholder="0">
+            <button class="btn btn--ouro" type="button" data-somar>Somar ao ouro</button>
+          </div>
+        </label>
+
+        <button class="btn btn--perigo btn--largo" type="button" data-zerar>Zerar contagem</button>
+      </div>
+    </aside>
+  </main>
+
+  <div class="recado" data-recado role="status" aria-live="polite"></div>
+
+  <script src="js/state.js"></script>
+  <script src="data/loot.js"></script>
+  <script src="js/loot.js"></script>
+</body>
+</html>
