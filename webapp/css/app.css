@@ -1476,6 +1476,26 @@
   right: 1.2rem;
 }
 
+/* Aviso de sincronização caída. Fixo e fora do fluxo: aparece nas telas
+ * projetadas sem empurrar nada nem criar rolagem. O canto inferior direito é o
+ * único livre — à esquerda mora o "+ Ouro do loot", acima o rodapé do Relógio. */
+.aviso-conexao {
+  position: fixed;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  z-index: 60;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--sangue);
+  border-radius: var(--raio);
+  background: rgba(178, 58, 77, 0.16);
+  color: var(--texto);
+  font-family: var(--fonte-corpo);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
 @media (max-width: 640px) {
   .conteudo,
   .jogadores__barra,

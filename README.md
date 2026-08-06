@@ -1,96 +1,185 @@
 # A Última Dungeon
 
-Este repositório reúne o aplicativo web e as referências de **A Última Dungeon**, uma aventura roguelike de D&D 5e:
+Aplicativo web e referências de **A Última Dungeon**, uma one-shot roguelike de
+D&D 5e para 6 jogadores de nível 3, em cerca de 4 horas.
 
-- [`webapp/`](webapp/): painel de mesa com as telas Mestre, Jogadores e Relógio.
-- [`loja/`](loja/): pequeno site da loja disponível aos jogadores.
-- [`referencias/`](referencias/): documentação da aventura e da loja.
+- [`webapp/`](webapp/): painel de mesa — telas do Mestre, dos Jogadores, do
+  Relógio, as duas lojas e a calculadora de loot.
+- [`referencias/`](referencias/): a aventura, os catálogos das lojas, as bênçãos
+  e as tabelas de jogo. É a fonte da verdade; o webapp transcreve esses dados.
+- [`loja/`](loja/): arte dos mercadores e dos ícones de bênção, em
+  `loja/assets/`, mais um esqueleto de site anterior ao painel.
+- [`servidor/`](servidor/): servidor do painel — serve os arquivos e guarda o
+  estado da sessão. Só biblioteca padrão do Node.
+- [`compose.yml`](compose.yml) e [`deploy/`](deploy/): o serviço no VPS e o bloco
+  a acrescentar ao Caddy de lá.
 
-## Painel de mesa
+## Como rodar
 
-| Tela | Arquivo | Função |
+```sh
+node servidor/servidor.js
+```
+
+Depois abra <http://localhost:8777/webapp/>.
+
+Abrir os arquivos direto do disco (`file://`) continua funcionando, e um
+servidor estático qualquer (`python3 -m http.server 8777`) também — mas nos dois
+casos a sincronização fica limitada às abas do mesmo navegador, porque não há
+servidor de estado para conversar. Ver [Sincronização](#sincronização).
+
+Variáveis de ambiente:
+
+| Variável | Padrão | Para que serve |
+|---|---|---|
+| `PORTA` | `8777` | Porta HTTP. |
+| `ENDERECO` | `0.0.0.0` | Interface. Em produção, `127.0.0.1` — só o proxy fala com ele. |
+| `RAIZ` | raiz do repositório | De onde saem os arquivos estáticos. |
+| `ARQUIVO_ESTADO` | `servidor/estado.json` | Onde a sessão é gravada. |
+
+Só `webapp/` e `loja/` são servidos. `referencias/`, `.git/` e as notas de
+agente ficam fora do alcance de quem tiver a URL.
+
+## Telas
+
+| Tela | Arquivo | Para quem |
 |---|---|---|
 | Painel | [`webapp/index.html`](webapp/index.html) | Escolhe qual tela abrir. |
-| Mestre | [`webapp/mestre.html`](webapp/mestre.html) | Controla a tela dos jogadores, o relógio, a run e o ouro. |
-| Jogadores | [`webapp/jogadores.html`](webapp/jogadores.html) | Tela pública da mesa: dungeon ou acampamento, tempo e ouro. |
-| Relógio | [`webapp/relogio.html`](webapp/relogio.html) | Cronômetro da sessão em tela cheia; só exibe, quem controla é o Mestre. |
+| Mestre | [`webapp/mestre.html`](webapp/mestre.html) | Mestre: relógio, run, ouro, mecânicas, pausas e o que projetar. |
+| Jogadores | [`webapp/jogadores.html`](webapp/jogadores.html) | Tela pública da mesa. |
+| Relógio | [`webapp/relogio.html`](webapp/relogio.html) | Cronômetro da sessão; só exibe, quem controla é o Mestre. |
+| Loot | [`webapp/loot.html`](webapp/loot.html) | Mestre: contagem de abates e fechamento do ouro da run. |
+| A Última Provisão | [`webapp/bram.html`](webapp/bram.html) | Jogadores, no acampamento. |
+| O Véu Entre Vidas | [`webapp/iria.html`](webapp/iria.html) | Jogadores, no acampamento, depois da Pedra de Íria. |
 
-Cada tela deve ficar em uma janela ou monitor diferente. As três compartilham o
-mesmo estado e se atualizam entre si automaticamente.
+Cada tela fica em uma janela ou monitor diferente e todas compartilham o mesmo
+estado, atualizando-se entre si.
 
-### O Véu Entre Vidas (Íria)
+### Sincronização
 
-Íria vende as nove bênçãos do catálogo, ao preço cheio. Diferente de Bram, não
-há balcões: todos os cards aparecem já na entrada da loja.
+Quatro vias de propagação. As três locais — `BroadcastChannel`, evento `storage`
+e polling de 500 ms sobre o `localStorage` — cobrem várias janelas **do mesmo
+navegador**. A quarta é o servidor, e é ela que permite o Mestre no notebook, os
+Jogadores na TV e o Relógio no tablet: cada tela recebe por SSE
+(`/api/eventos`) e envia por `POST /api/estado`.
 
-Os Pergaminhos de Experiência formam uma escada — o de nível 5 exige que o grupo
-já tenha comprado o de nível 4, e o de nível 6 exige o de nível 5. O card
-bloqueado mostra "Exige &lt;pergaminho anterior&gt;" e não tem botão. O
-pré-requisito olha o histórico de compras (`bencaosAdquiridas`), não o
-inventário, então consumir um pergaminho não retranca o próximo.
+Servido por `file://` ou por um servidor estático qualquer, a quarta via
+simplesmente não liga e o painel se comporta como antes.
 
-Bênçãos permanentes já em posse do grupo não podem ser recompradas; consumíveis
-podem ser comprados de novo depois de usados.
+Com o servidor no ar ele é a autoridade: ao abrir, a tela adota o estado que vier
+de lá. Se o servidor estiver sem estado — primeira tela da sessão, ou servidor
+reiniciado sem o arquivo — a tela semeia o dele com o que tem em cache, desde que
+não seja um estado intocado (uma tela recém-aberta nunca apaga uma sessão em
+andamento). O eco do próprio envio é descartado comparando o conteúdo, então não
+há laço de gravações.
+
+Instantes vêm de `Dungeon.agora()`, que é `Date.now()` corrigido pela diferença
+com o relógio do servidor. Sem isso, um dispositivo com o relógio atrasado
+mostraria um tempo de sessão diferente do das outras telas. **Use `agora()` em
+vez de `Date.now()`** em qualquer coisa que vá para o estado.
+
+Se a sincronização cair, todas as telas mostram um aviso discreto no canto
+inferior direito ([`webapp/js/aviso-conexao.js`](webapp/js/aviso-conexao.js)) e
+seguem funcionando com o último estado recebido. O `EventSource` reconecta
+sozinho e o aviso some. Sem esse aviso a queda é invisível: cada tela continua
+mostrando o que tinha e ninguém percebe que pararam de conversar.
+
+A chave e o canal levam a versão do formato no nome
+(`ultima-dungeon:estado:v9`), e estados de outra versão são ignorados. Assim uma
+aba antiga que ficou aberta não corrompe o estado novo — ela apenas fica surda
+até recarregar. Mudar o formato do estado exige subir `VERSAO` em
+[`webapp/js/state.js`](webapp/js/state.js), o que descarta a sessão anterior.
+
+O servidor guarda **um estado por versão**, espelhando essa mesma trava: subir
+`VERSAO` cria um estado novo em vez de misturar com o antigo.
+
+### API
+
+| Rota | O que faz |
+|---|---|
+| `GET /api/eventos?v=9` | SSE. Manda o estado atual na conexão e a cada mudança. |
+| `GET /api/estado?v=9` | Estado atual, ou `null` se o servidor não tem nenhum. |
+| `POST /api/estado?v=9` | Grava o estado enviado no corpo e publica para as outras telas. |
+| `DELETE /api/estado?v=9` | Descarta a sessão daquela versão. |
+| `GET /api/saude` | Diagnóstico: quantas telas ligadas e quais versões em memória. |
+
+## Produção
+
+Em <https://dungeon.pflausino.xyz>, no VPS `pflausino.xyz`. Um container na rede
+`proxy` do Docker, atrás do Caddy que já serve os outros sites de lá — o Caddy
+termina o TLS e repassa para `dungeon:8777`.
+
+O [`compose.yml`](compose.yml) não constrói imagem nenhuma: o painel não tem
+dependências, então `node:22-alpine` roda o servidor direto sobre o repositório
+montado em somente-leitura.
+
+```sh
+# no VPS, como pflausino (não precisa de sudo: Docker e /opt/proxy são dele)
+git clone -b feat/prod-vps git@github.com:pflausino/dnd-rougue.git /opt/apps/dungeon
+cd /opt/apps/dungeon && mkdir -p estado
+docker compose up -d
+
+# o bloco do site entra no Caddyfile compartilhado, sem substituí-lo
+cp /opt/proxy/Caddyfile /opt/proxy/Caddyfile.bak
+cat deploy/Caddyfile.trecho >> /opt/proxy/Caddyfile
+docker exec caddy caddy validate --config /etc/caddy/Caddyfile
+docker exec caddy caddy reload --config /etc/caddy/Caddyfile
+```
+
+Conferir: `curl -s https://dungeon.pflausino.xyz/api/saude`, `docker logs
+dungeon` e `docker inspect --format '{{.State.Health.Status}}' dungeon`.
+
+Atualizar: `git -C /opt/apps/dungeon pull && docker restart dungeon`. O estado
+sobrevive ao restart — o servidor o relê do disco.
+
+Quatro detalhes que não são opcionais:
+
+- **A porta 8777 não é publicada no host.** Só `expose`, para o Caddy alcançar
+  pela rede do Docker. Publicá-la abriria o painel em HTTP puro, contornando o
+  TLS.
+- **O `deploy/Caddyfile.trecho` é um trecho**, não um Caddyfile. Colá-lo sobre
+  `/opt/proxy/Caddyfile` derruba os outros oito sites do mesmo proxy. Acrescente,
+  e valide antes de recarregar.
+- **O SSE tem rota própria no bloco do Caddy**, sem `encode` e com
+  `flush_interval -1`. Comprimido ou bufferizado, o fluxo de eventos só chega
+  quando enche um bloco: as telas param de sincronizar e o aviso de conexão
+  pisca sem motivo.
+- **`ARQUIVO_ESTADO` aponta para `estado/`**, montado fora do `:ro` e ignorado
+  pelo git, para um `git pull` não levar a sessão embora.
+
+**Nada é protegido por senha.** Quem tiver a URL alcança `mestre.html` e pode
+dar *Reiniciar tudo* na sessão. Se isso passar a incomodar, o caminho mais curto
+é `basic_auth` no bloco do Caddy cobrindo `/webapp/mestre.html` e
+`/webapp/loot.html`.
+
+## Tela dos Jogadores
+
+Barra fixa com run, ouro do grupo e tempo restante. O palco muda conforme o modo
+que o mestre escolhe:
+
+- **Dungeon** — "Run N" em destaque.
+- **Acampamento** — as lojas abertas e, depois de um TPK, a escolha da pausa.
 
 ### Bênçãos do grupo
 
-Toda bênção comprada entra no inventário do grupo (`estado.bencaos`). Durante a
-dungeon, a tela dos jogadores mostra uma tira de fichas logo abaixo do cabeçalho
-— ícone, nome e tipo (**Consumível** ou **Permanente**, conforme
-[`referencias/bencaos.md`](referencias/bencaos.md)). Clicar em uma ficha abre um
-modal com lema, efeito, restrição e a nota sobre o consumo.
+Toda bênção comprada entra no inventário (`estado.bencaos`) e aparece numa tira
+de fichas abaixo do cabeçalho, com ícone, nome e tipo (**Consumível** ou
+**Permanente**, conforme [`referencias/bencaos.md`](referencias/bencaos.md)).
+Clicar abre um modal com lema, efeito, restrição e a nota sobre o consumo.
 
-Bênçãos **consumíveis** ganham no modal um botão **Consumir**, que exige dois
-toques (o segundo confirma) e some sozinho depois de cinco segundos sem
-confirmação. Ao consumir, a bênção sai do inventário e a ficha desaparece da
-tira. As permanentes não têm esse botão.
-
-### Loot da run (ferramenta do mestre)
-
-[`webapp/loot.html`](webapp/loot.html) acumula o que o grupo derrubou e fecha a
-conta no fim do ciclo. Os inimigos e as faixas de recompensa vêm da seção 13 de
-[`referencias/aventura.md`](referencias/aventura.md), em
-[`webapp/data/loot.js`](webapp/data/loot.js).
-
-Cada linha tem contador (−/+, valor digitável e "Todos" para marcar o encontro
-inteiro), a expressão daquele grupo (`5d8 + 40`) e a média. O resumo lateral
-junta tudo por tipo de dado — `19d4 + 8d8 + 2d20 + 180` — com média, mínimo e
-máximo. É essa expressão que o mestre anuncia à mesa.
-
-Cada sala tem um botão **Ouro dobrado**, para efeitos como o Contrato da Fortuna.
-Marcado, a sala dobra os próprios dados (`5d8 + 40` vira `10d8 + 80`) e o resumo
-avisa quantas salas estão dobradas. É controle manual do mestre — nenhuma bênção
-liga isso sozinha.
-
-"Rolar por eles" sorteia quando ninguém quer rolar; o campo de resultado aceita
-o valor rolado na mesa e "Somar ao ouro" joga no ouro do grupo. "Zerar contagem"
-limpa para a próxima run. A contagem fica no estado compartilhado, então
-sobrevive a recarregar a página.
+Consumíveis ganham no modal um botão **Consumir**, que exige dois toques (o
+segundo confirma) e se desarma em cinco segundos. Ao consumir, a bênção sai do
+inventário e a ficha desaparece. Permanentes não têm esse botão.
 
 ### Ouro do loot
 
-No canto inferior esquerdo da tela dos jogadores há um botão discreto
-**+ Ouro do loot**. Ele abre um modal com atalhos (+5, +10, +25, +50, +100, que
-se somam no campo) e entrada livre, para o grupo registrar o que recolheu sem
-depender do mestre. O valor entra no ouro do grupo e aparece em todas as telas.
-
-### Exibir no Relógio
-
-Em **Exibir no Relógio**, na mesa do mestre, ele escolhe o que projetar além do
-cronômetro. Com algo selecionado, os dígitos encolhem e a tabela ocupa o centro
-da tela; em "Só o cronômetro" o relógio volta ao tamanho cheio.
-
-A primeira exibição é a **tabela de raridade aleatória de itens mágicos**
-([`referencias/tabelas.md`](referencias/tabelas.md)), nas versões **Básico** ou
-**Avançado** — só a coluna escolhida aparece, ao lado da raridade. Novas
-exibições entram em [`webapp/data/tabelas.js`](webapp/data/tabelas.js) e
-aparecem no controle automaticamente.
+Botão discreto **+ Ouro do loot** no canto inferior esquerdo. Abre um modal com
+atalhos (+5, +10, +25, +50, +100, que se somam no campo) e entrada livre, para o
+grupo registrar o que recolheu sem depender do mestre.
 
 ### Pausas por TPK
 
-Ao registrar um TPK, o grupo volta ao acampamento e escolhe, na própria tela dos
-jogadores, uma pausa de 5, 10 ou 30 minutos. As cotas valem para a sessão
-inteira:
+Ao registrar um TPK, o grupo volta ao acampamento e escolhe uma pausa de 5, 10 ou
+30 minutos na própria tela. As cotas valem para a sessão inteira:
 
 | Pausa | Quantidade |
 |---|---|
@@ -98,86 +187,124 @@ inteira:
 | 10 min | 2 |
 | 30 min | 1 |
 
-Enquanto a pausa corre, o cronômetro da sessão fica congelado — as 4 horas
-contam só tempo de jogo. Ao encerrar a pausa, o relógio volta a correr se já
-estava correndo. O mestre pode encerrar a pausa ou dispensar a escolha, e mudar
-o grupo para **Dungeon** também encerra a pausa em andamento — ou descarta a
-escolha que ainda não foi feita.
+Enquanto a pausa corre, o cronômetro da sessão fica congelado — as 4 horas contam
+só tempo de jogo — e a tela do Relógio mostra a contagem numa pílula pequena. Ao
+encerrar, o relógio volta a correr se já estava correndo. O mestre pode encerrar
+a pausa ou dispensar a escolha; mudar o grupo para **Dungeon** também encerra a
+pausa em andamento ou descarta a escolha pendente.
 
-Enquanto a pausa corre, a tela do Relógio mostra a contagem numa pílula pequena,
-sem tirar o cronômetro da sessão do lugar de destaque.
+## Lojas do acampamento
 
-### Lojas do acampamento
+As duas lojas de [`referencias/loja.md`](referencias/loja.md), declaradas em
+`Dungeon.LOJAS`:
 
-No acampamento, a tela dos jogadores mostra as duas lojas descritas em
-[`referencias/loja.md`](referencias/loja.md):
-
-| Loja | Mercador | Catálogo |
+| Loja | Mercador | Tela |
 |---|---|---|
-| A Última Provisão | Bram Barbacobre | `catalogo.html?loja=bram` |
-| O Véu Entre Vidas | Íria Sete-Véus | `catalogo.html?loja=iria` |
+| A Última Provisão | Bram Barbacobre | [`bram.html`](webapp/bram.html) |
+| O Véu Entre Vidas | Íria Sete-Véus | [`iria.html`](webapp/iria.html) |
 
-Na dungeon as lojas ficam escondidas. Se o mestre trocar para **Dungeon**
-enquanto os jogadores estão dentro de um catálogo, a loja fecha e a tela volta
-sozinha para o acampamento. Os retratos vêm de
-`loja/assets/personagens/`; sem o arquivo de imagem, o cartão cai num retrato de
-reserva com a inicial do mercador. As lojas são declaradas em `Dungeon.LOJAS`,
-em [`webapp/js/state.js`](webapp/js/state.js).
+Na dungeon as lojas ficam escondidas, e se o mestre trocar para **Dungeon**
+enquanto os jogadores estão dentro de uma loja, ela fecha e a tela volta sozinha
+para o acampamento ([`webapp/js/guarda-loja.js`](webapp/js/guarda-loja.js)).
+
+Os retratos vêm de `loja/assets/personagens/`; sem o arquivo de imagem, o cartão
+cai num retrato de reserva com a inicial do mercador.
 
 ### A Última Provisão (Bram)
 
-A loja tem três balcões:
+Três balcões, em subtelas:
 
 | Balcão | O que faz |
 |---|---|
 | Equipamentos | Os 55 produtos de `referencias/loja.md`, por categoria, com preço e botão de compra. |
 | Baú de Itens Mágicos | Cobra 300 PO pela rolagem. O item é sorteado na mesa, pelo mestre. |
-| Bênção | Mostra a bênção sorteada para a run, com 25% de desconto se o grupo já tem acesso à Íria. |
+| Bênção | A bênção sorteada para a run, com 25% de desconto se o grupo já tem acesso à Íria. |
 
-Os três Pergaminhos de Experiência ficam fora do sorteio de Bram: são marcados
-com `mercador: "iria"` em [`webapp/data/bencaos.js`](webapp/data/bencaos.js) e
-serão vendidos por O Véu Entre Vidas. Sobram seis bênçãos no sorteio dele.
-
-A coluna Maestria mostra o termo em inglês (como nas fichas) e a tradução em
-português logo abaixo. O mapa fica em `window.MAESTRIAS_PT`, no topo de
-[`webapp/data/equipamentos.js`](webapp/data/equipamentos.js) — as traduções
-vieram de um guia da comunidade, não do Livro do Jogador oficial em pt-BR, então
-vale conferir e corrigir ali quando tiver o livro à mão.
-
-Toda compra debita o ouro do grupo; o botão fica travado quando o ouro não
-cobre o preço. Os dados ficam em [`webapp/data/`](webapp/data/), transcritos de
-`referencias/loja.md` e `referencias/bencaos.md`.
-
-A bênção é sorteada uma vez por run e fica registrada no estado, então as três
-telas mostram a mesma oferta. Ela troca sozinha quando a run avança, e o mestre
-pode forçar um novo sorteio.
+A bênção é sorteada uma vez por run e fica no estado, então todas as telas veem a
+mesma oferta; ela troca quando a run avança, e o mestre pode forçar novo sorteio.
+Os três Pergaminhos de Experiência ficam fora do sorteio dele — são marcados com
+`mercador: "iria"` em [`webapp/data/bencaos.js`](webapp/data/bencaos.js).
 
 Sem acesso à loja de Íria, o balcão de bênçãos também oferece a **Pedra de Íria**
-(100 PO). Comprá-la debita o ouro e liga o acesso na hora — o mestre também pode
-ligar ou desligar isso à mão em **Mecânicas**, na mesa do mestre. Enquanto o
-acesso estiver desligado, o cartão de O Véu Entre Vidas não revela nada: fica só
-uma moldura tracejada com um "?", dando a dica de que há outra loja no
-acampamento.
+(100 PO). Comprá-la debita o ouro e libera o acesso na hora; o mestre também pode
+ligar ou desligar isso à mão em **Mecânicas**. Enquanto estiver desligado, o
+cartão de O Véu Entre Vidas não revela nada — só uma moldura tracejada com um
+"?", dando a dica de que há outra loja.
 
-### Como rodar
+A coluna Maestria mostra o termo em inglês e a tradução em português. O mapa fica
+em `window.MAESTRIAS_PT`, no topo de
+[`webapp/data/equipamentos.js`](webapp/data/equipamentos.js) — as traduções vieram
+de um guia da comunidade, **não** do Livro do Jogador oficial em pt-BR, então vale
+conferir e corrigir ali quando tiver o livro à mão.
 
-Servir os arquivos por HTTP é a forma recomendada, pois garante a sincronização
-entre as telas:
+### O Véu Entre Vidas (Íria)
 
-```sh
-python3 -m http.server 8777
-```
+Vende as nove bênçãos do catálogo, ao preço cheio. Diferente de Bram, não há
+balcões: todos os cards aparecem já na entrada.
 
-Depois abra <http://localhost:8777/webapp/>.
+Os Pergaminhos de Experiência formam uma escada — o de nível 5 exige que o grupo
+já tenha comprado o de nível 4, e o de nível 6 exige o de nível 5. O card
+bloqueado mostra "Exige &lt;pergaminho anterior&gt;" e não tem botão. O
+pré-requisito olha o histórico de compras (`bencaosAdquiridas`), não o
+inventário, para que consumir uma bênção nunca retranque a seguinte.
 
-Abrir os arquivos direto do disco (`file://`) também funciona no mesmo
-navegador, mas a sincronização depende do `localStorage` compartilhado e é menos
-confiável.
+Bênçãos permanentes já em posse não podem ser recompradas; consumíveis podem.
 
-### Sincronização
+Toda compra debita o ouro do grupo, nas duas lojas, e o botão fica travado quando
+o ouro não cobre o preço.
 
-O estado (relógio, run, ouro e modo) fica em `localStorage` e é
-propagado por `BroadcastChannel`, pelo evento `storage` e por um polling de
-500 ms. Isso cobre várias janelas **do mesmo navegador, no mesmo computador**.
-Usar telas em dispositivos diferentes exigirá um servidor de estado, ainda não
-implementado.
+## Mesa do Mestre
+
+Blocos independentes: **Relógio** (iniciar/pausar, ±min, duração da sessão),
+**Run** (tentativa, ouro, Registrar TPK), **Tela dos Jogadores** (Dungeon ou
+Acampamento), **Exibir no Relógio**, **Mecânicas**, **Pausas** e **Sessão**
+(duração e reiniciar tudo).
+
+### Exibir no Relógio
+
+Escolhe o que projetar além do cronômetro. Com algo selecionado, os dígitos
+encolhem e a tabela ocupa o centro da tela. A primeira exibição é a **tabela de
+raridade aleatória de itens mágicos** de
+[`referencias/tabelas.md`](referencias/tabelas.md), nas versões **Básico** ou
+**Avançado** — só a coluna escolhida aparece. Novas exibições entram em
+[`webapp/data/tabelas.js`](webapp/data/tabelas.js) e surgem no controle
+automaticamente.
+
+### Mecânicas
+
+Interruptores que o mestre liga conforme o grupo progride. Hoje: **Acesso à loja
+de Íria**, que libera O Véu Entre Vidas e dá os 25% de desconto nas bênçãos de
+Bram. O bloco também mostra a bênção da run e permite sortear outra.
+
+## Loot da run
+
+[`webapp/loot.html`](webapp/loot.html) acumula o que o grupo derrubou e fecha a
+conta no fim do ciclo. Inimigos e faixas de recompensa vêm da seção 13 de
+[`referencias/aventura.md`](referencias/aventura.md), em
+[`webapp/data/loot.js`](webapp/data/loot.js).
+
+Cada linha tem contador (−/+, valor digitável e "Todos" para marcar o encontro
+inteiro), a expressão daquele grupo (`5d8 + 40`) e a média. O resumo lateral junta
+tudo por tipo de dado — `19d4 + 8d8 + 2d20 + 180` — com média, mínimo e máximo. É
+essa expressão que o mestre anuncia à mesa.
+
+Cada sala tem um botão **Ouro dobrado**, para efeitos como o Contrato da Fortuna:
+a sala dobra os próprios dados (`5d8 + 40` vira `10d8 + 80`), então a expressão
+anunciada já sai pronta. É marcação manual do mestre — nenhuma bênção liga isso
+sozinha.
+
+"Rolar por eles" sorteia quando ninguém quer rolar; o campo de resultado aceita o
+valor rolado na mesa e **Somar ao ouro** joga no ouro do grupo. **Zerar contagem**
+limpa os contadores e as salas dobradas para a próxima run.
+
+## De onde vêm os dados
+
+| Referência | Arquivo do webapp | Conteúdo |
+|---|---|---|
+| `referencias/loja.md` | [`webapp/data/equipamentos.js`](webapp/data/equipamentos.js) | Os 55 produtos de Bram e as maestrias. |
+| `referencias/bencaos.md` | [`webapp/data/bencaos.js`](webapp/data/bencaos.js) | As nove bênçãos, a Pedra de Íria, preços e tipos. |
+| `referencias/tabelas.md` | [`webapp/data/tabelas.js`](webapp/data/tabelas.js) | Tabelas projetáveis no Relógio. |
+| `referencias/aventura.md` (seção 13) | [`webapp/data/loot.js`](webapp/data/loot.js) | Inimigos, ND e faixas de ouro. |
+
+Ao mudar uma referência, atualize o arquivo de dados correspondente — e
+vice-versa.

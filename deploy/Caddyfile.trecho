@@ -1,0 +1,28 @@
+# Bloco a acrescentar ao Caddyfile do proxy do VPS (`/opt/proxy/Caddyfile`),
+# que já serve os outros sites. **Não é um Caddyfile completo** — colar isto
+# sobre o arquivo inteiro derruba tudo o que já está lá.
+#
+#   cp /opt/proxy/Caddyfile /opt/proxy/Caddyfile.bak
+#   cat deploy/Caddyfile.trecho >> /opt/proxy/Caddyfile
+#   docker exec caddy caddy validate --config /etc/caddy/Caddyfile
+#   docker exec caddy caddy reload --config /etc/caddy/Caddyfile
+#
+# Validar antes de recarregar não é zelo: um erro de sintaxe aqui derruba os
+# outros sites do mesmo proxy.
+
+dungeon.pflausino.xyz {
+	# O SSE fica em rota própria, sem compressão e sem buffer. Comprimido ou
+	# bufferizado, o fluxo de eventos só chega quando enche um bloco — as telas
+	# param de sincronizar e o aviso de conexão pisca sem motivo.
+	@eventos path /api/eventos
+	handle @eventos {
+		reverse_proxy dungeon:8777 {
+			flush_interval -1
+		}
+	}
+
+	handle {
+		encode zstd gzip
+		reverse_proxy dungeon:8777
+	}
+}

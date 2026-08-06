@@ -1,0 +1,53 @@
+# Serviço do painel no VPS. Entra na rede `proxy`, onde vive o Caddy que termina
+# o TLS — a porta 8777 não é publicada no host, só o proxy alcança.
+#
+# Sem build e sem imagem própria: o painel não tem dependências, então a imagem
+# oficial do Node roda o servidor direto sobre o repositório montado.
+
+services:
+  dungeon:
+    image: node:22-alpine
+    container_name: dungeon
+    restart: unless-stopped
+
+    working_dir: /app
+    command: node servidor/servidor.js
+    # Mesmo uid do dono do repositório, para o estado sair gravável fora do container.
+    user: "1000:1000"
+
+    environment:
+      PORTA: "8777"
+      # 0.0.0.0 dentro do container: é como o Caddy chega pela rede do Docker.
+      # A porta não é publicada no host, então não há exposição em HTTP puro.
+      ENDERECO: 0.0.0.0
+      RAIZ: /app
+      ARQUIVO_ESTADO: /estado/estado.json
+      TZ: America/Sao_Paulo
+
+    volumes:
+      # Somente leitura: o container serve o repositório, nunca escreve nele.
+      - ./:/app:ro
+      # Fora do :ro para o estado poder ser gravado; ignorado pelo git.
+      - ./estado:/estado
+
+    expose:
+      - "8777"
+
+    # `restart: unless-stopped` não pega processo vivo mas travado; isto pega.
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:8777/api/saude').then(function(r){process.exit(r.ok?0:1)}).catch(function(){process.exit(1)})
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
