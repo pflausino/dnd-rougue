@@ -1,20 +1,45 @@
 /* Estado compartilhado entre as telas Mestre, Jogadores e Relógio.
  *
- * O estado vive em localStorage e é propagado por três vias, para funcionar
- * tanto em servidor local quanto abrindo os arquivos direto no navegador:
+ * O estado vive em localStorage e é propagado por quatro vias, para funcionar
+ * abrindo os arquivos direto no navegador, num servidor local ou no VPS:
  *   1. BroadcastChannel (imediato, quando disponível);
  *   2. evento `storage` (outras abas da mesma origem);
- *   3. polling de 500 ms (rede de segurança em file://).
+ *   3. polling de 500 ms (rede de segurança em file://);
+ *   4. servidor (SSE para receber, POST para enviar).
+ *
+ * As três primeiras só alcançam abas do mesmo navegador. A quarta é o que
+ * permite o Mestre no notebook e os Jogadores na TV: quando a página vem por
+ * http(s), o servidor é a autoridade e o localStorage passa a ser só o cache
+ * local — de onde a tela parte enquanto a conexão não sobe.
  */
 (function (global) {
   "use strict";
 
-  /* A versão entra na chave e no canal: telas de versões diferentes (uma aba
-   * antiga que ficou aberta, por exemplo) não disputam o mesmo estado. */
+  /* A versão entra na chave, no canal e na rota da API: telas de versões
+   * diferentes (uma aba antiga que ficou aberta, por exemplo) não disputam o
+   * mesmo estado. */
   var VERSAO = 9;
   var CHAVE = "ultima-dungeon:estado:v" + VERSAO;
   var NOME_CANAL = "ultima-dungeon:v" + VERSAO;
   var INTERVALO_POLL = 500;
+
+  /* Em file:// não há servidor para conversar; as três vias locais bastam. */
+  var REMOTO =
+    global.location &&
+    (global.location.protocol === "http:" || global.location.protocol === "https:");
+
+  /* A API é irmã de webapp/, e não fixa na raiz, para o painel continuar
+   * funcionando se um dia for servido sob um subcaminho (`/dungeon/webapp/`). */
+  var BASE_API = (function () {
+    if (!REMOTO) return null;
+    var caminho = global.location.pathname;
+    var pasta = caminho.indexOf("/webapp/") >= 0 ? caminho.replace(/\/webapp\/.*$/, "") : "";
+    return pasta + "/api";
+  })();
+
+  /* Espera antes de enviar ao servidor. Uma rajada de cliques (+5, +5, +5)
+   * viraria um POST por clique; coalescer manda só o estado final. */
+  var ESPERA_ENVIO = 40;
 
   var MINUTO = 60 * 1000;
   var HORA = 60 * MINUTO;
@@ -167,6 +192,16 @@
     }
   }
 
+  /* Diferença entre o relógio do servidor e o desta máquina. Com as telas em
+   * dispositivos diferentes, um relógio atrasado faria o cronômetro da sessão
+   * mostrar um tempo diferente em cada tela — todo instante do estado passa por
+   * `agora()` para que todas contem pelo mesmo relógio. */
+  var desvioServidor = 0;
+
+  function agora() {
+    return Date.now() + desvioServidor;
+  }
+
   function notificar(origem) {
     assinantes.forEach(function (cb) {
       try {
@@ -177,13 +212,18 @@
     });
   }
 
-  function gravar() {
+  function persistirLocal() {
     try {
       global.localStorage.setItem(CHAVE, JSON.stringify(estado));
     } catch (erro) {
       console.warn("[estado] não foi possível gravar", erro);
     }
+  }
+
+  function gravar() {
+    persistirLocal();
     if (canal) canal.postMessage({ tipo: "estado", estado: estado });
+    publicarRemoto();
   }
 
   /* Carimbo monotônico: duas gravações no mesmo milissegundo precisam de
@@ -191,8 +231,8 @@
   var ultimoCarimbo = 0;
 
   function carimbar() {
-    var agora = Date.now();
-    ultimoCarimbo = agora > ultimoCarimbo ? agora : ultimoCarimbo + 1;
+    var instante = agora();
+    ultimoCarimbo = instante > ultimoCarimbo ? instante : ultimoCarimbo + 1;
     return ultimoCarimbo;
   }
 
@@ -217,6 +257,9 @@
     if (JSON.stringify(novo) === JSON.stringify(estado)) return;
     estado = mesclar(estadoInicial(), novo);
     ultimoCarimbo = Math.max(ultimoCarimbo, estado.atualizadoEm || 0);
+    /* Guarda o que veio de fora: sem isso, um F5 voltaria ao último estado que
+     * *esta* tela gravou, descartando o que as outras fizeram desde então. */
+    persistirLocal();
     notificar("remoto");
   }
 
@@ -235,12 +278,108 @@
     receberExterno(ler());
   }, INTERVALO_POLL);
 
+  /* --- servidor ----------------------------------------------------------- */
+
+  /* Estado da conexão, para as telas avisarem quando a sincronização cai.
+   * `ativo: false` é o modo file:// ou local, em que não há nada a monitorar. */
+  var conexao = { ativo: !!REMOTO, ligado: false, erro: null };
+  var assinantesConexao = [];
+
+  function anunciarConexao(ligado, erro) {
+    if (conexao.ligado === ligado && conexao.erro === (erro || null)) return;
+    conexao.ligado = ligado;
+    conexao.erro = erro || null;
+    assinantesConexao.forEach(function (cb) {
+      try {
+        cb(conexao);
+      } catch (falha) {
+        console.error("[estado] assinante de conexão falhou", falha);
+      }
+    });
+  }
+
+  var envioAgendado = null;
+
+  function publicarRemoto() {
+    if (!REMOTO || envioAgendado) return;
+    envioAgendado = global.setTimeout(function () {
+      envioAgendado = null;
+      enviarAoServidor();
+    }, ESPERA_ENVIO);
+  }
+
+  function enviarAoServidor() {
+    global
+      .fetch(BASE_API + "/estado?v=" + VERSAO, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(estado)
+      })
+      .then(function (resposta) {
+        if (!resposta.ok) throw new Error("HTTP " + resposta.status);
+        return resposta.json();
+      })
+      .then(function (corpo) {
+        if (corpo && typeof corpo.servidorEm === "number") {
+          desvioServidor = corpo.servidorEm - Date.now();
+        }
+        anunciarConexao(true, null);
+      })
+      .catch(function (erro) {
+        anunciarConexao(false, String(erro.message || erro));
+      });
+  }
+
+  function abrirFluxo() {
+    if (!REMOTO || typeof global.EventSource !== "function") return;
+
+    var fonte = new global.EventSource(BASE_API + "/eventos?v=" + VERSAO);
+
+    fonte.addEventListener("open", function () {
+      anunciarConexao(true, null);
+    });
+
+    fonte.addEventListener("estado", function (evento) {
+      var corpo;
+      try {
+        corpo = JSON.parse(evento.data);
+      } catch (erro) {
+        return;
+      }
+      anunciarConexao(true, null);
+      if (typeof corpo.servidorEm === "number") {
+        desvioServidor = corpo.servidorEm - Date.now();
+      }
+
+      /* Servidor sem estado: primeira tela a abrir semeia o dele com o que tem
+       * em cache. É também o caminho de recuperação se o servidor reiniciar sem
+       * o arquivo. Um estado intocado (`atualizadoEm` zero) não semeia nada —
+       * senão uma tela recém-aberta apagaria a sessão em andamento. */
+      if (!corpo.estado) {
+        if (estado.atualizadoEm > 0) enviarAoServidor();
+        return;
+      }
+
+      receberExterno(corpo.estado);
+    });
+
+    /* O EventSource reconecta sozinho; o handler existe só para a tela saber
+     * que está desconectada enquanto isso. */
+    fonte.addEventListener("error", function () {
+      if (fonte.readyState !== global.EventSource.OPEN) {
+        anunciarConexao(false, "sem conexão com o servidor");
+      }
+    });
+  }
+
+  abrirFluxo();
+
   /* --- relógio ----------------------------------------------------------- */
 
   function decorridoMs(algum) {
     var atual = algum || estado;
     var r = atual.relogio;
-    var extra = r.rodando && r.iniciadoEm ? Date.now() - r.iniciadoEm : 0;
+    var extra = r.rodando && r.iniciadoEm ? agora() - r.iniciadoEm : 0;
     return Math.max(0, r.acumuladoMs + extra);
   }
 
@@ -274,7 +413,7 @@
   var relogio = {
     iniciar: function () {
       if (estado.relogio.rodando) return;
-      atualizar({ relogio: { rodando: true, iniciadoEm: Date.now() } });
+      atualizar({ relogio: { rodando: true, iniciadoEm: agora() } });
     },
     pausar: function () {
       if (!estado.relogio.rodando) return;
@@ -295,7 +434,7 @@
       atualizar({
         relogio: {
           acumuladoMs: alvo,
-          iniciadoEm: estado.relogio.rodando ? Date.now() : null
+          iniciadoEm: estado.relogio.rodando ? agora() : null
         }
       });
     },
@@ -330,7 +469,7 @@
   function restantePausaMs(algum) {
     var atual = algum || estado;
     if (!pausaAtiva(atual)) return 0;
-    return atual.pausa.terminaEm - Date.now();
+    return atual.pausa.terminaEm - agora();
   }
 
   /* --- ações de mesa ----------------------------------------------------- */
@@ -441,7 +580,7 @@
           pausa: {
             pendente: false,
             duracaoMs: minutos * MINUTO,
-            terminaEm: Date.now() + minutos * MINUTO,
+            terminaEm: agora() + minutos * MINUTO,
             retomarRelogio: rodando,
             usadas: usadas
           }
@@ -502,6 +641,21 @@
     },
     relogio: relogio,
     acoes: acoes,
+    /* Relógio ajustado ao do servidor; use em vez de `Date.now()`. */
+    agora: agora,
+    conexao: function () {
+      return conexao;
+    },
+    /* Como `assinar`, mas para o estado da conexão com o servidor. */
+    assinarConexao: function (cb) {
+      assinantesConexao.push(cb);
+      cb(conexao);
+      return function () {
+        assinantesConexao = assinantesConexao.filter(function (item) {
+          return item !== cb;
+        });
+      };
+    },
     decorridoMs: decorridoMs,
     restanteMs: restanteMs,
     pausaAtiva: pausaAtiva,

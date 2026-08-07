@@ -1,0 +1,5 @@
+# Estado da sessão gravado pelo servidor. Localmente cai em servidor/; no VPS o
+# container o grava em estado/ (ver ARQUIVO_ESTADO no compose.yml).
+servidor/estado.json
+servidor/estado.json.tmp
+estado/
