@@ -3,3 +3,6 @@
 servidor/estado.json
 servidor/estado.json.tmp
 estado/
+
+# Segredos (chave da ElevenLabs). O repositório é público — nunca versionar.
+.env

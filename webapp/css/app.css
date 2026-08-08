@@ -204,6 +204,12 @@
   justify-content: flex-end;
 }
 
+/* Nota de rodapé de um campo: explica um controle sem virar um parágrafo. */
+.dica {
+  color: var(--texto-tenue);
+  font-size: 0.75rem;
+}
+
 /* Campos dentro de uma linha compartilham o espaço com o botão ao lado. */
 .linha > input {
   flex: 1 1 110px;
@@ -1026,6 +1032,54 @@
   color: var(--ouro);
 }
 
+/* --- portão de acesso ----------------------------------------------------- */
+
+/* Enquanto a senha não entra, o conteúdo da página protegida não aparece.
+ * `visibility` em vez de `display`: some sem recalcular layout nenhum, e o
+ * diálogo (filho do body) reativa a visibilidade só para si. */
+html[data-travado] body {
+  visibility: hidden;
+}
+
+html[data-travado] body > .portao,
+html[data-travado] body > .portao * {
+  visibility: visible;
+}
+
+/* Sem isso a página protegida rola atrás do diálogo. */
+html[data-travado] body {
+  overflow: hidden;
+}
+
+.portao__texto {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--texto-fraco);
+}
+
+.portao__erro {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffb3c0;
+}
+
+/* O link "Sou jogador" é um <a> com cara de botão: precisa desmanchar o
+ * sublinhado que o tema dá a toda âncora. */
+.portao__caixa .btn {
+  border-bottom: none;
+}
+
+.hub__acesso {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.4rem;
+}
+
+.hub__acesso .btn {
+  border-bottom: none;
+}
+
 /* Recado de compra. */
 .recado {
   position: fixed;
@@ -1382,6 +1436,73 @@
   box-shadow: 0 0 18px rgba(178, 58, 77, 0.6);
 }
 
+/* Sala onde o grupo está. Fica acima do cronômetro, que continua sendo o
+ * número principal da tela. */
+.sala-atual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.sala-atual__nome {
+  margin: 0;
+  font-size: clamp(1.6rem, 4.5vw, 3rem);
+  line-height: 1.05;
+  color: var(--lilas);
+  text-shadow: 0 0 40px rgba(157, 92, 240, 0.4);
+}
+
+.sala-atual__sub {
+  margin: 0;
+  font-size: clamp(0.8rem, 1.6vw, 1rem);
+  color: var(--texto-fraco);
+}
+
+/* Com uma tabela projetada o espaço é do conteúdo; a sala vira uma linha. */
+.relogio--com-exibicao .sala-atual__nome {
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+}
+
+.relogio--com-exibicao .sala-atual__sub {
+  display: none;
+}
+
+/* Controle da trilha. Fixo no canto oposto ao aviso de conexão e discreto: a
+ * tela é projetada, ele existe só para o toque que libera o autoplay e para
+ * mutar o som sem mexer no estado das outras telas. */
+.trilha__botao {
+  position: fixed;
+  left: 1.2rem;
+  bottom: 1.2rem;
+  z-index: 60;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  background: rgba(123, 63, 191, 0.14);
+  color: var(--texto-fraco);
+  font-family: var(--fonte-corpo);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: color var(--transicao), border-color var(--transicao);
+}
+
+.trilha__botao[aria-pressed="true"] {
+  color: var(--lilas);
+}
+
+/* Autoplay recusado: o botão precisa ser achado de longe, é o único jeito de a
+ * trilha começar. */
+.trilha__botao--bloqueado {
+  border-color: var(--ouro);
+  background: rgba(217, 169, 92, 0.16);
+  color: var(--ouro);
+  font-size: 0.95rem;
+  animation: pulso 2s ease-in-out infinite;
+}
+
 /* Pausa na tela do Relógio: presente, mas menor que o cronômetro da sessão. */
 .pausa-mini {
   display: flex;
@@ -1496,6 +1617,227 @@
   pointer-events: none;
 }
 
+/* --- monstros (consulta rápida) ------------------------------------------ */
+
+.monstros__filtro {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+  padding: 0.9rem 1.1rem;
+  background: rgba(16, 10, 28, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+.monstros__filtro input {
+  max-width: 320px;
+}
+
+.monstros__vazio {
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.monstro-grade {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  align-items: start;
+}
+
+.monstro {
+  padding: 1.1rem 1.2rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.monstro__cabeca {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.monstro__titulo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.monstro__titulo h3 {
+  font-size: 1.2rem;
+}
+
+.monstro__apelido {
+  font-size: 0.85rem;
+  color: var(--lilas);
+}
+
+.monstro__quantidade {
+  flex: 0 0 auto;
+}
+
+.monstro__classificacao {
+  margin: -0.3rem 0 0;
+  font-family: var(--fonte-display);
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--texto-fraco);
+}
+
+.monstro__nota {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ouro);
+}
+
+.monstro__vitals {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--borda);
+  border-bottom: 1px solid var(--borda);
+}
+
+.monstro__atributos {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.4rem;
+  text-align: center;
+}
+
+.monstro__atributo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.3rem 0.15rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: rgba(8, 4, 15, 0.4);
+}
+
+.monstro__atributo strong {
+  font-family: var(--fonte-mono);
+  font-size: 0.9rem;
+}
+
+.monstro__linhas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--texto-fraco);
+}
+
+.monstro__linhas strong {
+  color: var(--texto);
+}
+
+.monstro__secao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.monstro__secao h4 {
+  font-family: var(--fonte-corpo);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brilho-forte);
+  margin: 0;
+}
+
+.monstro__item {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.monstro__item strong {
+  font-style: italic;
+  color: var(--texto);
+}
+
+.monstro__fonte {
+  margin: 0.2rem 0 0;
+  font-size: 0.72rem;
+  color: var(--texto-tenue);
+}
+
+.monstro__rolagens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.35rem 0 0.2rem;
+}
+
+/* --- log de rolagens (Mestre e Monstros) --------------------------------- */
+
+.rolagem-log {
+  position: fixed;
+  left: 1.2rem;
+  bottom: 1.2rem;
+  z-index: 55;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.3rem;
+  max-width: 380px;
+  max-height: 40vh;
+  overflow-y: auto;
+  pointer-events: none;
+}
+
+.rolagem-log:empty {
+  display: none;
+}
+
+.rolagem-log__item {
+  margin: 0;
+  padding: 0.4rem 0.7rem;
+  font-family: var(--fonte-mono);
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: var(--texto-fraco);
+  background: rgba(16, 10, 28, 0.88);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  backdrop-filter: blur(6px);
+}
+
+.rolagem-log__item--resolvida {
+  color: var(--texto);
+  border-color: var(--borda-forte);
+}
+
+/* --- dado 3D (tela do Relógio) -------------------------------------------- */
+
+.dado-3d {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.dado-3d--ativo {
+  opacity: 1;
+}
+
+.dado-3d canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 @media (max-width: 640px) {
   .conteudo,
   .jogadores__barra,
@@ -1506,5 +1848,9 @@
 
   .topo {
     padding: 0.85rem 1rem;
+  }
+
+  .monstro__atributos {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

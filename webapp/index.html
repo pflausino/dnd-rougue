@@ -6,6 +6,9 @@
   <title>A Última Dungeon | Painel</title>
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/app.css">
+  <!-- O hub não é protegido: é a porta de entrada de todos. O portão só decide
+       quais cartões aparecem. -->
+  <script src="js/portao.js"></script>
 </head>
 <body>
   <main class="hub">
@@ -15,21 +18,43 @@
       <p class="hub__sub">Abra cada tela em uma janela própria. Elas se sincronizam automaticamente.</p>
 
       <div class="hub__grade">
-        <a class="cartao" href="mestre.html">
-          <span class="rotulo">Controle</span>
-          <h2>Mestre</h2>
-          <p>Comanda a tela dos jogadores, o relógio, as runs e o ouro do grupo.</p>
-        </a>
         <a class="cartao" href="jogadores.html">
           <span class="rotulo">Mesa</span>
           <h2>Jogadores</h2>
           <p>Tela pública: dungeon ou acampamento, tempo restante e ouro do grupo.</p>
         </a>
-        <a class="cartao" href="relogio.html">
+        <a class="cartao" href="mestre.html" data-exige-acesso hidden>
+          <span class="rotulo">Controle</span>
+          <h2>Mestre</h2>
+          <p>Comanda a tela dos jogadores, o relógio, as runs e o ouro do grupo.</p>
+        </a>
+        <a class="cartao" href="relogio.html" data-exige-acesso hidden>
           <span class="rotulo">Tempo</span>
           <h2>Relógio</h2>
           <p>Cronômetro da sessão de 4 horas em tela cheia, controlado pelo mestre.</p>
         </a>
+        <a class="cartao" href="loot.html" data-exige-acesso hidden>
+          <span class="rotulo">Fechamento</span>
+          <h2>Loot</h2>
+          <p>Calculadora do ouro da run a partir dos abates de cada encontro.</p>
+        </a>
+        <a class="cartao" href="monstros.html" data-exige-acesso hidden>
+          <span class="rotulo">Referência</span>
+          <h2>Monstros</h2>
+          <p>Bloco de estatística de todos os monstros da dungeon, para consulta rápida.</p>
+        </a>
+      </div>
+
+      <!-- Sem senha, o hub mostra só a tela da mesa. O botão manda para a tela
+           do Mestre, que é quem pede a senha — não há um segundo diálogo aqui. -->
+      <div class="hub__acesso" data-sem-acesso hidden>
+        <a class="btn btn--fantasma" href="mestre.html">Entrar como mestre</a>
+      </div>
+
+      <div class="hub__acesso" data-exige-acesso hidden>
+        <button class="btn btn--fantasma btn--pequeno" type="button" data-portao-sair>
+          Sair do modo mestre
+        </button>
       </div>
 
       <p class="hub__nota">

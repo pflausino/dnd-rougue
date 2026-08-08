@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR" data-protegido>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monstros | A Última Dungeon</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/app.css">
+  <!-- No <head>, fora do bloco do fim da página: a trava tem de entrar antes
+       do corpo pintar, senão a tela pisca antes de pedir a senha. -->
+  <script src="js/portao.js"></script>
+</head>
+<body>
+  <header class="topo">
+    <div class="topo__titulo">
+      <span class="marca">A Última Dungeon</span>
+      <h1>Monstros — consulta rápida</h1>
+    </div>
+    <nav class="nav">
+      <a href="index.html">Painel</a>
+      <a href="mestre.html">Mestre</a>
+      <a href="loot.html">Loot</a>
+      <a href="monstros.html" aria-current="page">Monstros</a>
+    </nav>
+  </header>
+
+  <main class="conteudo">
+    <div class="monstros__filtro">
+      <label class="campo" style="flex:1">
+        <span class="rotulo">Buscar</span>
+        <input type="text" data-busca-monstros placeholder="Nome do monstro…" autocomplete="off">
+      </label>
+    </div>
+
+    <div data-lista-monstros></div>
+    <p class="monstros__vazio vazio" data-monstros-vazio hidden>Nenhum monstro encontrado.</p>
+  </main>
+
+  <script src="js/state.js"></script>
+  <script src="js/aviso-conexao.js"></script>
+  <script src="data/monstros.js"></script>
+  <script src="js/monstros.js"></script>
+  <script src="js/log-rolagens.js"></script>
+</body>
+</html>

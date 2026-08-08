@@ -53,7 +53,14 @@ var TIPOS = {
   ".svg": "image/svg+xml",
   ".ico": "image/x-icon",
   ".woff2": "font/woff2",
-  ".md": "text/plain; charset=utf-8"
+  ".mp3": "audio/mpeg",
+  ".ogg": "audio/ogg",
+  ".m4a": "audio/mp4",
+  ".md": "text/plain; charset=utf-8",
+  /* dice-box (webapp/assets/dice-box/) carrega isto via WebAssembly.instantiateStreaming,
+   * que exige o Content-Type correto — sem ele cai num caminho mais lento e,
+   * em alguns navegadores, falha. */
+  ".wasm": "application/wasm"
 };
 
 /* --- estado -------------------------------------------------------------- */
@@ -185,7 +192,33 @@ function resolverArquivo(caminho) {
   return alvo;
 }
 
-function servirEstatico(caminho, resposta) {
+/* `bytes=inicio-fim`, com qualquer das pontas omitida. Devolve null para o que
+ * não for uma faixa simples: múltiplas faixas e sufixos malformados caem no
+ * 200 inteiro, que é resposta válida para um Range que o servidor não atende. */
+function faixaPedida(cabecalho, tamanho) {
+  var achado = /^bytes=(\d*)-(\d*)$/.exec((cabecalho || "").trim());
+  if (!achado) return null;
+
+  var temInicio = achado[1] !== "";
+  var temFim = achado[2] !== "";
+  if (!temInicio && !temFim) return null;
+
+  var inicio;
+  var fim;
+  if (!temInicio) {
+    /* `bytes=-500`: os últimos 500 bytes. */
+    inicio = Math.max(0, tamanho - Number(achado[2]));
+    fim = tamanho - 1;
+  } else {
+    inicio = Number(achado[1]);
+    fim = temFim ? Math.min(Number(achado[2]), tamanho - 1) : tamanho - 1;
+  }
+
+  if (inicio > fim || inicio >= tamanho) return { invalida: true };
+  return { inicio: inicio, fim: fim };
+}
+
+function servirEstatico(caminho, resposta, faixaBruta) {
   var alvo = resolverArquivo(caminho);
   if (!alvo) return responderTexto(resposta, 404, "não encontrado");
 
@@ -199,7 +232,7 @@ function servirEstatico(caminho, resposta) {
         resposta.writeHead(301, { Location: caminho + "/" });
         return resposta.end();
       }
-      return servirEstatico(caminho + "index.html", resposta);
+      return servirEstatico(caminho + "index.html", resposta, faixaBruta);
     }
 
     var extensao = path.extname(alvo).toLowerCase();
@@ -207,10 +240,15 @@ function servirEstatico(caminho, resposta) {
 
     /* `no-cache` revalida sempre, e o ETag faz a revalidação custar um 304.
      * Cache heurístico do Chrome já custou tempo de caça a "bug" que era JS
-     * velho — para seis pessoas numa mesa, o tráfego extra não pesa. */
+     * velho — para seis pessoas numa mesa, o tráfego extra não pesa.
+     *
+     * `Accept-Ranges` existe pelas trilhas: o Safari recusa tocar mídia de um
+     * servidor que não atende Range, e o Chrome precisa dele para rebobinar a
+     * faixa no loop sem baixar tudo de novo. */
     var cabecalhos = {
       "Content-Type": TIPOS[extensao] || "application/octet-stream",
       "Cache-Control": "no-cache",
+      "Accept-Ranges": "bytes",
       ETag: etag
     };
 
@@ -219,9 +257,26 @@ function servirEstatico(caminho, resposta) {
       return resposta.end();
     }
 
-    cabecalhos["Content-Length"] = info.size;
-    resposta.writeHead(200, cabecalhos);
-    fs.createReadStream(alvo)
+    var faixa = faixaPedida(faixaBruta, info.size);
+
+    if (faixa && faixa.invalida) {
+      cabecalhos["Content-Range"] = "bytes */" + info.size;
+      resposta.writeHead(416, cabecalhos);
+      return resposta.end();
+    }
+
+    var opcoes = {};
+    if (faixa) {
+      opcoes = { start: faixa.inicio, end: faixa.fim };
+      cabecalhos["Content-Range"] = "bytes " + faixa.inicio + "-" + faixa.fim + "/" + info.size;
+      cabecalhos["Content-Length"] = faixa.fim - faixa.inicio + 1;
+      resposta.writeHead(206, cabecalhos);
+    } else {
+      cabecalhos["Content-Length"] = info.size;
+      resposta.writeHead(200, cabecalhos);
+    }
+
+    fs.createReadStream(alvo, opcoes)
       .on("error", function () {
         resposta.destroy();
       })
@@ -355,7 +410,7 @@ var servidor = http.createServer(function (pedido, resposta) {
     return resposta.end();
   }
 
-  return servirEstatico(caminho, resposta);
+  return servirEstatico(caminho, resposta, pedido.headers.range);
 });
 
 /* O `requestTimeout` do Node derruba requisições longas, e o SSE de uma sessão

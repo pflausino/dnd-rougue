@@ -1,11 +1,14 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-protegido>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Relógio | A Última Dungeon</title>
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/app.css">
+  <!-- No <head>, fora do bloco do fim da página: a trava tem de entrar antes
+       do corpo pintar, senão a tela pisca antes de pedir a senha. -->
+  <script src="js/portao.js"></script>
 </head>
 <body>
   <main class="relogio" data-relogio>
@@ -14,6 +17,12 @@
       <a href="mestre.html">Mestre</a>
       <a href="loot.html">Loot</a>
     </nav>
+
+    <!-- Sala onde o grupo está, indicada pelo Mestre -->
+    <div class="sala-atual" data-sala hidden>
+      <h2 class="sala-atual__nome" data-sala-nome></h2>
+      <p class="sala-atual__sub" data-sala-sub></p>
+    </div>
 
     <span class="rotulo" data-estado>Pausado</span>
     <p class="relogio__digitos mono" data-digitos>04:00:00</p>
@@ -53,9 +62,16 @@
     </section>
   </main>
 
+  <!-- Fora do <main>: o autoplay só libera com um toque nesta aba, e o botão
+       não pode empurrar o conteúdo da tela projetada. -->
+  <button class="trilha__botao" type="button" data-trilha-botao hidden>Trilha ligada</button>
+
   <script src="js/state.js"></script>
   <script src="js/aviso-conexao.js"></script>
   <script src="data/tabelas.js"></script>
+  <script src="data/salas.js"></script>
   <script src="js/relogio.js"></script>
+  <script src="js/trilha.js"></script>
+  <script type="module" src="js/dados-3d.js"></script>
 </body>
 </html>

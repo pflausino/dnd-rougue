@@ -18,10 +18,14 @@ outro (a tabela no fim do README mapeia os pares).
 - HTML, CSS e JavaScript puros. **Sem build, sem dependências, sem framework.**
   Vale para [`servidor/servidor.js`](servidor/servidor.js) também: só a
   biblioteca padrão do Node, mesmo estilo dos scripts do front.
+  **Única exceção:** [`webapp/assets/dice-box/`](webapp/assets/dice-box/) — a
+  lib de dado 3D da tela do Relógio (`js/dados-3d.js`), vendorizada (baixada
+  do unpkg, não CDN, não npm) porque física 3D não dá pra fazer em CSS puro.
+  É também o único módulo ES do projeto — `dice-box` só publica como import.
 - Cada script é um IIFE com `"use strict"`, usa `var` e `function` (ES5 no
   estilo, apesar de rodar em navegador moderno) e conversa com o estado por
   `window.Dungeon`. Dados globais ficam em `window.CATALOGO_BRAM`,
-  `window.BENCAOS`, `window.EXIBICOES`, `window.ENCONTROS_LOOT`.
+  `window.BENCAOS`, `window.EXIBICOES`, `window.ENCONTROS_LOOT`, `window.SALAS`.
 - Nomes de variáveis, funções, ids e comentários em **português**. Termos de
   regra de D&D ficam como estão nas fichas (`Nick`, `Potion of Healing`).
 - Comentários explicam **por quê**, não o quê; existem onde a decisão não é
@@ -44,7 +48,7 @@ Tudo em [`webapp/js/state.js`](webapp/js/state.js), a única fonte de estado:
 - **Servido por `file://` a quarta via não liga** (`REMOTO` é falso) e o painel
   se comporta como antes. Com servidor, ele é a autoridade e o `localStorage`
   passa a ser cache local.
-- A chave, o canal e a rota da API carregam a versão do formato (`...:estado:v9`).
+- A chave, o canal e a rota da API carregam a versão do formato (`...:estado:v11`).
   **Ao mudar o formato, suba `VERSAO`** — isso isola abas antigas e descarta a
   sessão anterior, que é o comportamento desejado. O servidor guarda um estado
   por versão, seguindo a mesma trava.
@@ -87,6 +91,125 @@ Armadilhas já pagas, não repita:
   altura da viewport, sem rolagem. Ao acrescentar coisas ali, confira
   `document.documentElement.scrollHeight <= innerHeight`.
 
+## Trilha das salas
+
+A tela do Relógio toca a faixa da sala escolhida pelo mestre
+([`webapp/js/trilha.js`](webapp/js/trilha.js)). Quatro coisas já pagas:
+
+- **Os MP3 vivem em `webapp/assets/audio/`**, não em `referencias/`. O servidor
+  só publica `webapp/` e `loja/` — arquivo em `referencias/` dá 404 no navegador.
+- **`servidor.js` atende `Range`.** Não é enfeite: o Safari recusa tocar mídia de
+  um servidor sem `Accept-Ranges`, e sem isso rebobinar a faixa no loop rebaixa o
+  arquivo inteiro. Ao mexer em `servirEstatico`, mantenha o 206.
+- **O loop é à mão, com dois `<audio>` e cruzamento de 5 s.** `audio.loop = true`
+  dá corte seco no fim da faixa, audível na mesa. O ramp usa curva de potência
+  constante (`sin(g·π/2)`): linear afunda o volume no meio da emenda, que é
+  justamente o que o crossfade deveria esconder.
+- **O autoplay é bloqueado até alguém tocar naquela aba.** Por isso o botão
+  *Ativar trilha*; recarregar a página exige um toque novo. Não há como contornar
+  — é política do navegador, não bug.
+
+## Portão de acesso
+
+[`webapp/js/portao.js`](webapp/js/portao.js) separa o que a mesa vê do que só o
+mestre vê. Abertas sem senha: **Jogadores** e as duas **lojas**. Pedem senha:
+**Mestre, Relógio, Loot e Monstros**. O **hub** (`index.html`) fica aberto — é a
+porta de entrada de todos — e só esconde os cartões das telas de controle.
+
+- **Isto é ofuscação, não segurança, e o comentário no topo do arquivo diz isso
+  em voz alta.** A conferência roda no cliente: quem abrir o DevTools grava
+  `ultima-dungeon:acesso` na mão e entra. Serve para o jogador não abrir a tela
+  do mestre por engano na mesa. **Em `dungeon.pflausino.xyz` não barra ninguém
+  de fora** — para isso o servidor teria de recusar as páginas, o que exigiria
+  mexer em `servirEstatico` (e derrubaria o modo `file://`, que não tem
+  servidor). Não prometa proteção que este arquivo não entrega.
+- A senha vive como **impressão FNV-1a** (`IMPRESSAO`), não em texto puro — só
+  para não entregar a senha a quem abre o arquivo por curiosidade. Trocar:
+  `Portao.impressao("nova senha")` no console e colar o resultado.
+- **A chave do `localStorage` não carrega a `VERSAO` do estado**, de propósito:
+  subir o formato do estado descarta a sessão de jogo, mas não pode deslogar o
+  mestre no meio da mesa.
+- Duas formas de usar, as duas por atributo, como o resto do projeto:
+  `data-protegido` no `<html>` trava a página inteira; `data-exige-acesso` num
+  elemento o esconde sem a senha (é o que tira o link *Painel* da tela dos
+  Jogadores), e `data-sem-acesso` faz o inverso.
+- **`portao.js` entra no `<head>`, não no bloco do fim da página.** É a única
+  exceção à ordem dos scripts do projeto, e tem motivo: a trava precisa entrar
+  antes do corpo pintar, senão a tela do mestre pisca inteira antes de pedir a
+  senha.
+- A trava esconde com `visibility`, não `display`: o `<dialog>` é filho do
+  `body` e reativa a visibilidade só para si, sem recalcular layout nenhum.
+- `Esc` no diálogo é cancelado à mão. Sem isso o `<dialog>` fecharia e deixaria
+  a tela travada e sem saída.
+- **Ainda descoberto:** o botão *+ Ouro do loot* na tela dos Jogadores é um
+  controle de mestre numa tela aberta — quem estiver na frente da TV pode somar
+  ouro. Não foi fechado porque também é o atalho que o mestre usa ali; marcar
+  com `data-exige-acesso` resolve, se um dia incomodar.
+
+## Rolagens de dado
+
+A tela de Monstros (`webapp/js/monstros.js`) tem botões de rolagem nos blocos
+de estatística. Quem decide o número é a tela do Relógio, não quem clicou:
+
+- **O clique só pede a rolagem** (`Dungeon.acoes.pedirRolagem`, grava
+  `estado.rolagem` com `status: "pendente"`). Quem resolve de fato
+  (`resolverRolagem`) é [`webapp/js/dados-3d.js`](webapp/js/dados-3d.js), na
+  tela do Relógio — o número que sai da física do dado 3D é o oficial, porque
+  a lib não tem como *forçar* o dado a cair num valor escolhido de fora.
+- **Sem a tela do Relógio aberta, quem pediu resolve sozinho** depois de uma
+  espera (`ESPERA_RETORNO_MS` em `monstros.js`). Por isso o botão nunca trava
+  o jogo, mesmo sem a TV ligada — só perde a animação.
+- **`pendente` e `resolvida` chegam com o mesmo `id`.** Um assinante que
+  distinga só por id (em vez de por id *e* status) processa a primeira
+  notificação e ignora a segunda — foi o bug do log em
+  [`webapp/js/log-rolagens.js`](webapp/js/log-rolagens.js): guarde o que já foi
+  renderizado por linha (`dataset.resolvida`), não por id isolado.
+- **`animando` existe pra travar o retorno local enquanto o dado real está no
+  ar.** Sem esse status intermediário entre `pendente` e `resolvida`, dava pra
+  o retorno local de `monstros.js` gravar um número diferente enquanto o dado
+  3D já tinha começado a cair de verdade — a física, uma vez iniciada, não tem
+  como ser cancelada, então o dado terminava mostrando uma face que não batia
+  com o que ficou salvo no estado. `dados-3d.js` grava `animando`
+  (`marcarRolagemAnimando`) no instante exato antes de chamar `box.roll()`, e o
+  retorno local só age se o status ainda for `pendente`. Se depois disso a
+  física falhar ou nunca terminar, quem resolve é o próprio `dados-3d.js` no
+  `catch` — ele que travou a rolagem, ele que tem de destravar.
+- **`box.roll({qty, sides, ...})` devolve um array PLANO — não array de grupos
+  com `.rolls`.** `resultados[0].rolls.map(...)` (o que os docs de "Common
+  Objects" da lib sugerem) dá `undefined` pra essa forma de chamar `roll` — o
+  formato com `.rolls` é de outra assinatura, não desta. Foi bug real, não
+  suposição: ficou gravado `console.error` a cada clique, a noite inteira,
+  antes de alguém notar. O `.catch` engolia o erro e caía num Math.random()
+  novo e **desconectado do resultado físico real** (que estava certo, só não
+  lido) — por isso o dado rolava uma face e o log mostrava outro número
+  qualquer, sem relação nenhuma. Leitura certa é `resultados.map(d => d.value)`
+  direto. Se voltar a mexer nisso, teste isolado primeiro (sem app no meio,
+  ver o padrão acima) e confira o `console.error` a cada rolagem — ele avisa.
+- **`assetPath` do `dice-box` tem de ser absoluto.** A lib cria o worker de
+  física a partir de uma *blob URL* (`new Worker(URL.createObjectURL(blob))`),
+  e é o worker que busca o tema (`theme.config.json`, malha, texturas). Uma
+  blob URL não tem diretório — um `assetPath` relativo resolve certinho na
+  thread principal mas não bate em lugar nenhum dentro do worker, e o
+  carregamento do tema fica pendente pra sempre, **sem erro nenhum** (nem
+  `catch`, nem evento `error` do worker). `dados-3d.js` usa
+  `new URL("../assets/dice-box/assets/", import.meta.url).href` para sempre
+  mandar um caminho absoluto, robusto a prefixo de proxy diferente.
+- **Mesmo com o caminho certo, `init()`/`roll()` podem nunca resolver.** Rede
+  lenta, WebGL ausente, disco lento na primeira carga — a promise não resolve
+  nem rejeita, só fica pendente. `dados-3d.js` embrulha os dois num timeout
+  próprio (`comLimite`) por isso; sem ele a tela do Relógio trava esperando o
+  dado por toda a sessão.
+- **`suspendSimulation: true` não é o que parece — desliga a cena 3D inteira.**
+  A descrição ("usa RNG em vez de física 3D") sugere só pular a física e manter
+  a queda visual; na prática é um modo sem visual nenhum, pensado para uso
+  headless. Ligá-la faz o dado nunca aparecer. Já foi tentado e revertido aqui.
+- **Física real pode divergir do valor gravado — é limitação conhecida, não
+  bug deste app.** O próprio Roll20 sofre disso há anos (fórum cheio de
+  reclamação): o "leitor" de face às vezes marca a rolagem como parada um
+  instante antes da física acomodar de verdade. `dados-3d.js` amortece a
+  física (menos força, menos altura, `settleTimeout` maior) para reduzir a
+  chance, mas não elimina — é física de verdade, não teatro.
+
 ## Testar
 
 Não há suíte automatizada. O ciclo usado até agora:
@@ -100,7 +223,7 @@ Não há suíte automatizada. O ciclo usado até agora:
 
 Ao mexer na sincronização, dois testes que pegam o que o olho não pega:
 
-- **Simular a outra máquina com `curl`.** `GET /api/estado?v=9`, mudar um campo,
+- **Simular a outra máquina com `curl`.** `GET /api/estado?v=10`, mudar um campo,
   `POST` de volta: a tela aberta tem de reagir sem F5. É o único jeito fácil de
   exercitar o caminho do servidor em vez do `BroadcastChannel`, que atende as
   abas do mesmo navegador e mascara um SSE quebrado.
@@ -111,6 +234,14 @@ Ao mexer na sincronização, dois testes que pegam o que o olho não pega:
 Para o modo `file://`, que a automação do Chrome não alcança, dá para carregar
 `state.js` num `window` falso com `vm.runInContext` e conferir que `REMOTO` é
 falso, que nenhum `EventSource` abre e que o `localStorage` continua recebendo.
+
+**Dado 3D: se `init()`/`roll()` nunca resolverem, confira `assetPath` antes de
+qualquer outra coisa.** Foi a causa real de uma tarde perdida — parecia bug de
+ambiente (WebGL, extensão de automação, rede), mas era o `assetPath` relativo
+não batendo dentro do worker de blob URL da lib (ver "Rolagens de dado"
+acima). O sintoma é sempre o mesmo: nem erro, nem rejeição, só pendente para
+sempre. Confirmar com `new URL(assetPath, import.meta.url)` OU um `origin`
+absoluto antes de suspeitar de mais nada.
 
 **Cache do Chrome atrapalhava muito** com `python3 -m http.server`, que não manda
 `Cache-Control` — o navegador servia JS/CSS antigos por heurística e já custou

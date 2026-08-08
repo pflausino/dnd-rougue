@@ -18,7 +18,7 @@
   /* A versão entra na chave, no canal e na rota da API: telas de versões
    * diferentes (uma aba antiga que ficou aberta, por exemplo) não disputam o
    * mesmo estado. */
-  var VERSAO = 9;
+  var VERSAO = 11;
   var CHAVE = "ultima-dungeon:estado:v" + VERSAO;
   var NOME_CANAL = "ultima-dungeon:v" + VERSAO;
   var INTERVALO_POLL = 500;
@@ -112,6 +112,9 @@
         duracaoMs: DURACAO_PADRAO_MS
       },
       modo: "acampamento",
+      /* Onde o grupo está agora, por id de data/salas.js. É o que a tela do
+       * Relógio nomeia e de onde ela tira a trilha. null = sala não indicada. */
+      sala: null,
       /* Interruptores que o mestre liga na mesa conforme o grupo progride. */
       mecanicas: {
         lojaIria: false
@@ -145,7 +148,12 @@
         duracaoMs: 0,
         retomarRelogio: false,
         usadas: { 5: 0, 10: 0, 30: 0 }
-      }
+      },
+      /* Última rolagem pedida na tela de Monstros. "pendente" = ainda sem
+       * resultado; a tela do Relógio (dado 3D) ou, na falta dela, quem pediu
+       * é que preenche `dados`/`resultado` e vira "resolvida". null = nenhuma
+       * rolagem ainda, ou a última já foi de uma versão anterior do formato. */
+      rolagem: null
     };
   }
 
@@ -489,6 +497,11 @@
       atualizar({ ouro: estado.ouro - valor });
       return true;
     },
+    /* Sala onde o grupo está. Clicar na mesma sala de novo desmarca — é como o
+     * mestre corta a trilha sem ter de escolher outra sala. */
+    definirSala: function (id) {
+      atualizar({ sala: id === estado.sala ? null : id || null });
+    },
     /* id nulo devolve a tela do Relógio ao cronômetro puro. */
     definirExibicao: function (id, variante) {
       atualizar({ exibicao: { id: id || null, variante: variante || null } });
@@ -614,6 +627,59 @@
       estado.atualizadoEm = carimbar();
       gravar();
       notificar("local");
+    },
+    /* Pede uma rolagem (dado da ficha de monstro + bônus). Devolve o id para
+     * quem pediu casar com `resolverRolagem` — inclui `agora()` porque dois
+     * cliques rápidos no mesmo botão precisam de ids diferentes. Quem resolve
+     * de fato é a tela do Relógio, com o dado 3D; sem ela conectada, quem
+     * pediu tem um retorno próprio via Math.random(). */
+    pedirRolagem: function (detalhe) {
+      var id = [detalhe.monstro, detalhe.acao, detalhe.rotulo, agora()].join(":");
+      atualizar({
+        rolagem: {
+          id: id,
+          monstro: detalhe.monstro,
+          apelido: detalhe.apelido || null,
+          acao: detalhe.acao,
+          rotulo: detalhe.rotulo,
+          qtd: detalhe.qtd,
+          lados: detalhe.lados,
+          bonus: detalhe.bonus || 0,
+          tipo: detalhe.tipo || null,
+          status: "pendente",
+          dados: null,
+          resultado: null
+        }
+      });
+      return id;
+    },
+    /* Trava a rolagem em "animando": o dado 3D já carregou e está de fato
+     * caindo. Sem isso, o retorno local de quem pediu (js/monstros.js) pode
+     * destravar a rolagem enquanto o dado real ainda está no ar — o dado
+     * termina de rolar do mesmo jeito (a física já começou, não dá pra
+     * cancelar), só que a face que ele mostra não vai bater com o número que
+     * o retorno local gravou por cima. "animando" impede o retorno local de
+     * agir enquanto o dado de verdade está em voo. */
+    marcarRolagemAnimando: function (id) {
+      if (!estado.rolagem || estado.rolagem.id !== id || estado.rolagem.status !== "pendente") {
+        return false;
+      }
+      atualizar({ rolagem: { status: "animando" } });
+      return true;
+    },
+    /* Resolve uma rolagem "pendente" ou "animando" — nunca uma já resolvida.
+     * Evita que uma segunda tela de Relógio, ou um retorno atrasado,
+     * sobrescreva o resultado já mostrado. */
+    resolverRolagem: function (id, dados, resultado) {
+      if (
+        !estado.rolagem ||
+        estado.rolagem.id !== id ||
+        (estado.rolagem.status !== "pendente" && estado.rolagem.status !== "animando")
+      ) {
+        return false;
+      }
+      atualizar({ rolagem: { status: "resolvida", dados: dados, resultado: resultado } });
+      return true;
     }
   };
 
