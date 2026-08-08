@@ -4,7 +4,8 @@ Aplicativo web e referências de **A Última Dungeon**, uma one-shot roguelike d
 D&D 5e para 6 jogadores de nível 3, em cerca de 4 horas.
 
 - [`webapp/`](webapp/): painel de mesa — telas do Mestre, dos Jogadores, do
-  Relógio, as duas lojas e a calculadora de loot.
+  Relógio, as duas lojas e a calculadora de loot. As trilhas das salas ficam em
+  `webapp/assets/audio/`.
 - [`referencias/`](referencias/): a aventura, os catálogos das lojas, as bênçãos
   e as tabelas de jogo. É a fonte da verdade; o webapp transcreve esses dados.
 - [`loja/`](loja/): arte dos mercadores e dos ícones de bênção, em
@@ -46,7 +47,7 @@ agente ficam fora do alcance de quem tiver a URL.
 | Painel | [`webapp/index.html`](webapp/index.html) | Escolhe qual tela abrir. |
 | Mestre | [`webapp/mestre.html`](webapp/mestre.html) | Mestre: relógio, run, ouro, mecânicas, pausas e o que projetar. |
 | Jogadores | [`webapp/jogadores.html`](webapp/jogadores.html) | Tela pública da mesa. |
-| Relógio | [`webapp/relogio.html`](webapp/relogio.html) | Cronômetro da sessão; só exibe, quem controla é o Mestre. |
+| Relógio | [`webapp/relogio.html`](webapp/relogio.html) | Cronômetro da sessão, sala atual e trilha; só exibe, quem controla é o Mestre. |
 | Loot | [`webapp/loot.html`](webapp/loot.html) | Mestre: contagem de abates e fechamento do ouro da run. |
 | A Última Provisão | [`webapp/bram.html`](webapp/bram.html) | Jogadores, no acampamento. |
 | O Véu Entre Vidas | [`webapp/iria.html`](webapp/iria.html) | Jogadores, no acampamento, depois da Pedra de Íria. |
@@ -84,7 +85,7 @@ sozinho e o aviso some. Sem esse aviso a queda é invisível: cada tela continua
 mostrando o que tinha e ninguém percebe que pararam de conversar.
 
 A chave e o canal levam a versão do formato no nome
-(`ultima-dungeon:estado:v9`), e estados de outra versão são ignorados. Assim uma
+(`ultima-dungeon:estado:v10`), e estados de outra versão são ignorados. Assim uma
 aba antiga que ficou aberta não corrompe o estado novo — ela apenas fica surda
 até recarregar. Mudar o formato do estado exige subir `VERSAO` em
 [`webapp/js/state.js`](webapp/js/state.js), o que descarta a sessão anterior.
@@ -96,10 +97,10 @@ O servidor guarda **um estado por versão**, espelhando essa mesma trava: subir
 
 | Rota | O que faz |
 |---|---|
-| `GET /api/eventos?v=9` | SSE. Manda o estado atual na conexão e a cada mudança. |
-| `GET /api/estado?v=9` | Estado atual, ou `null` se o servidor não tem nenhum. |
-| `POST /api/estado?v=9` | Grava o estado enviado no corpo e publica para as outras telas. |
-| `DELETE /api/estado?v=9` | Descarta a sessão daquela versão. |
+| `GET /api/eventos?v=10` | SSE. Manda o estado atual na conexão e a cada mudança. |
+| `GET /api/estado?v=10` | Estado atual, ou `null` se o servidor não tem nenhum. |
+| `POST /api/estado?v=10` | Grava o estado enviado no corpo e publica para as outras telas. |
+| `DELETE /api/estado?v=10` | Descarta a sessão daquela versão. |
 | `GET /api/saude` | Diagnóstico: quantas telas ligadas e quais versões em memória. |
 
 ## Produção
@@ -146,10 +147,13 @@ Quatro detalhes que não são opcionais:
 - **`ARQUIVO_ESTADO` aponta para `estado/`**, montado fora do `:ro` e ignorado
   pelo git, para um `git pull` não levar a sessão embora.
 
-**Nada é protegido por senha.** Quem tiver a URL alcança `mestre.html` e pode
-dar *Reiniciar tudo* na sessão. Se isso passar a incomodar, o caminho mais curto
-é `basic_auth` no bloco do Caddy cobrindo `/webapp/mestre.html` e
-`/webapp/loot.html`.
+**A senha do painel não protege de verdade.** As telas de controle (Mestre,
+Relógio, Loot, Monstros) pedem uma senha antes de abrir, mas a conferência roda
+no navegador: quem abrir o DevTools grava a chave em `localStorage` e entra. Ela
+evita o jogador abrir a tela do mestre por engano na mesa — não evita mais nada,
+e quem tiver a URL ainda alcança tudo. Barrar de verdade continua sendo
+`basic_auth` no bloco do Caddy, cobrindo `/webapp/mestre.html`,
+`/webapp/loot.html`, `/webapp/monstros.html` e `/webapp/relogio.html`.
 
 ## Tela dos Jogadores
 
@@ -257,8 +261,40 @@ o ouro não cobre o preço.
 
 Blocos independentes: **Relógio** (iniciar/pausar, ±min, duração da sessão),
 **Run** (tentativa, ouro, Registrar TPK), **Tela dos Jogadores** (Dungeon ou
-Acampamento), **Exibir no Relógio**, **Mecânicas**, **Pausas** e **Sessão**
-(duração e reiniciar tudo).
+Acampamento), **Sala atual**, **Exibir no Relógio**, **Mecânicas**, **Pausas** e
+**Sessão** (duração e reiniciar tudo).
+
+### Sala atual
+
+Um botão por sala do fluxo da aventura, de
+[`webapp/data/salas.js`](webapp/data/salas.js). A sala escolhida aparece nomeada
+no alto da tela do Relógio e escolhe a trilha que toca lá. Clicar na sala já
+marcada desmarca — é como o mestre corta a trilha sem escolher outra sala.
+
+### Trilha das salas
+
+Cada sala aponta para um MP3 em `webapp/assets/audio/<pasta>/`. Quem toca é a
+tela do Relógio, e só ela: as outras telas ficam mudas, então dá para deixar o
+Relógio na caixa de som sem que o notebook do mestre duplique o áudio.
+
+O loop é feito à mão em [`webapp/js/trilha.js`](webapp/js/trilha.js), com dois
+elementos `<audio>` e um cruzamento de cinco segundos entre o fim e o começo da
+faixa — `audio.loop` daria um corte seco, que se ouve na mesa. Trocar de sala usa
+o mesmo cruzamento. As três arenas dividem a mesma faixa e trocar entre elas não
+reinicia o áudio.
+
+Duas coisas que valem saber na hora de usar:
+
+- **O navegador não deixa a trilha começar sozinha.** A tela do Relógio é
+  projetada e ninguém encosta nela, então o autoplay cai na política do
+  navegador. Aparece um botão **Ativar trilha** no canto inferior esquerdo: um
+  toque libera o áudio pelo resto da sessão daquela aba. Depois disso o mesmo
+  botão liga e desliga o som, sem mexer no estado das outras telas — recarregar a
+  página exige um novo toque.
+- **Sala sem faixa gerada toca silêncio**, e o nome dela aparece igual. No
+  controle do mestre ela vem marcada com *(sem trilha)*. Ao gerar o áudio, largue
+  o arquivo em `webapp/assets/audio/<pasta>/batalha.mp3` e aponte o caminho no
+  campo `trilha` de [`webapp/data/salas.js`](webapp/data/salas.js).
 
 ### Exibir no Relógio
 
@@ -305,6 +341,8 @@ limpa os contadores e as salas dobradas para a próxima run.
 | `referencias/bencaos.md` | [`webapp/data/bencaos.js`](webapp/data/bencaos.js) | As nove bênçãos, a Pedra de Íria, preços e tipos. |
 | `referencias/tabelas.md` | [`webapp/data/tabelas.js`](webapp/data/tabelas.js) | Tabelas projetáveis no Relógio. |
 | `referencias/aventura.md` (seção 13) | [`webapp/data/loot.js`](webapp/data/loot.js) | Inimigos, ND e faixas de ouro. |
+| `referencias/aventura.md` (seção 2) | [`webapp/data/salas.js`](webapp/data/salas.js) | Salas do fluxo e a trilha de cada uma. |
+| `referencias/aventura.md` (seção 15) | [`webapp/data/monstros.js`](webapp/data/monstros.js) | Blocos de estatística dos 13 monstros e as rolagens de cada ação. |
 
 Ao mudar uma referência, atualize o arquivo de dados correspondente — e
 vice-versa.

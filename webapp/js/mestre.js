@@ -16,6 +16,8 @@
     ouroInput: document.querySelector("[data-ouro-input]"),
     modos: document.querySelector("[data-modos]"),
     modoAtual: document.querySelector("[data-modo-atual]"),
+    salas: document.querySelector("[data-salas]"),
+    salaEstado: document.querySelector("[data-sala-estado]"),
     duracaoInput: document.querySelector("[data-duracao-input]"),
     pausaEstado: document.querySelector("[data-pausa-estado]"),
     pausaContagem: document.querySelector("[data-pausa-contagem]"),
@@ -44,6 +46,21 @@
     });
     el.modos.appendChild(botao);
     return { id: modo.id, nome: modo.nome, botao: botao };
+  });
+
+  /* Uma sala por botão. As sem faixa gerada ficam marcadas: o mestre precisa
+   * saber que aquela sala entra em silêncio antes de clicar nela. */
+  var botoesSala = window.SALAS.map(function (sala) {
+    var botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "btn btn--pequeno";
+    botao.textContent = sala.trilha ? sala.nome : sala.nome + " (sem trilha)";
+    botao.setAttribute("aria-pressed", "false");
+    botao.addEventListener("click", function () {
+      D.acoes.definirSala(sala.id);
+    });
+    el.salas.appendChild(botao);
+    return { id: sala.id, nome: sala.nome, botao: botao };
   });
 
   /* --- render ------------------------------------------------------------ */
@@ -198,8 +215,22 @@
       oferta.nome + " — " + desconto + " PO" + (estado.ofertaBencao.comprada ? " (adquirida)" : "");
   }
 
+  function renderizarSala(estado) {
+    var escolhida = null;
+
+    botoesSala.forEach(function (item) {
+      var marcada = item.id === estado.sala;
+      item.botao.setAttribute("aria-pressed", marcada ? "true" : "false");
+      if (marcada) escolhida = item.nome;
+    });
+
+    el.salaEstado.textContent = escolhida || "Nenhuma";
+    el.salaEstado.classList.toggle("selo--ativo", Boolean(escolhida));
+  }
+
   function renderizar(estado) {
     renderizarTempo(estado);
+    renderizarSala(estado);
     renderizarPausa(estado);
     renderizarExibicao(estado);
     renderizarMecanicas(estado);

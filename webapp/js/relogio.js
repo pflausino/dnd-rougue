@@ -16,6 +16,9 @@
     pausa: document.querySelector("[data-pausa]"),
     pausaRotulo: document.querySelector("[data-pausa-rotulo]"),
     pausaContagem: document.querySelector("[data-pausa-contagem]"),
+    sala: document.querySelector("[data-sala]"),
+    salaNome: document.querySelector("[data-sala-nome]"),
+    salaSub: document.querySelector("[data-sala-sub]"),
     exibicao: document.querySelector("[data-exibicao]"),
     exibicaoVersao: document.querySelector("[data-exibicao-versao]"),
     exibicaoTitulo: document.querySelector("[data-exibicao-titulo]"),
@@ -36,6 +39,15 @@
     el.pausaContagem.textContent = D.formatarMinutos(restante);
     el.pausaContagem.classList.toggle("pausa-mini__contagem--fim", restante <= 0);
     el.pausaRotulo.textContent = restante <= 0 ? "Pausa encerrada" : "Pausa em andamento";
+  }
+
+  function renderizarSala(estado) {
+    var sala = estado.sala ? window.salaPorId(estado.sala) : null;
+    el.sala.hidden = !sala;
+    if (!sala) return;
+
+    el.salaNome.textContent = sala.nome;
+    el.salaSub.textContent = sala.sub || "";
   }
 
   /* Evita remontar a tabela a cada segundo. */
@@ -106,6 +118,7 @@
     el.run.textContent = "Run " + atual.run;
     el.duracao.textContent = D.formatarDuracao(atual.relogio.duracaoMs);
 
+    renderizarSala(atual);
     renderizarPausa(atual);
     renderizarExibicao(atual);
   }
