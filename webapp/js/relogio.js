@@ -18,7 +18,6 @@
     pausaContagem: document.querySelector("[data-pausa-contagem]"),
     sala: document.querySelector("[data-sala]"),
     salaNome: document.querySelector("[data-sala-nome]"),
-    salaSub: document.querySelector("[data-sala-sub]"),
     exibicao: document.querySelector("[data-exibicao]"),
     exibicaoVersao: document.querySelector("[data-exibicao-versao]"),
     exibicaoTitulo: document.querySelector("[data-exibicao-titulo]"),
@@ -46,8 +45,9 @@
     el.sala.hidden = !sala;
     if (!sala) return;
 
+    /* Só o nome. O `sub` de salas.js descreve o que a sala tem dentro — numa
+     * tela projetada, isso é spoiler. */
     el.salaNome.textContent = sala.nome;
-    el.salaSub.textContent = sala.sub || "";
   }
 
   /* Evita remontar a tabela a cada segundo. */
