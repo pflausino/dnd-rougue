@@ -57,6 +57,9 @@ var TIPOS = {
   ".ogg": "audio/ogg",
   ".m4a": "audio/mp4",
   ".md": "text/plain; charset=utf-8",
+  /* Sem este tipo o Chrome recusa o manifesto e a tela dos Jogadores deixa de
+   * ser instalável — sem erro visível, só some a opção de instalar. */
+  ".webmanifest": "application/manifest+json; charset=utf-8",
   /* dice-box (webapp/assets/dice-box/) carrega isto via WebAssembly.instantiateStreaming,
    * que exige o Content-Type correto — sem ele cai num caminho mais lento e,
    * em alguns navegadores, falha. */

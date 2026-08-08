@@ -109,6 +109,45 @@ A tela do Relógio toca a faixa da sala escolhida pelo mestre
   *Ativar trilha*; recarregar a página exige um toque novo. Não há como contornar
   — é política do navegador, não bug.
 
+## App instalável (PWA)
+
+A tela dos Jogadores instala como app no tablet da mesa:
+[`webapp/jogadores.webmanifest`](webapp/jogadores.webmanifest),
+[`webapp/sw.js`](webapp/sw.js) e
+[`webapp/js/instalavel.js`](webapp/js/instalavel.js), que só registra o service
+worker. As lojas carregam o mesmo manifesto — fazem parte do app; as telas de
+controle, não.
+
+**O `sw.js` tem três regras que não são estilo — são o que impede ele de
+quebrar o painel. Estão comentadas no arquivo; leia antes de mexer:**
+
+- **`/api/` nunca passa pelo service worker.** `/api/eventos` é um SSE aberto
+  pela sessão inteira: responder a ele pelo worker corta o streaming e as telas
+  param de sincronizar, sem erro visível. Teste que pega: `POST` no estado por
+  `curl` e ver a aba reagir sem F5.
+- **Rede primeiro, cache só como queda.** Cache-first tornaria o problema de
+  "JS velho" (documentado em *Testar*) **permanente** — sobrevive ao
+  Cmd+Shift+R, porque quem responde é o worker, não o cache HTTP. Teste que
+  pega: mudar um arquivo, recarregar, conferir que a mudança chegou.
+- **Só `status === 200` entra no cache.** O servidor responde 206 a `Range`
+  (os MP3 da trilha); um 206 guardado voltaria depois como se fosse o arquivo
+  inteiro, entregando áudio truncado. Pedido com cabeçalho `Range` nem passa
+  pelo worker.
+
+Mais duas coisas já pagas:
+
+- **Ao mudar o que é guardado, suba `VERSAO` em `sw.js`.** É o que apaga o
+  cache antigo no `activate`. Sem isso convivem dois caches e o antigo nunca sai.
+- **`.webmanifest` precisa do MIME certo** (`application/manifest+json`, já em
+  `servidor/servidor.js`). Sem ele o Chrome recusa o manifesto em silêncio: não
+  dá erro, só some a opção de instalar.
+
+Os ícones em `webapp/assets/icones/` foram gerados por script, sem dependência
+(PNG é assinatura + chunks, e o `zlib` do Node comprime). Para refazer ou mudar
+o desenho, o gerador não está versionado — é mais rápido reescrevê-lo do que
+mantê-lo. O `icone-maskable-512.png` tem o dado menor de propósito: o Android
+recorta em círculo e comeria a ponta.
+
 ## Portão de acesso
 
 [`webapp/js/portao.js`](webapp/js/portao.js) separa o que a mesa vê do que só o

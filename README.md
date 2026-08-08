@@ -163,6 +163,22 @@ que o mestre escolhe:
 - **Dungeon** — "Run N" em destaque.
 - **Acampamento** — as lojas abertas e, depois de um TPK, a escolha da pausa.
 
+### Instalar como app no tablet
+
+Esta tela (e as lojas) instala como aplicativo, para ficar em tela cheia no
+tablet da mesa, sem barra de endereço:
+
+- **Chrome/Edge** — ícone de instalar na barra de endereço, ou menu ⋮ →
+  *Instalar A Última Dungeon*.
+- **iPad/Safari** — Compartilhar → *Adicionar à Tela de Início*.
+
+Precisa de HTTPS, então funciona em <https://dungeon.pflausino.xyz> (e em
+`localhost` para testar). Servindo por `file://` não instala.
+
+Perdendo o wi-fi no meio da mesa, o app ainda abre e mostra o último estado que
+recebeu, com o aviso de sincronização caída no canto — não sincroniza até a rede
+voltar, mas não vira tela de erro.
+
 ### Bênçãos do grupo
 
 Toda bênção comprada entra no inventário (`estado.bencaos`) e aparece numa tira

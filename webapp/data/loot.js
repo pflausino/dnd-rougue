@@ -47,7 +47,7 @@ window.ENCONTROS_LOOT = [
     inimigos: [
       { id: "young-gold-dragon", nome: "Young Gold Dragon", previstos: 1, nd: "10", faixa: "especial" },
       { id: "mimic", nome: "Mimic", previstos: 1, nd: "2", faixa: "media" },
-      { id: "flying-sword", nome: "Flying Sword", previstos: 4, nd: "1/4", faixa: "baixa" }
+      { id: "flying-sword", nome: "Animated Flying Sword", previstos: 4, nd: "1/4", faixa: "baixa" }
     ]
   },
   {
@@ -56,7 +56,7 @@ window.ENCONTROS_LOOT = [
     inimigos: [
       {
         id: "goblin",
-        nome: "Goblin",
+        nome: "Goblin Warrior",
         previstos: 12,
         nd: "1/4",
         faixa: "baixa",
@@ -71,7 +71,7 @@ window.ENCONTROS_LOOT = [
     inimigos: [
       {
         id: "hobgoblin",
-        nome: "Hobgoblin",
+        nome: "Hobgoblin Warrior",
         previstos: 6,
         nd: "1/2",
         faixa: "baixa",
