@@ -1453,19 +1453,9 @@ html[data-travado] body {
   text-shadow: 0 0 40px rgba(157, 92, 240, 0.4);
 }
 
-.sala-atual__sub {
-  margin: 0;
-  font-size: clamp(0.8rem, 1.6vw, 1rem);
-  color: var(--texto-fraco);
-}
-
 /* Com uma tabela projetada o espaço é do conteúdo; a sala vira uma linha. */
 .relogio--com-exibicao .sala-atual__nome {
   font-size: clamp(1.1rem, 2.4vw, 1.6rem);
-}
-
-.relogio--com-exibicao .sala-atual__sub {
-  display: none;
 }
 
 /* Controle da trilha. Fixo no canto oposto ao aviso de conexão e discreto: a

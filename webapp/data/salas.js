@@ -9,6 +9,11 @@
  *
  * As três arenas dividem a mesma faixa — é uma sala só na ficção, dividida em
  * zonas. Trocar entre elas não reinicia o áudio (ver js/trilha.js).
+ *
+ * `sub` hoje não é exibido em lugar nenhum: ele diz o que a sala tem dentro
+ * ("5 Ghasts, 1 Wraith…") e a única tela que o mostrava era a do Relógio, que é
+ * projetada para a mesa — era spoiler puro. Se um dia servir, que seja numa
+ * tela só do mestre; **nunca** de volta ao Relógio ou aos Jogadores.
  */
 window.SALAS = [
   {
