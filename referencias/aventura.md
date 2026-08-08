@@ -174,7 +174,7 @@ Atravessar correndo um corredor de cinco quadrados.
 
 - 1 Young Gold Dragon (Dragão de Ouro Jovem).
 - 1 Mimic disfarçado de baú.
-- 4 Flying Swords instaladas ou penduradas nas paredes.
+- 4 Animated Flying Swords instaladas ou penduradas nas paredes.
 
 ### Objetivo
 
@@ -184,7 +184,7 @@ Sobreviver à sala e conquistar o tesouro guardado pelo Mimic.
 
 - O Dragão de Ouro está enrolado em torno do suposto baú.
 - O baú é o Mimic.
-- As quatro espadas nas paredes se animam como Flying Swords.
+- As quatro espadas nas paredes se animam como Animated Flying Swords.
 - O loot único do Mimic é uma Lâmina Solar.
 
 ### Dificuldade pretendida
@@ -201,7 +201,7 @@ Sobreviver à sala e conquistar o tesouro guardado pelo Mimic.
 
 - Dragão de Ouro Jovem: recompensa especial de `1d100 + 100` PO.
 - Mimic: `1d8 + 8` PO e a Lâmina Solar.
-- Quatro Flying Swords: `4d4 + 16` PO no total.
+- Quatro Animated Flying Swords: `4d4 + 16` PO no total.
 
 ### Pendente importante
 
@@ -238,7 +238,7 @@ Ainda não foi decidido se existe pausa, cura ou compra entre as três fases da 
 
 ### Monstros
 
-- 12 Goblins.
+- 12 Goblin Warriors.
 - 1 Goblin Boss.
 
 ### Objetivo
@@ -287,7 +287,7 @@ Estes goblins podem ser apresentados como a mesma força responsável pelas lan�
 
 ### Monstros
 
-- 6 Hobgoblins.
+- 6 Hobgoblin Warriors.
 - 1 Hobgoblin Captain.
 
 ### Objetivo
@@ -301,18 +301,18 @@ Romper a formação e derrotar o Capitão.
 - Capitão.
 - 4 hobgoblins formando uma linha defensiva.
 - 2 hobgoblins atuando como arqueiros.
-- O Capitão começa usando Leadership, concedendo `1d4` aos ataques e salvaguardas dos aliados afetados.
-- Os hobgoblins tentam cercar um personagem para ativar Martial Advantage e concentrar dano.
+- O Capitão fica atrás da linha, com a Aura of Authority cobrindo os quatro da frente: dentro da emanação de 10 pés, todos têm vantagem em ataques e salvaguardas.
+- Os hobgoblins tentam ficar colados nos personagens para ativar Pack Tactics, que exige um aliado a até 5 pés do alvo.
 
 #### Fase de avanço
 
 - Quando o Capitão chega à metade dos PV, ordena o avanço.
 - Os arqueiros abandonam suas posições.
-- A formação passa a cercar e isolar personagens.
+- A formação passa a cercar e isolar personagens, mas sem sair da aura do Capitão — o que a mantém compacta e a torna alvo de área.
 
 #### Queda do Capitão
 
-- Leadership termina.
+- A Aura of Authority some com ele.
 - Os sobreviventes realizam mais um turno e então recuam.
 - Os sobreviventes que recuam concedem recompensa normalmente.
 
@@ -323,7 +323,7 @@ Romper a formação e derrotar o Capitão.
 ### Tentativas futuras
 
 - O grupo aprende a separar os hobgoblins.
-- Pode impedir Martial Advantage e focar o Capitão.
+- Pode impedir Pack Tactics e focar o Capitão para derrubar a aura.
 - Controle de área e deslocamento forçado ganham grande valor.
 
 ## 11. Subchefe: Monte Errante
@@ -449,10 +449,10 @@ Aplicações aprovadas:
 | Caminho fácil | Flameskull | 2 | 4 | Média | `1d8+8` | `2d8+16` | 25 |
 | Caminho difícil | Young Gold Dragon | 1 | 10 | Especial | `1d100+100` | `1d100+100` | 150,5 |
 | Caminho difícil | Mimic | 1 | 2 | Média | `1d8+8` | `1d8+8` | 12,5 |
-| Caminho difícil | Flying Sword | 4 | 1/4 | Baixa | `1d4+4` | `4d4+16` | 26 |
-| Arena 1 | Goblin | 12 | 1/4 | Baixa | `1d4+4` | `12d4+48` | 78 |
+| Caminho difícil | Animated Flying Sword | 4 | 1/4 | Baixa | `1d4+4` | `4d4+16` | 26 |
+| Arena 1 | Goblin Warrior | 12 | 1/4 | Baixa | `1d4+4` | `12d4+48` | 78 |
 | Arena 1 | Goblin Boss | 1 | 1 | Baixa | `1d4+4` | `1d4+4` | 6,5 |
-| Arena 2 | Hobgoblin | 6 | 1/2 | Baixa | `1d4+4` | `6d4+24` | 39 |
+| Arena 2 | Hobgoblin Warrior | 6 | 1/2 | Baixa | `1d4+4` | `6d4+24` | 39 |
 | Arena 2 | Hobgoblin Captain | 1 | 3 | Média | `1d8+8` | `1d8+8` | 12,5 |
 | Subchefe | Shambling Mound | 1 | 5 | Especial | `1d100+100` | `1d100+100` | 150,5 |
 | Chefe final | Dracohydra | 1 | 11 | Final | - | Sem ouro | 0 |
@@ -524,23 +524,40 @@ Esses itens podem futuramente compor a loja ou a tabela de melhorias.
 
 ## 15. Fontes de regras e fichas
 
-Os links abaixo foram usados ou são adequados para consultar as fichas. O projeto mistura monstros oficiais legados de 2014 com o conjunto de regras revisado de 2024/2025; o próximo agente deve conferir compatibilidade antes da versão final.
+As fichas usadas são as do Monster Manual de 2025 (`XMM`), alinhadas com o conjunto de regras revisado de 2024. A única exceção é a Draconidra, que não foi refeita em 2025 e continua na versão de Fizban's Treasury of Dragons.
+
+Quatro criaturas mudaram de nome na virada e os links já apontam para o nome novo: Flying Sword virou **Animated Flying Sword**, Goblin virou **Goblin Warrior**, Hobgoblin virou **Hobgoblin Warrior** e o Hobgoblin Captain saiu do Volo's Guide para o Monster Manual. Os `id` internos do webapp continuam os antigos, porque casam com a calculadora de loot.
 
 ### Monstros
 
-- [Ghast](https://5e.tools/bestiary/ghast-mm.html)
-- [Wraith](https://5e.tools/bestiary/wraith-mm.html)
-- [Bone Devil](https://5e.tools/bestiary/bone-devil-mm.html)
-- [Flameskull](https://5e.tools/bestiary/flameskull-mm.html)
-- [Young Gold Dragon](https://5e.tools/bestiary/young-gold-dragon-mm.html)
-- [Mimic](https://5e.tools/bestiary/mimic-mm.html)
-- [Flying Sword](https://5e.tools/bestiary/flying-sword-mm.html)
-- [Goblin](https://5e.tools/bestiary/goblin-mm.html)
-- [Goblin Boss](https://5e.tools/bestiary/goblin-boss-mm.html)
-- [Hobgoblin](https://5e.tools/bestiary/hobgoblin-mm.html)
-- [Hobgoblin Captain](https://5e.tools/bestiary/hobgoblin-captain-mm.html)
-- [Shambling Mound](https://5e.tools/bestiary/shambling-mound-mm.html)
+- [Ghast](https://5e.tools/bestiary/ghast-xmm.html)
+- [Wraith](https://5e.tools/bestiary/wraith-xmm.html)
+- [Bone Devil](https://5e.tools/bestiary/bone-devil-xmm.html)
+- [Flameskull](https://5e.tools/bestiary/flameskull-xmm.html)
+- [Young Gold Dragon](https://5e.tools/bestiary/young-gold-dragon-xmm.html)
+- [Mimic](https://5e.tools/bestiary/mimic-xmm.html)
+- [Animated Flying Sword](https://5e.tools/bestiary/animated-flying-sword-xmm.html)
+- [Goblin Warrior](https://5e.tools/bestiary/goblin-warrior-xmm.html)
+- [Goblin Boss](https://5e.tools/bestiary/goblin-boss-xmm.html)
+- [Hobgoblin Warrior](https://5e.tools/bestiary/hobgoblin-warrior-xmm.html)
+- [Hobgoblin Captain](https://5e.tools/bestiary/hobgoblin-captain-xmm.html)
+- [Shambling Mound](https://5e.tools/bestiary/shambling-mound-xmm.html)
 - [Dracohydra](https://5e.tools/bestiary/dracohydra-ftd.html)
+
+### O que a virada de 2025 mudou no balanceamento
+
+Nenhum ND mudou, então a economia de ouro da seção 13 continua válida. O que mudou e afeta a mesa:
+
+- **Hobgoblin Warrior:** Martial Advantage virou Pack Tactics, e a espada longa passou a `2d10 + 1` — o dano fixo por acerto mais que dobrou, sem depender de posicionamento. O arco longo agora soma `3d4` de veneno.
+- **Hobgoblin Captain:** ganhou PV (39 → 58) e trocou Leadership e Martial Advantage por Aura of Authority, uma emanação de 10 pés que dá vantagem em ataques e salvaguardas a ele e aos aliados dentro dela.
+- **Shambling Mound:** perdeu PV (136 → 110), mas agora ele mesmo causa dano elétrico nos ataques e no Engulf, e passou a puxar alvos para perto.
+- **Bone Devil:** CA 19 → 16 e PV 142 → 161; o ferrão ficou mais forte e agora impede o alvo de recuperar PV enquanto envenenado.
+- **Flameskull:** perdeu o repertório de mago (`shield`, `blur`, `flaming sphere`) e ficou com `fireball` uma vez por dia, `magic missile` duas e `mage hand` à vontade. Em compensação o Fire Ray subiu para `3d6 + 3` e alcança 60 pés.
+- **Wraith:** o Life Drain reduz o máximo de PV **sem salvaguarda**.
+- **Goblin Warrior:** 7 → 10 PV, e os ataques somam `1d4` quando a rolagem teve vantagem.
+- **Animated Flying Sword:** perdeu Antimagic Susceptibility e False Appearance; antimagia não desliga mais as espadas da Câmara do Tesouro.
+- **Mimic:** perdeu False Appearance e Grappler; agarra pelo Pseudopod e morde mais forte em quem já está agarrado.
+- **Ghast:** perdeu Turn Defiance, a paralisia da garra dura só até o fim do próximo turno do alvo, e a mordida virou perfurante + necrótico.
 
 ### Itens mágicos revisados
 
@@ -597,7 +614,7 @@ Prioridade média:
 2. Definir ordem de iniciativa e gatilhos de todas as fases.
 3. Criar cartões curtos de referência para cada encontro.
 4. Definir condições de vitória alternativas além de matar criaturas.
-5. Revisar a conversão entre fichas de monstros de 2014 e regras de personagens de 2024.
+5. Reavaliar a dificuldade dos encontros com as fichas de 2025: a Falange Hobgoblin ficou bem mais dura (dano da espada longa e Aura of Authority) e o Monte Errante ficou 26 PV mais fraco.
 6. Estabelecer preços para consumíveis e melhorias.
 
 ## 18. Riscos de design

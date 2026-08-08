@@ -162,11 +162,18 @@
 
     var vitals = document.createElement("div");
     vitals.className = "monstro__vitals mono";
+    /* Ordem do bloco de 2025: CA, Iniciativa, PV, Deslocamento. A Draconidra
+     * ainda é ficha de 2014 e não tem linha de iniciativa — daí o filtro. */
     [
       ["CA", monstro.ca + (monstro.caObs ? " (" + monstro.caObs + ")" : "")],
+      ["Iniciativa", monstro.iniciativa],
       ["PV", monstro.pv + " (" + monstro.pvDado + ")"],
       ["Deslocamento", monstro.deslocamento]
-    ].forEach(function (par) {
+    ]
+      .filter(function (par) {
+        return par[1];
+      })
+      .forEach(function (par) {
       var campo = document.createElement("div");
       var rotulo = document.createElement("span");
       rotulo.className = "rotulo";
@@ -207,6 +214,7 @@
     [
       linha("Salvaguardas", monstro.salvaguardas),
       linha("Perícias", monstro.pericias),
+      linha("Equipamento", monstro.equipamento),
       linha("Resistências a dano", monstro.resistenciasDano),
       linha("Imunidades a dano", monstro.imunidadesDano),
       linha("Imunidades a condição", monstro.imunidadesCondicao),
@@ -223,6 +231,7 @@
     [
       blocoDeItens("Traços", monstro.tracos, monstro),
       blocoDeItens("Ações", monstro.acoes, monstro),
+      blocoDeItens("Ações bônus", monstro.acoesBonus, monstro),
       blocoDeItens("Reações", monstro.reacoes, monstro)
     ]
       .filter(Boolean)
