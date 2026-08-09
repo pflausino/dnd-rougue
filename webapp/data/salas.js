@@ -53,8 +53,8 @@ window.SALAS = [
     trilha: "assets/audio/03-arena/batalha.mp3"
   },
   {
-    id: "arena-monte",
-    nome: "Arena III — Monte Errante",
+    id: "arena-beholder",
+    nome: "Arena III — Contemplador Zumbi",
     sub: "Subchefe",
     trilha: "assets/audio/03-arena/batalha.mp3"
   },

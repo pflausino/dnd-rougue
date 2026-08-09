@@ -231,6 +231,7 @@
     [
       blocoDeItens("Traços", monstro.tracos, monstro),
       blocoDeItens("Ações", monstro.acoes, monstro),
+      blocoDeItens("Raios do olho", monstro.raios, monstro),
       blocoDeItens("Ações bônus", monstro.acoesBonus, monstro),
       blocoDeItens("Reações", monstro.reacoes, monstro)
     ]
@@ -303,4 +304,13 @@
 
     el.vazio.hidden = algumVisivel;
   });
+
+  /* O painel de combate (js/combate.js) rola os mesmos ataques e precisa do
+   * mesmo caminho de ida e volta — inclusive do retorno local quando não há
+   * tela do Relógio aberta. Exposto em vez de copiado: duas cópias
+   * divergiriam, e a que estivesse errada só apareceria na mesa. */
+  window.RolagemMonstro = {
+    pedir: rolarComRetorno,
+    notacao: notacao
+  };
 })();

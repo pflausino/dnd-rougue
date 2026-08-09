@@ -37,7 +37,7 @@ Goblins inacessíveis           Mimic + 4 Flying Swords
                      ARENA
        1. Horda Goblin
        2. Falange Hobgoblin
-       3. Monte Errante (subchefe)
+       3. Contemplador Zumbi (subchefe)
                        |
                        v
              COVIL DA DRACONIDRA
@@ -57,7 +57,7 @@ Elementos mostrados:
 - Entrada com símbolo de retorno.
 - Sala inicial com três totens em torno do círculo de invocação.
 - Bifurcação entre os dois caminhos.
-- Arena única dividida visualmente em zonas goblin, hobgoblin e pantanosa.
+- Arena única dividida visualmente em zonas goblin, hobgoblin e pantanosa. A zona pantanosa foi desenhada para o Monte Errante e não combina mais com o Contemplador Zumbi; o mapa precisa ser refeito nesse trecho.
 - Dois condutores elétricos na arena.
 - Covil final com pilares e runas elementais.
 - Linha tracejada indicando o retorno à entrada após um TPK.
@@ -221,7 +221,7 @@ A arena contém três encontros consecutivos no mesmo espaço:
 
 1. Horda Goblin.
 2. Falange Hobgoblin.
-3. Monte Errante como subchefe.
+3. Contemplador Zumbi como subchefe.
 
 Objetivo de ritmo: produzir escala e desgaste sem administrar dezenas de iniciativas individuais.
 
@@ -326,47 +326,50 @@ Romper a formação e derrotar o Capitão.
 - Pode impedir Pack Tactics e focar o Capitão para derrubar a aura.
 - Controle de área e deslocamento forçado ganham grande valor.
 
-## 11. Subchefe: Monte Errante
+## 11. Subchefe: Contemplador Zumbi
 
 ### Monstro
 
-- 1 Shambling Mound, chamado de Monte Errante em português neste projeto.
+- 1 Beholder Zombie, chamado de Contemplador Zumbi em português neste projeto.
+
+Substituiu o Shambling Mound (Monte Errante). A escolha passou antes pelo
+Beholder inteiro, mais clássico, mas ele é ND 13 — um salto grande demais para a
+posição. O Beholder Zombie é ND 5, exatamente o do Monte Errante, então a
+dificuldade da Arena III continua onde estava e nenhum número da seção 13 mudou.
 
 ### Objetivo
 
-Derrotar o Monte Errante sem permitir que os mecanismos elétricos da arena o curem.
+Derrubar o Contemplador Zumbi antes que os raios desmontem a formação do grupo.
 
 ### Mecânica especial
 
-- Existem dois condutores elétricos em lados opostos da arena.
-- A derrota do Hobgoblin Captain ativa os condutores.
-- Descargas ou zonas elétricas podem atingir o campo.
-- Eletricidade pode curar ou fortalecer o Monte Errante, aproveitando sua interação oficial com dano elétrico.
+- **Undead Fortitude.** Reduzido a 0 PV, faz uma salvaguarda de Constituição CD 5 + o dano sofrido e fica com 1 PV se passar. Não vale contra dano radiante nem contra acerto crítico. É a mecânica marcante da sala e o gancho direto da Lâmina Solar: sem dano radiante, o grupo precisa derrubar o zumbi várias vezes; com ela, cai de uma vez.
+- **Eye Rays aleatórios.** Dois por turno, sorteados em `1d4` sem repetir no mesmo turno. O mestre não escolhe — a tela de Monstros tem o botão para isso. Os quatro raios são Paralyzing, Fear, Enervation e Disintegration, todos CD 14.
+- **Disintegration Ray** é o único que ameaça matar de vez: 27 (5d10) de dano de força e, se levar o alvo a 0 PV, ele vira pó. Um em quatro por raio, dois raios por turno.
+- **Ação única por rodada.** Sem ações lendárias, sem cone antimagia e sem Legendary Resistance — diferente do Beholder vivo, este é um solo comum contra seis personagens, e a economia de ações pesa contra ele. Se cair rápido demais na mesa, o ajuste natural é somar algo à arena, não inflar a ficha.
+- **Os dois condutores elétricos continuam sem função definida.** Existiam para curar o Monte Errante por Lightning Absorption; o zumbi não tem interação nenhuma com dano elétrico. Ou viram perigo de terreno puro, ou saem do mapa.
 
 ### Dificuldade pretendida
 
-- Subchefe muito perigoso depois de duas batalhas consecutivas.
-- O encontro deve recompensar posicionamento e leitura do padrão elétrico.
+- Subchefe perigoso depois de duas batalhas consecutivas, mas dentro do padrão do resto da dungeon — não é o muro que o Beholder inteiro seria.
+- O encontro deve recompensar dano radiante concentrado e distância dos raios.
 
 ### Tentativas futuras
 
-- O grupo conhece as zonas de descarga.
-- Pode afastar o monstro dos condutores ou usar o padrão elétrico contra outros alvos.
+- O grupo aprende que a Lâmina Solar encerra o Undead Fortitude e prioriza quem a carrega.
+- Aprende que crítico também ignora o traço, o que dá valor a vantagem em ataque.
+- Aprende a se espalhar: os raios pegam um alvo por vez, então aglomerar não ajuda, mas ficar longe reduz a mordida.
 
 ### Recompensa
 
-- Recompensa especial de `1d100 + 100` PO.
-- O ouro só é recebido quando o Monte Errante for derrotado ou neutralizado; apenas chegar até ele não concede a recompensa.
+- Recompensa especial de `1d100 + 100` PO, a mesma do Monte Errante.
+- O ouro só é recebido quando o Contemplador Zumbi for derrotado ou neutralizado; apenas chegar até ele não concede a recompensa.
 
 ### Pendente
 
-A mecânica elétrica ainda não possui números finais. É necessário definir:
-
-- Quando cada condutor dispara.
-- Área, CD e dano da descarga.
-- Quantos PV o Monte Errante recupera.
-- Como os jogadores desativam ou redirecionam um condutor.
-- Se os condutores permanecem destruídos entre runs. A recomendação é que reiniciem com a dungeon.
+- O que fazer com os dois condutores elétricos, que perderam a função original: sumir do mapa ou virar dano de terreno puro.
+- Se o encontro precisa de reforço, já que o subchefe agora age uma vez por rodada contra seis personagens.
+- Qual miniatura usar: a do Monte Errante não serve mais e a substituta ainda não foi escolhida.
 
 ## 12. Chefe final: Draconidra
 
@@ -420,7 +423,7 @@ Cada ameaça concede ouro conforme sua dificuldade:
 | Alta | 5 a 10 | `1d20 + 20` PO | 30,5 PO |
 | Especial | Marco escolhido pelo mestre | `1d100 + 100` PO | 150,5 PO |
 
-A faixa especial foi atribuída ao Dragão de Ouro Jovem e ao Monte Errante. A Draconidra não concede ouro.
+A faixa especial foi atribuída ao Dragão de Ouro Jovem e ao Contemplador Zumbi. Ela é um marco escolhido pelo mestre, não uma consequência do ND. A Draconidra não concede ouro.
 
 ### Regra contra punição por boa estratégia
 
@@ -454,7 +457,7 @@ Aplicações aprovadas:
 | Arena 1 | Goblin Boss | 1 | 1 | Baixa | `1d4+4` | `1d4+4` | 6,5 |
 | Arena 2 | Hobgoblin Warrior | 6 | 1/2 | Baixa | `1d4+4` | `6d4+24` | 39 |
 | Arena 2 | Hobgoblin Captain | 1 | 3 | Média | `1d8+8` | `1d8+8` | 12,5 |
-| Subchefe | Shambling Mound | 1 | 5 | Especial | `1d100+100` | `1d100+100` | 150,5 |
+| Subchefe | Beholder Zombie | 1 | 5 | Especial | `1d100+100` | `1d100+100` | 150,5 |
 | Chefe final | Dracohydra | 1 | 11 | Final | - | Sem ouro | 0 |
 
 ### Quatro runs pelo caminho fácil
@@ -465,10 +468,10 @@ Hipóteses usadas:
 - Impede ou derrota o Bone Devil e recebe sua recompensa.
 - Passa pelo caminho fácil.
 - Completa as duas batalhas da arena.
-- Chega ao Monte Errante, mas não necessariamente o derrota.
+- Chega ao Contemplador Zumbi, mas não necessariamente o derrota.
 - Todos os encontros pagam recompensa integral novamente em cada run.
 
-Média por run antes de derrotar o Monte Errante:
+Média por run antes de derrotar o Contemplador Zumbi:
 
 | Trecho | Média |
 |---|---:|
@@ -483,8 +486,8 @@ Resultados em quatro runs:
 - Média acumulada: **1.138 PO**.
 - Mínimo possível: **836 PO**.
 - Máximo possível: **1.440 PO**.
-- Se derrotarem o Monte Errante apenas na quarta run: média de **1.288,5 PO**.
-- Se derrotarem o Monte Errante em todas as quatro runs: média de **1.740 PO**.
+- Se derrotarem o Contemplador Zumbi apenas na quarta run: média de **1.288,5 PO**.
+- Se derrotarem o Contemplador Zumbi em todas as quatro runs: média de **1.740 PO**.
 
 ### Regra de repetição não adotada
 
@@ -507,7 +510,8 @@ Foi sugerido que encontros já vencidos pagassem metade nas runs seguintes para 
 - Causa dano radiante em vez de cortante.
 - Causa `+1d8` de dano radiante contra mortos-vivos.
 - É excelente contra Ghasts e Wraith.
-- Continua sendo uma arma forte contra goblins, hobgoblins, Mimic, Monte Errante e Bone Devil.
+- Continua sendo uma arma forte contra goblins, hobgoblins, Mimic e Bone Devil.
+- Contra o Contemplador Zumbi é a resposta planejada: dano radiante desliga o Undead Fortitude dele.
 - O dano radiante é a resposta planejada para impedir o crescimento das cabeças da Draconidra.
 
 ### Itens discutidos, mas não escolhidos como recompensa principal
@@ -541,7 +545,7 @@ Quatro criaturas mudaram de nome na virada e os links já apontam para o nome no
 - [Goblin Boss](https://5e.tools/bestiary/goblin-boss-xmm.html)
 - [Hobgoblin Warrior](https://5e.tools/bestiary/hobgoblin-warrior-xmm.html)
 - [Hobgoblin Captain](https://5e.tools/bestiary/hobgoblin-captain-xmm.html)
-- [Shambling Mound](https://5e.tools/bestiary/shambling-mound-xmm.html)
+- [Beholder Zombie](https://5e.tools/bestiary/beholder-zombie-xmm.html)
 - [Dracohydra](https://5e.tools/bestiary/dracohydra-ftd.html)
 
 ### O que a virada de 2025 mudou no balanceamento
@@ -550,7 +554,6 @@ Nenhum ND mudou, então a economia de ouro da seção 13 continua válida. O que
 
 - **Hobgoblin Warrior:** Martial Advantage virou Pack Tactics, e a espada longa passou a `2d10 + 1` — o dano fixo por acerto mais que dobrou, sem depender de posicionamento. O arco longo agora soma `3d4` de veneno.
 - **Hobgoblin Captain:** ganhou PV (39 → 58) e trocou Leadership e Martial Advantage por Aura of Authority, uma emanação de 10 pés que dá vantagem em ataques e salvaguardas a ele e aos aliados dentro dela.
-- **Shambling Mound:** perdeu PV (136 → 110), mas agora ele mesmo causa dano elétrico nos ataques e no Engulf, e passou a puxar alvos para perto.
 - **Bone Devil:** CA 19 → 16 e PV 142 → 161; o ferrão ficou mais forte e agora impede o alvo de recuperar PV enquanto envenenado.
 - **Flameskull:** perdeu o repertório de mago (`shield`, `blur`, `flaming sphere`) e ficou com `fireball` uma vez por dia, `magic missile` duas e `mage hand` à vontade. Em compensação o Fire Ray subiu para `3d6 + 3` e alcança 60 pés.
 - **Wraith:** o Life Drain reduz o máximo de PV **sem salvaguarda**.
@@ -579,7 +582,7 @@ Seleção feita para impressão FDM em uma impressora Bambu Lab. Quando disponí
 - **Goblin Boss — 1 miniatura:** [Goblin King with Crown and Staff](https://makerworld.com/en/models/2518398-goblin-king-with-crown-and-staff) — MakerWorld; perfil de `0,2 mm`, 2 paredes e 15% de preenchimento.
 - **Hobgoblin — 6 miniaturas:** [Dungeons & Dragons — Hobgoblin Warlord](https://makerworld.com/en/models/2066234-dungeons-dragons-d-d-hobgoblin-warlord#profileId-2231363) — MakerWorld; modelo dividido em duas partes, perfil de `0,08 mm`, 2 paredes e 10% de preenchimento.
 - **Hobgoblin Captain — 1 miniatura:** [D&D Hobgoblin Captain](https://makerworld.com/en/models/2720746-d-d-hobgoblin-captain) — MakerWorld; a página inclui fotografias da impressão real.
-- **Shambling Mound — 1 miniatura:** [Vine Blight | Shambling Mound](https://makerworld.com/en/models/2579068-vine-blight-shambling-mound#profileId-2844269) — MakerWorld; modelo testado em FDM, perfil de `0,12 mm`, 2 paredes e 15% de preenchimento.
+- **Beholder Zombie — 1 miniatura:** ainda não escolhida. O modelo do Shambling Mound saiu da lista com a troca do subchefe.
 - **Dracohydra — 1 miniatura:** [Five-Headed Dragon — RPG Boss](https://makerworld.com/en/models/2722219-five-headed-dragon-rpg-boss) — MakerWorld; modelo gratuito de cinco cabeças usado como Dracohydra, com impressão real em PLA numa Bambu Lab e perfil de `0,2 mm`, 2 paredes e 15% de preenchimento, com duração estimada de 5,1 horas em uma placa.
 
 ## 16. Decisões substituídas
@@ -593,7 +596,9 @@ Estas ideias apareceram anteriormente, mas foram substituídas e não fazem part
 - Hydra comum como chefe final.
 - Dragon Slayer como principal ferramenta contra o chefe.
 - Três caminhos opcionais; a versão atual possui apenas caminho fácil e difícil.
-- Subchefe em sala separada; o Monte Errante agora acontece na própria arena.
+- Subchefe em sala separada; o subchefe agora acontece na própria arena.
+- Shambling Mound (Monte Errante) como subchefe; trocado por um beholder-kin.
+- Beholder inteiro como subchefe; ND 13 era um salto grande demais para a posição, e ficou o Beholder Zombie, de ND 5.
 
 ## 17. Principais pendências para o próximo agente
 
@@ -602,7 +607,7 @@ Prioridade alta:
 1. Fechar as estatísticas e o funcionamento dos três totens.
 2. Fechar a mecânica do corredor e esclarecer falha, queda e falha crítica.
 3. Definir a razão narrativa ou solução alternativa para enfrentar um Dragão de Ouro Jovem.
-4. Fechar os números dos dois condutores elétricos do Monte Errante.
+4. Decidir o destino dos dois condutores elétricos, que perderam a função com a saída do Monte Errante.
 5. Definir o padrão telegráfico e elemental do sopro da Draconidra.
 6. Criar a loja e as melhorias permanentes usando a economia já calculada.
 7. Definir descansos, restauração no reset e persistência de consumíveis.
@@ -614,7 +619,7 @@ Prioridade média:
 2. Definir ordem de iniciativa e gatilhos de todas as fases.
 3. Criar cartões curtos de referência para cada encontro.
 4. Definir condições de vitória alternativas além de matar criaturas.
-5. Reavaliar a dificuldade dos encontros com as fichas de 2025: a Falange Hobgoblin ficou bem mais dura (dano da espada longa e Aura of Authority) e o Monte Errante ficou 26 PV mais fraco.
+5. Reavaliar a dificuldade dos encontros com as fichas de 2025: a Falange Hobgoblin ficou bem mais dura (dano da espada longa e Aura of Authority).
 6. Estabelecer preços para consumíveis e melhorias.
 
 ## 18. Riscos de design
@@ -623,7 +628,7 @@ Prioridade média:
 - Os encontros são letais demais para nível 3 se as melhorias não forem fortes e rapidamente acessíveis.
 - Muitos inimigos individuais podem tornar a arena lenta; iniciativas agrupadas são essenciais.
 - Fireball contra personagens de nível 3 pode causar morte imediata ou TPK, especialmente em dose dupla.
-- Wraith, Bone Devil, Young Gold Dragon, Shambling Mound e Dracohydra estão muito acima do padrão de dificuldade do grupo.
+- Wraith, Bone Devil, Young Gold Dragon e Dracohydra estão muito acima do padrão de dificuldade do grupo.
 - A recompensa integral em todas as runs permite farmar as primeiras salas indefinidamente.
 - A Lâmina Solar resolve a regeneração para apenas um portador; o grupo ainda precisa de formas secundárias de causar dano radiante ou proteger esse personagem.
 - O caminho difícil pode se tornar obrigatório, apesar de ser apresentado como opcional, porque contém a resposta mais direta ao chefe final.

@@ -48,7 +48,7 @@ Tudo em [`webapp/js/state.js`](webapp/js/state.js), a única fonte de estado:
 - **Servido por `file://` a quarta via não liga** (`REMOTO` é falso) e o painel
   se comporta como antes. Com servidor, ele é a autoridade e o `localStorage`
   passa a ser cache local.
-- A chave, o canal e a rota da API carregam a versão do formato (`...:estado:v11`).
+- A chave, o canal e a rota da API carregam a versão do formato (`...:estado:v12`).
   **Ao mudar o formato, suba `VERSAO`** — isso isola abas antigas e descarta a
   sessão anterior, que é o comportamento desejado. O servidor guarda um estado
   por versão, seguindo a mesma trava.
@@ -184,6 +184,62 @@ porta de entrada de todos — e só esconde os cartões das telas de controle.
   controle de mestre numa tela aberta — quem estiver na frente da TV pode somar
   ouro. Não foi fechado porque também é o atalho que o mestre usa ali; marcar
   com `data-exige-acesso` resolve, se um dia incomodar.
+
+## Atalhos de mesa (`/api/acao/…`)
+
+[`servidor/acoes.js`](servidor/acoes.js) aplica transições de estado sem
+navegador no meio, para virarem botão físico. `GET /api/acoes` lista tudo.
+
+- **É uma segunda implementação das transições de `webapp/js/state.js`, copiada
+  à mão.** Mudar `registrarTpk` ou `relogio.pausar` lá e esquecer daqui deixa o
+  atalho fazendo coisa diferente do botão da tela — e só aparece na mesa. O
+  cabeçalho do arquivo diz isso; ao mexer numa transição, mexa nos dois lugares.
+  Carregar `state.js` num `vm` evitaria a cópia, mas traria os temporizadores e
+  o `EventSource` dele para dentro do servidor.
+- **A ordem das salas é lida de `webapp/data/salas.js`, não copiada** — roda o
+  arquivo num contexto com `window` falso. É o dado que mais muda, então a
+  cópia rotaria rápido.
+- **Sem `?v=`, quem decide a versão são as telas conectadas, não o maior estado
+  guardado.** O servidor guarda um estado por versão e os antigos ficam lá
+  depois de um bump; escolher pelo maior guardado fazia o atalho editar em
+  silêncio uma sessão morta enquanto o painel aberto não mexia um dedo — foi
+  bug real durante a implementação. O SSE sabe a versão de cada tela.
+- **Uma tela recém-aberta e intocada não semeia o servidor** (é a trava que
+  impede uma aba nova de apagar a sessão). Então "sem estado" acontece com o
+  painel aberto na frente do mestre; a mensagem de erro diz o que destrava.
+- **`rolar` precisa de alguém que resolva.** Quem resolve é a tela do Relógio,
+  com a física do dado. Sem ela aberta, o servidor resolve sozinho depois de
+  `ESPERA_DADO_3D` — sem isso o atalho deixaria um "rolando…" preso para sempre
+  no log das outras telas.
+- Os atalhos aceitam **GET** além de POST, o que normalmente não se faz com
+  rota que muda estado. Passa aqui porque `/api/estado` já aceita POST sem
+  autenticação nenhuma: não há nada a proteger que já não esteja aberto.
+  Fechar é decisão de proxy (`basic_auth` no Caddy), não deste arquivo.
+
+## Painel de combate
+
+No topo da tela de Monstros ([`webapp/js/combate.js`](webapp/js/combate.js)):
+as criaturas da sala marcada pelo mestre, uma linha de vida por criatura e um
+bloco de rolagens por *tipo* — o ataque do Ghast é o mesmo nos cinco. Os blocos
+de estatística abaixo não são tocados por esse arquivo.
+
+- **`estado.danos` guarda o dano sofrido, não o PV restante.** Assim restaurar
+  é escrever `0` em cada chave, que é o que `mesclar` exige — um `{}` vazio não
+  limparia nada (a mesma armadilha de `zerarAbates`). E o PV cheio continua
+  vindo de `data/monstros.js`, sem cópia no estado para envelhecer.
+- **A chave é `<encontro>:<idMonstro>:<índice>`.** O Ghast nº 3 da Sala do
+  Ritual é `ritual:ghast:2`.
+- **Os ids de encontro em `data/monstros.js` são os mesmos ids de sala em
+  `data/salas.js`** — foi por isso que o grupo do chefe deixou de ser
+  `chefe-final` e virou `draconidra`. Sem isso seria preciso uma tabela de
+  tradução entre os dois arquivos, que envelheceria calada.
+- **O painel só é remontado quando a sala muda**; o resto é atualização no
+  lugar. Remontar a cada `−1` perderia a rolagem do scroll no meio do combate.
+- **`window.RolagemMonstro` existe para não duplicar a rolagem.** O painel e os
+  blocos rolam pelo mesmo caminho, com o mesmo retorno local quando não há tela
+  do Relógio aberta; duas cópias divergiriam e a errada só apareceria na mesa.
+- Um TPK zera os danos junto com a run (`referencias/aventura.md` §4: a dungeon
+  reinicia com o grupo). *Restaurar vidas* zera só a sala em campo.
 
 ## Rolagens de dado
 

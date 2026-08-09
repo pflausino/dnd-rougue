@@ -103,6 +103,53 @@ O servidor guarda **um estado por versão**, espelhando essa mesma trava: subir
 | `DELETE /api/estado?v=10` | Descarta a sessão daquela versão. |
 | `GET /api/saude` | Diagnóstico: quantas telas ligadas e quais versões em memória. |
 
+## Atalhos de mesa
+
+Ações do painel por HTTP, para virarem botão físico (Steam Deck, teclado macro,
+atalho de celular) e evitar procurar o controle na tela do Mestre no meio do
+combate.
+
+```sh
+curl -s http://localhost:8777/api/acoes            # lista tudo, com os parâmetros
+curl -s http://localhost:8777/api/acao/relogio/alternar
+curl -s "http://localhost:8777/api/acao/ouro/ajustar?delta=150"
+```
+
+Aceitam GET e POST — um atalho que só abre a URL funciona. A resposta traz um
+resumo do painel (`run`, `ouro`, `modo`, `sala`, tempo restante), que dá para
+mostrar de volta no aparelho.
+
+| Atalho | O que faz |
+| --- | --- |
+| `relogio/alternar` | Inicia ou pausa o cronômetro |
+| `relogio/ajustar?minutos=±N` | Soma ou devolve tempo à mesa |
+| `relogio/zerar` | Volta a zero, parado |
+| `tpk` | Nova run, volta ao acampamento, libera a pausa |
+| `modo/alternar` | Tela dos Jogadores entre dungeon e acampamento |
+| `sala/proxima`, `sala/anterior` | Anda no fluxo da aventura |
+| `sala/limpar` | Desmarca a sala e corta a trilha |
+| `sala/definir?id=ritual` | Marca uma sala pelo id |
+| `ouro/ajustar?delta=N` | Soma (ou tira) ouro do grupo |
+| `run/ajustar?delta=N` | Corrige a tentativa sem contar morte |
+| `pausa/escolher?minutos=5` | Começa a pausa (respeita a cota) |
+| `pausa/encerrar` | Encerra a pausa |
+| `vidas/restaurar` | PV cheio nas criaturas da sala marcada |
+| `rolar?dados=1d20&bonus=0` | Joga um dado — aparece em 3D no Relógio |
+
+Três coisas que valem saber:
+
+- **Não passe `?v=`.** Sem ele o atalho age na versão que as telas abertas
+  estão usando; fixar a versão na mão quebraria todos os botões no próximo bump
+  do formato do estado.
+- **O painel precisa ter gravado algo** na sessão para os atalhos agirem — uma
+  tela recém-aberta e intocada não semeia o servidor. Mexer em qualquer coisa
+  uma vez destrava.
+- **Não há autenticação nenhuma** nesses atalhos. Isso não é novidade da rota:
+  `POST /api/estado` já era aberto, então quem alcança a URL sempre pôde
+  reiniciar a sessão. Em `dungeon.pflausino.xyz` isso vale para a internet
+  inteira. Fechar é `basic_auth` no bloco do Caddy cobrindo `/api/`, lembrando
+  que aí as telas também precisam mandar a credencial.
+
 ## Produção
 
 Em <https://dungeon.pflausino.xyz>, no VPS `pflausino.xyz`. Um container na rede
