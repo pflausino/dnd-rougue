@@ -99,6 +99,18 @@ Bênçãos são efeitos especiais que alteram regras específicas da expedição
 
 **Efeito:** escolha uma sala já vencida. O nível de dificuldade dessa sala aumenta permanentemente e permanece elevado em todas as runs futuras.
 
+## Relógio Místico
+
+> O tempo cede, uma vez, a quem souber pedir.
+
+**Preço:** **500 PO**.
+
+**Tipo:** **Consumível** — é consumido ao ser ativado, e some da vitrine para sempre.
+
+**Efeito:** ao ser ativado, acrescenta **30 minutos** à duração da sessão. O cronômetro do Relógio ganha meia hora na hora, sem alterar o tempo já decorrido.
+
+**Restrição:** Íria só tem um. Depois de comprado, não volta à vitrine nesta sessão.
+
 ## Pedra de Íria
 
 > Sete véus se abrem diante daqueles reconhecidos pela pedra.

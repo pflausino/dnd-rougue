@@ -90,6 +90,27 @@ window.BENCAOS = [
     icone: "../loja/assets/bencaos/braseiro-tregua.png"
   },
   {
+    id: "relogio-mistico",
+    tipo: "Consumível",
+    tipoNota: "É consumido ao ser ativado, e some da vitrine para sempre.",
+    nome: "Relógio Místico",
+    mercador: "iria",
+    preco: 500,
+    /* Único da sessão: consumível, mas a loja não repõe. Sem isso o grupo
+     * compraria tempo indefinidamente e a one-shot deixaria de ter prazo, que é
+     * o que faz a dungeon apertar. */
+    unico: true,
+    /* Minutos que o consumo acrescenta à sessão. É o único item do catálogo com
+     * efeito que o app aplica sozinho — o relógio da mesa vive aqui dentro, e
+     * pedir para o mestre somar à mão o que o app sabe fazer só criaria chance
+     * de somar duas vezes ou nenhuma. */
+    minutosBonus: 30,
+    lema: "O tempo cede, uma vez, a quem souber pedir.",
+    efeito: "Ao ser ativado, acrescenta 30 minutos à duração da sessão. O cronômetro do Relógio ganha meia hora na hora, sem alterar o tempo já decorrido.",
+    restricao: "Íria só tem um. Depois de comprado, não volta à vitrine nesta sessão.",
+    icone: "../loja/assets/bencaos/relogio-mistico.png"
+  },
+  {
     id: "pergaminho-alta-experiencia",
     /* Os pergaminhos formam uma escada: o nível 5 exige ter passado pelo 4. */
     requer: "pergaminho-experiencia",

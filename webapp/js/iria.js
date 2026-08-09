@@ -116,9 +116,13 @@
       var requisito = bencao.requer ? window.bencaoPorId(bencao.requer) : null;
       var requisitoCumprido = !requisito || estado.bencaosAdquiridas.indexOf(requisito.id) >= 0;
 
-      /* Permanente já em posse não se compra de novo; consumível pode repetir. */
+      /* Permanente já em posse não se compra de novo; consumível pode repetir —
+       * a menos que seja `unico`, e aí a conta é contra `bencaosAdquiridas`, o
+       * histórico que sobrevive ao consumo. Contra `bencaos` a vitrine reporia
+       * o item no instante em que o grupo o usasse. */
+      var esgotado = bencao.unico && estado.bencaosAdquiridas.indexOf(bencao.id) >= 0;
       var jaPossui = temNoInventario && !ehConsumivel(bencao);
-      var bloqueado = !requisitoCumprido || jaPossui;
+      var bloqueado = !requisitoCumprido || jaPossui || esgotado;
 
       item.card.classList.toggle("vitrine__item--bloqueado", bloqueado);
       item.botao.hidden = bloqueado;
@@ -126,6 +130,8 @@
 
       if (!requisitoCumprido) {
         item.aviso.textContent = "Exige " + requisito.nome;
+      } else if (esgotado) {
+        item.aviso.textContent = "Íria só tinha um";
       } else if (jaPossui) {
         item.aviso.textContent = "Já em posse do grupo";
       } else {
