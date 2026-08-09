@@ -79,13 +79,17 @@
 
   /* --- o que projetar na tela do Relógio --------------------------------- */
 
-  /* "Só o cronômetro" é a primeira opção; as demais vêm de data/tabelas.js. */
+  /* "Só o cronômetro" é a primeira opção; no meio vêm as tabelas de
+   * data/tabelas.js e no fim a hidra, que não é tabela e por isso não sai de
+   * lá — mas disputa o mesmo espaço da tela do Relógio, então divide o mesmo
+   * seletor (ver EXIBICAO_HIDRA em state.js). */
   var botoesExibicao = [{ id: null, nome: "Só o cronômetro", exibicao: null }]
     .concat(
       window.EXIBICOES.map(function (exibicao) {
         return { id: exibicao.id, nome: exibicao.nome, exibicao: exibicao };
       })
     )
+    .concat([{ id: D.EXIBICAO_HIDRA, nome: "Hidra", exibicao: null }])
     .map(function (opcao) {
       var botao = document.createElement("button");
       botao.type = "button";
@@ -141,9 +145,12 @@
 
     el.variantesCampo.hidden = botoesVariante.length === 0;
 
+    /* A hidra cai aqui junto com o cronômetro puro: não vem de tabelas.js, logo
+     * `exibicaoPorId` não a acha. */
     if (!exibicao) {
-      el.exibicaoEstado.textContent = "Só o cronômetro";
-      el.exibicaoEstado.classList.remove("selo--ativo");
+      var hidra = escolhida === D.EXIBICAO_HIDRA;
+      el.exibicaoEstado.textContent = hidra ? "Hidra" : "Só o cronômetro";
+      el.exibicaoEstado.classList.toggle("selo--ativo", hidra);
       return;
     }
 

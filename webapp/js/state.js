@@ -18,7 +18,7 @@
   /* A versão entra na chave, no canal e na rota da API: telas de versões
    * diferentes (uma aba antiga que ficou aberta, por exemplo) não disputam o
    * mesmo estado. */
-  var VERSAO = 13;
+  var VERSAO = 14;
   var CHAVE = "ultima-dungeon:estado:v" + VERSAO;
   var NOME_CANAL = "ultima-dungeon:v" + VERSAO;
   var INTERVALO_POLL = 500;
@@ -88,7 +88,27 @@
     return null;
   }
 
+  /* Id reservado de `exibicao`: não sai de data/tabelas.js como os outros, é o
+   * painel das cabeças da hidra. Fica no mesmo campo das tabelas de propósito —
+   * a tela do Relógio mostra uma coisa por vez, e um campo só torna impossível
+   * projetar tabela e hidra ao mesmo tempo. */
+  var EXIBICAO_HIDRA = "hidra";
+
+  /* Cabeças com que a Dracohydra entra em campo (traço Multiple Heads, ficha em
+   * data/monstros.js). Não é teto: cortar uma faz nascerem duas. */
+  var CABECAS_HIDRA = 5;
+
   var DURACAO_PADRAO_MS = 4 * HORA;
+
+  /* Numeradas de 1 e todas de pé. Os números nunca se repetem na sessão, mesmo
+   * depois de a cabeça morrer: é assim que o mestre fala "a cabeça 7" sem
+   * ambiguidade — e é de onde a arte de cada uma é derivada, sem precisar
+   * guardar caminho de imagem no estado. */
+  function hidraInicial() {
+    var cabecas = [];
+    for (var i = 1; i <= CABECAS_HIDRA; i += 1) cabecas.push({ n: i, viva: true });
+    return { proxima: CABECAS_HIDRA + 1, cabecas: cabecas };
+  }
 
   /* Cada TPK dá direito a uma pausa. As de 5 min são ilimitadas; as maiores
    * têm cota fechada para a sessão inteira. */
@@ -120,11 +140,17 @@
         lojaIria: false
       },
       /* O que o mestre está projetando na tela do Relógio, além do cronômetro.
-       * id nulo = só o relógio. */
+       * id nulo = só o relógio; "hidra" = o painel de cabeças. */
       exibicao: {
         id: null,
         variante: null
       },
+      /* Cabeças da Dracohydra em campo. É lista, e não contador, porque cada
+       * cabeça vive por conta própria: cortada ganha um X e fica cinza, e pode
+       * voltar a viver (nascem duas no fim do turno em que uma morre, a menos
+       * que ela tenha sofrido dano radiante). `proxima` é o número da próxima a
+       * nascer — nunca reaproveita um já usado. */
+      hidra: hidraInicial(),
       /* Formas que a tela de Projeção joga na mesa pelo projetor, na ordem em
        * que foram criadas — a última desenhada é a que fica por cima.
        *
@@ -284,9 +310,20 @@
    *
    * Estados de outra versão são ignorados. Sem essa trava, uma aba com o código
    * antigo ainda aberta mesclaria o estado novo sobre o formato dela e, na
-   * primeira gravação, apagaria os campos que ela não conhece. */
+   * primeira gravação, apagaria os campos que ela não conhece.
+   *
+   * **Estado mais velho que o daqui também é ignorado**, e isso não é zelo: o
+   * eco do servidor chega atrasado quando o POST sai de uma aba em segundo
+   * plano, porque o navegador estica o `setTimeout` de `ESPERA_ENVIO` para ~1 s
+   * ali. Duas ações seguidas viravam gravação → eco velho → estado de volta ao
+   * que era, sem aviso nenhum. Na mesa aparecia assim: dois cliques em "+50 PO"
+   * chegavam a 100 e voltavam para 50 sozinhos; a cabeça cortada renascia. O
+   * carimbo é monotônico e corrigido pelo relógio do servidor (ver `agora()`),
+   * então dá para comparar entre máquinas. Quem tem o estado mais novo continua
+   * publicando, e é para ele que as outras telas convergem. */
   function receberExterno(novo) {
     if (!novo || novo.versao !== estado.versao) return;
+    if ((novo.atualizadoEm || 0) < (estado.atualizadoEm || 0)) return;
     if (JSON.stringify(novo) === JSON.stringify(estado)) return;
     estado = mesclar(estadoInicial(), novo);
     ultimoCarimbo = Math.max(ultimoCarimbo, estado.atualizadoEm || 0);
@@ -527,9 +564,44 @@
     definirSala: function (id) {
       atualizar({ sala: id === estado.sala ? null : id || null });
     },
-    /* id nulo devolve a tela do Relógio ao cronômetro puro. */
+    /* id nulo devolve a tela do Relógio ao cronômetro puro; EXIBICAO_HIDRA põe
+     * as cabeças no lugar da tabela. */
     definirExibicao: function (id, variante) {
       atualizar({ exibicao: { id: id || null, variante: variante || null } });
+    },
+    /* --- cabeças da hidra ------------------------------------------------ */
+
+    /* Cortar e ressuscitar são o mesmo botão: na mesa uma cabeça cai e volta
+     * várias vezes no mesmo combate, e um par cortar/curar separado só daria
+     * dois alvos para errar. `mesclar` troca o array inteiro, então a lista vai
+     * completa. */
+    hidraAlternar: function (n) {
+      var cabecas = estado.hidra.cabecas.map(function (cabeca) {
+        return cabeca.n === n ? { n: cabeca.n, viva: !cabeca.viva } : cabeca;
+      });
+      atualizar({ hidra: { cabecas: cabecas } });
+    },
+    /* Duas por cabeça cortada é o caso comum da ficha, mas quem conta é o
+     * mestre: o número vem de fora. */
+    hidraNascer: function (quantas) {
+      var total = Math.max(1, Math.round(quantas) || 1);
+      var cabecas = estado.hidra.cabecas.slice();
+      for (var i = 0; i < total; i += 1) {
+        cabecas.push({ n: estado.hidra.proxima + i, viva: true });
+      }
+      atualizar({ hidra: { proxima: estado.hidra.proxima + total, cabecas: cabecas } });
+    },
+    /* Desfaz um nascimento clicado por engano. `proxima` não recua: o número
+     * some da mesa junto com a cabeça, e reaproveitá-lo criaria duas cabeças 7
+     * na mesma sessão. */
+    hidraRemover: function (n) {
+      var cabecas = estado.hidra.cabecas.filter(function (cabeca) {
+        return cabeca.n !== n;
+      });
+      atualizar({ hidra: { cabecas: cabecas } });
+    },
+    hidraReiniciar: function () {
+      atualizar({ hidra: hidraInicial() });
     },
     definirMecanica: function (chave, ligada) {
       var patch = {};
@@ -628,6 +700,8 @@
           mortes: atual.mortes + 1,
           modo: "acampamento",
           danos: danos,
+          /* Pelo mesmo motivo dos danos: a hidra volta inteira na run nova. */
+          hidra: hidraInicial(),
           pausa: { pendente: true }
         };
       });
@@ -777,6 +851,8 @@
     LOJAS: LOJAS,
     PRECO_BAU: PRECO_BAU,
     DESCONTO_BENCAO: DESCONTO_BENCAO,
+    EXIBICAO_HIDRA: EXIBICAO_HIDRA,
+    CABECAS_HIDRA: CABECAS_HIDRA,
     lojaPorId: lojaPorId,
     DURACAO_PADRAO_MS: DURACAO_PADRAO_MS,
     get: function () {

@@ -143,6 +143,31 @@
       </div>
     </section>
 
+    <!-- Hidra -->
+    <section class="painel bloco">
+      <div class="bloco__cabeca">
+        <h2>Hidra</h2>
+        <span class="selo" data-hidra-estado>5 de 5 de pé</span>
+      </div>
+
+      <div class="pilha">
+        <div class="campo">
+          <span class="rotulo">Clique numa cabeça para cortar ou trazer de volta</span>
+          <div class="hidra-controle" data-hidra-cabecas></div>
+        </div>
+        <div class="linha">
+          <button class="btn btn--pequeno" type="button" data-hidra-nascer="1">+1 cabeça</button>
+          <button class="btn btn--pequeno" type="button" data-hidra-nascer="2">+2 cabeças</button>
+          <button class="btn btn--fantasma btn--pequeno" type="button" data-hidra-remover>− última</button>
+          <button class="btn btn--fantasma btn--pequeno" type="button" data-hidra-reiniciar>Reiniciar</button>
+        </div>
+        <small class="dica">
+          Uma cabeça morre ao sofrer 30 de dano num turno; no fim dele nascem duas
+          no lugar — a menos que ela tenha sofrido dano radiante.
+        </small>
+      </div>
+    </section>
+
     <!-- Mecânicas -->
     <section class="painel bloco">
       <div class="bloco__cabeca">
@@ -210,6 +235,8 @@
   <script src="data/bencaos.js"></script>
   <script src="data/tabelas.js"></script>
   <script src="data/salas.js"></script>
+  <script src="data/hidra.js"></script>
   <script src="js/mestre.js"></script>
+  <script src="js/hidra.js"></script>
 </body>
 </html>

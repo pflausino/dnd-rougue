@@ -61,6 +61,14 @@
       </table>
       <p class="exibicao__nota" data-exibicao-nota></p>
     </section>
+
+    <!-- Cabeças da Dracohydra, no lugar da tabela: as duas saem do mesmo campo
+         `exibicao`, então nunca aparecem juntas. Sem título — a sala acima já
+         diz "Covil da Draconidra". -->
+    <section class="hidra" data-hidra hidden>
+      <span class="hidra__contagem" data-hidra-contagem></span>
+      <div class="hidra__grade" data-hidra-grade></div>
+    </section>
   </main>
 
   <!-- Fora do <main>: o autoplay só libera com um toque nesta aba, e o botão
@@ -71,6 +79,7 @@
   <script src="js/aviso-conexao.js"></script>
   <script src="data/tabelas.js"></script>
   <script src="data/salas.js"></script>
+  <script src="data/hidra.js"></script>
   <script src="js/relogio.js"></script>
   <script src="js/trilha.js"></script>
   <!-- Antes do módulo do dado: scripts clássicos rodam primeiro, então

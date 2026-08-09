@@ -86,6 +86,14 @@ function zerarChaves(objeto) {
   return saida;
 }
 
+/* Cópia de hidraInicial() em webapp/js/state.js, incluindo as cinco cabeças —
+ * é a mesma duplicação avisada no topo deste arquivo. */
+function hidraInicial() {
+  var cabecas = [];
+  for (var i = 1; i <= 5; i += 1) cabecas.push({ n: i, viva: true });
+  return { proxima: 6, cabecas: cabecas };
+}
+
 function inteiro(valor, padrao) {
   var n = Number(valor);
   return Number.isFinite(n) ? Math.round(n) : padrao;
@@ -147,8 +155,10 @@ var ACOES = {
       estado.run += 1;
       estado.mortes += 1;
       estado.modo = "acampamento";
-      /* A dungeon reinicia com o grupo (aventura.md §4). */
+      /* A dungeon reinicia com o grupo (aventura.md §4) — dano dos monstros e
+       * cabeças da hidra voltam junto. */
       estado.danos = zerarChaves(estado.danos);
+      estado.hidra = hidraInicial();
       estado.pausa.pendente = true;
     }
   },
