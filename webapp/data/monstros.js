@@ -15,9 +15,7 @@ window.GRUPOS_MONSTROS = [
   { id: "ritual", titulo: "Sala do Ritual" },
   { id: "lancas", titulo: "Caminho fácil — Corredor das Lanças" },
   { id: "tesouro", titulo: "Caminho difícil — Câmara do Tesouro" },
-  { id: "arena-goblin", titulo: "Arena I — Horda Goblin" },
-  { id: "arena-zumbis", titulo: "Arena II — Horda de Zumbis" },
-  { id: "arena-beholder", titulo: "Arena III — Contemplador Zumbi" },
+  { id: "arena", titulo: "A Arena" },
   { id: "draconidra", titulo: "Chefe final — Draconidra" }
 ];
 
@@ -343,7 +341,7 @@ window.MONSTROS = [
     id: "goblin",
     nome: "Goblin Warrior",
     quantidade: 12,
-    encontro: "arena-goblin",
+    encontro: "arena",
     classificacao: "Fada pequena (goblinoide), caótica e neutra",
     ca: 15,
     iniciativa: "+2 (12)",
@@ -386,7 +384,7 @@ window.MONSTROS = [
     id: "goblin-boss",
     nome: "Goblin Boss",
     quantidade: 1,
-    encontro: "arena-goblin",
+    encontro: "arena",
     classificacao: "Fada pequena (goblinoide), caótica e neutra",
     ca: 17,
     iniciativa: "+2 (12)",
@@ -440,7 +438,7 @@ window.MONSTROS = [
     /* Conduzido como mob: o painel de combate mostra uma barra por grupo, com o
      * PV dos cinco somado, em vez de dez barras de 15. Ver js/combate.js. */
     mob: { grupos: 2, porGrupo: 5 },
-    encontro: "arena-zumbis",
+    encontro: "arena",
     classificacao: "Morto-vivo médio, neutro e mau",
     ca: 8,
     iniciativa: "-2 (8)",
@@ -478,7 +476,7 @@ window.MONSTROS = [
     id: "hobgoblin-captain",
     nome: "Hobgoblin Captain",
     quantidade: 1,
-    encontro: "arena-zumbis",
+    encontro: "arena",
     classificacao: "Fada média (goblinoide), leal e má",
     ca: 17,
     iniciativa: "+4 (14)",
@@ -525,7 +523,7 @@ window.MONSTROS = [
     nome: "Beholder Zombie",
     apelido: "Contemplador Zumbi",
     quantidade: 1,
-    encontro: "arena-beholder",
+    encontro: "arena",
     classificacao: "Morto-vivo grande, neutro e mau",
     ca: 15,
     iniciativa: "-1 (9)",

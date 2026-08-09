@@ -378,24 +378,17 @@ Interruptores que o mestre liga conforme o grupo progride. Hoje: **Acesso à loj
 de Íria**, que libera O Véu Entre Vidas e dá os 25% de desconto nas bênçãos de
 Bram. O bloco também mostra a bênção da run e permite sortear outra.
 
-## A arena num quadro só
+## A Arena num quadro só
 
-As três fases da arena entram em sequência, sem pausa entre elas. Marcar a fase
-seguinte no meio do combate só para achar a vida de um zumbi custaria o tempo que
-o painel existe para poupar — então as três salas declaram o mesmo `palco` em
-[`webapp/data/salas.js`](webapp/data/salas.js) e o painel de combate junta todas
-num quadro só, com uma divisória por fase e um selo *em campo* na que o mestre
-marcou.
+A Arena é **uma sala só** em [`webapp/data/salas.js`](webapp/data/salas.js), não
+três fases. Os inimigos entram em sequência sem pausa, então marcar a fase
+seguinte no meio do combate só para achar a vida de um zumbi custaria o tempo
+que o painel existe para poupar: goblins, zumbis e o Contemplador Zumbi
+aparecem juntos, com a mesma trilha.
 
-O dano continua guardado por sala de origem
-(`arena-beholder:beholder-zombie:0`), então bater no subchefe enquanto a fase 1
-está marcada funciona e o número sobrevive à troca de fase. E trocar de fase
-**não remonta o painel** — as criaturas são as mesmas, e remontar perderia a
-rolagem do scroll no meio do combate.
-
-Só o painel junta. Relógio, trilha e a calculadora de loot continuam vendo três
-salas separadas, que é o que permite saber em qual fase o grupo está e pagar o
-ouro por fase. *Restaurar vidas*, na arena, restaura as três de uma vez.
+A calculadora de loot em [`webapp/data/loot.js`](webapp/data/loot.js) continua
+com os três encontros separados — lá o eixo é o ouro por inimigo, e é onde a
+divisão ainda paga.
 
 ## Hordas conduzidas como mob
 

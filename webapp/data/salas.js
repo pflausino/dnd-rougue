@@ -7,14 +7,11 @@
  * fica em silêncio. Ao gerar o áudio, largue o arquivo em
  * `webapp/assets/audio/<pasta>/batalha.mp3` e aponte aqui.
  *
- * As três arenas dividem a mesma faixa — é uma sala só na ficção, dividida em
- * zonas. Trocar entre elas não reinicia o áudio (ver js/trilha.js).
- *
- * `palco` marca salas que são fases de um mesmo combate: o painel de combate
- * junta todas num quadro só, porque na mesa os inimigos entram em sequência sem
- * pausa e o mestre precisa das três fases à mão ao mesmo tempo. Só o painel
- * junta — Relógio, trilha e loot continuam vendo três salas separadas, que é o
- * que permite saber em qual fase o grupo está e pagar o ouro por fase.
+ * A Arena é **uma sala só**, não três. Na ficção sempre foi um espaço único, e
+ * na mesa os inimigos entram em sequência sem pausa: separar em fases obrigava
+ * o mestre a trocar de sala no meio do combate só para achar a vida de um
+ * zumbi. O loot continua contando por inimigo em data/loot.js, que é o eixo em
+ * que a divisão ainda importa — lá o ouro sai por encontro, não por sala.
  *
  * `sub` hoje não é exibido em lugar nenhum: ele diz o que a sala tem dentro
  * ("5 Ghasts, 1 Wraith…") e a única tela que o mostrava era a do Relógio, que é
@@ -47,24 +44,9 @@ window.SALAS = [
     trilha: "assets/audio/02-camara-do-tesouro/batalha.mp3"
   },
   {
-    id: "arena-goblin",
-    nome: "Arena I — Horda Goblin",
-    sub: "12 Goblins e o Goblin Boss",
-    palco: { id: "arena", nome: "Arena", fase: "Fase 1 — Horda Goblin" },
-    trilha: "assets/audio/03-arena/batalha.mp3"
-  },
-  {
-    id: "arena-zumbis",
-    nome: "Arena II — Horda de Zumbis",
-    sub: "10 Zumbis e o Capitão hobgoblin",
-    palco: { id: "arena", nome: "Arena", fase: "Fase 2 — Horda de Zumbis" },
-    trilha: "assets/audio/03-arena/batalha.mp3"
-  },
-  {
-    id: "arena-beholder",
-    nome: "Arena III — Contemplador Zumbi",
-    sub: "Subchefe",
-    palco: { id: "arena", nome: "Arena", fase: "Fase 3 — Contemplador Zumbi" },
+    id: "arena",
+    nome: "A Arena",
+    sub: "Goblins, zumbis e o Contemplador Zumbi, em sequência",
     trilha: "assets/audio/03-arena/batalha.mp3"
   },
   {
@@ -74,17 +56,6 @@ window.SALAS = [
     trilha: "assets/audio/05-draconidra/batalha.mp3"
   }
 ];
-
-/* As salas de um mesmo palco, na ordem do fluxo. Fora de um palco, a própria
- * sala sozinha — assim quem chama trata os dois casos igual. */
-window.salasDoPalco = function (id) {
-  var sala = window.salaPorId(id);
-  if (!sala) return [];
-  if (!sala.palco) return [sala];
-  return window.SALAS.filter(function (outra) {
-    return outra.palco && outra.palco.id === sala.palco.id;
-  });
-};
 
 window.salaPorId = function (id) {
   return (
