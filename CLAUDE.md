@@ -240,6 +240,21 @@ de estatística abaixo não são tocados por esse arquivo.
   do Relógio aberta; duas cópias divergiriam e a errada só apareceria na mesa.
 - Um TPK zera os danos junto com a run (`referencias/aventura.md` §4: a dungeon
   reinicia com o grupo). *Restaurar vidas* zera só a sala em campo.
+- **Salas com o mesmo `palco` viram um quadro só** (as três arenas). Quatro
+  coisas que vão junto:
+  - **Só o painel junta.** Relógio, trilha e loot continuam vendo três salas —
+    é o que permite dizer em qual fase o grupo está e pagar o ouro por fase.
+    Fundir as salas de verdade resolveria o painel e quebraria os três.
+  - **A chave de dano continua sendo a sala de origem**, não o palco. Bater no
+    subchefe com a fase 1 marcada grava em `arena-beholder:…` e o número
+    sobrevive à troca de fase.
+  - **A remontagem é decidida pelo conjunto montado, não pela sala.** Andar da
+    fase 1 para a 2 mostra as mesmas criaturas; remontar ali perderia a rolagem
+    do scroll no meio do combate. Trocar de fase só move o realce.
+  - **O selo *em campo* existe em todas as faixas e fica `hidden` nas outras.**
+    Criar só na fase atual obrigaria a remontar para movê-lo — e `[hidden]` já
+    funciona porque o tema tem `display: none !important` (ver Armadilhas de
+    front).
 - **Ficha com `mob` inverte a regra de uma linha por criatura**: a linha passa a
   ser do grupo, com o PV somado, e ganha uma coluna com quantas ainda estão de
   pé. Hoje só a Arena 2 usa (`{ grupos: 2, porGrupo: 5 }` nos dez zumbis). Três
