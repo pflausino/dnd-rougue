@@ -1762,6 +1762,146 @@ html[data-travado] body {
   color: var(--texto-tenue);
 }
 
+/* --- painel de combate (topo da tela de Monstros) ------------------------- */
+
+.combate {
+  margin-bottom: 1.2rem;
+}
+
+.combate__titulo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.combate__titulo h2 {
+  font-size: 1.3rem;
+}
+
+.combate__grade {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  align-items: start;
+}
+
+.combate-ficha {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.9rem 1rem 1rem;
+}
+
+.combate-ficha__cabeca {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.combate-ficha__cabeca h3 {
+  font-size: 1.05rem;
+}
+
+.combate-ficha__nota {
+  margin: -0.2rem 0 0;
+  font-size: 0.76rem;
+  color: var(--ouro);
+}
+
+.combate-ficha__vidas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.combate-vida {
+  display: grid;
+  grid-template-columns: 2.2rem 4.6rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: var(--raio);
+  background: rgba(8, 4, 15, 0.4);
+}
+
+.combate-vida__num {
+  font-size: 0.72rem;
+  color: var(--texto-tenue);
+}
+
+.combate-vida__pv {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* Barra de vida: leitura periférica, para o mestre não precisar ler o número
+ * de cada criatura no meio do turno. */
+.combate-vida__barra {
+  height: 5px;
+  min-width: 2rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+.combate-vida__barra > span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  background: var(--pocao);
+  transition: width var(--transicao);
+}
+
+.combate-vida--ferida .combate-vida__barra > span {
+  background: var(--ouro);
+}
+
+.combate-vida--caida {
+  opacity: 0.45;
+}
+
+.combate-vida--caida .combate-vida__pv {
+  text-decoration: line-through;
+}
+
+.combate-vida--caida .combate-vida__barra > span {
+  background: var(--sangue);
+}
+
+.combate-vida__botoes {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.combate-vida__botoes .btn {
+  min-width: 2.6rem;
+  padding: 0.2rem 0.35rem;
+}
+
+.combate-ficha__ataques {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--borda);
+}
+
+.combate-ataque {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.combate-ataque__nome {
+  font-family: var(--fonte-display);
+  font-style: italic;
+  font-size: 0.85rem;
+  min-width: 6.5rem;
+}
+
 .monstro__rolagens {
   display: flex;
   flex-wrap: wrap;

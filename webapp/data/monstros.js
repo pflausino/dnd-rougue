@@ -17,8 +17,8 @@ window.GRUPOS_MONSTROS = [
   { id: "tesouro", titulo: "Caminho difícil — Câmara do Tesouro" },
   { id: "arena-goblin", titulo: "Arena I — Horda Goblin" },
   { id: "arena-hobgoblin", titulo: "Arena II — Falange Hobgoblin" },
-  { id: "arena-monte", titulo: "Arena III — Monte Errante" },
-  { id: "chefe-final", titulo: "Chefe final — Draconidra" }
+  { id: "arena-beholder", titulo: "Arena III — Contemplador Zumbi" },
+  { id: "draconidra", titulo: "Chefe final — Draconidra" }
 ];
 
 window.MONSTROS = [
@@ -523,60 +523,79 @@ window.MONSTROS = [
     notaEncontro: "Ordena o avanço com metade dos PV; a Aura of Authority se move com ele, então a formação encolhe em vez de se espalhar — referencias/aventura.md §10."
   },
   {
-    id: "shambling-mound",
-    nome: "Shambling Mound",
-    apelido: "Monte Errante",
+    id: "beholder-zombie",
+    nome: "Beholder Zombie",
+    apelido: "Contemplador Zumbi",
     quantidade: 1,
-    encontro: "arena-monte",
-    classificacao: "Planta grande, sem alinhamento",
+    encontro: "arena-beholder",
+    classificacao: "Morto-vivo grande, neutro e mau",
     ca: 15,
     iniciativa: "-1 (9)",
-    pv: 110,
-    pvDado: "13d10 + 39",
-    deslocamento: "30 pés, natação 20 pés",
-    atributos: { for: 18, des: 8, con: 16, int: 5, sab: 10, car: 5 },
-    pericias: "Stealth +3",
-    resistenciasDano: "frio, fogo",
-    imunidadesDano: "elétrico",
-    imunidadesCondicao: "surdo, exaustão",
-    sentidos: "visão cega 60 pés, Percepção passiva 10",
-    idiomas: "—",
+    pv: 93,
+    pvDado: "11d10 + 33",
+    deslocamento: "5 pés, voo 20 pés (flutua)",
+    atributos: { for: 14, des: 8, con: 16, int: 3, sab: 8, car: 5 },
+    salvaguardas: "Wis +2",
+    imunidadesDano: "veneno",
+    imunidadesCondicao: "exaustão, envenenado, caído",
+    sentidos: "visão no escuro 60 pés, Percepção passiva 9",
+    idiomas: "entende Deep Speech e Undercommon, mas não fala",
     nd: "5 (1.800 XP)",
     tracos: [
       {
-        nome: "Lightning Absorption",
-        texto: "Sempre que sofrer dano elétrico, não sofre dano e recupera PV iguais ao dano elétrico recebido."
+        nome: "Undead Fortitude",
+        texto: "Se o dano o reduzir a 0 PV, faz uma salvaguarda de Constituição CD 5 + o dano sofrido; passando, fica com 1 PV. Não vale se o dano for radiante ou vier de um acerto crítico.",
+        rolagens: [{ rotulo: "Salvaguarda", dado: "1d20", bonus: 3 }]
       }
     ],
     acoes: [
+      { nome: "Multiattack", texto: "Usa Eye Rays duas vezes." },
       {
-        nome: "Multiattack",
-        texto: "Faz três ataques de Charged Tendril. Pode trocar um deles por um uso de Engulf."
-      },
-      {
-        nome: "Charged Tendril",
-        texto: "Ataque corpo a corpo: +7 para acertar, alcance 10 pés. Acerto: 7 (1d6 + 4) de dano contundente mais 5 (2d4) de dano elétrico. Se o alvo for uma criatura Média ou menor, é puxado 5 pés em linha reta na direção do monte.",
+        nome: "Bite",
+        texto: "Ataque corpo a corpo: +5 para acertar, alcance 5 pés. Acerto: 16 (4d6 + 2) de dano perfurante.",
         rolagens: [
-          { rotulo: "Acerto", dado: "1d20", bonus: 7 },
-          { rotulo: "Dano", dado: "1d6", bonus: 4, tipo: "contundente" },
-          { rotulo: "Dano (elétrico)", dado: "2d4", bonus: 0, tipo: "elétrico" }
+          { rotulo: "Acerto", dado: "1d20", bonus: 5 },
+          { rotulo: "Dano", dado: "4d6", bonus: 2, tipo: "perfurante" }
         ]
       },
       {
-        nome: "Engulf",
-        texto: "Salvaguarda de Força CD 15 para uma criatura Média ou menor a até 5 pés. Falha: é puxada para o espaço do monte e fica agarrada (CD de fuga 14), cega e contida, sofrendo 10 (3d6) de dano elétrico no início de cada turno dela. Ao se mover, o monte leva o alvo junto. Só engole uma criatura por vez.",
-        rolagens: [{ rotulo: "Dano (elétrico)", dado: "3d6", bonus: 0, tipo: "elétrico" }]
+        nome: "Eye Rays",
+        texto: "Dispara ao acaso um dos raios mágicos abaixo contra um alvo que enxergue a até 120 pés. Role 1d4 e rerrole se aquele raio já saiu neste turno. Todos usam CD 14.",
+        rolagens: [{ rotulo: "Qual raio", dado: "1d4", bonus: 0 }]
+      }
+    ],
+    /* Os raios saem numa seção própria: enfiá-los no texto de Eye Rays
+     * tiraria o botão de dano de cada um. */
+    raios: [
+      {
+        nome: "1 · Paralyzing Ray",
+        texto: "Salvaguarda de Constituição CD 14. Falha: fica paralisado e repete a salvaguarda ao fim de cada turno dele. Depois de 1 minuto, o sucesso é automático."
+      },
+      {
+        nome: "2 · Fear Ray",
+        texto: "Salvaguarda de Sabedoria CD 14. Falha: 13 (3d8) de dano psíquico e fica amedrontado até o fim do próximo turno dele. Sucesso: nada acontece.",
+        rolagens: [{ rotulo: "Dano", dado: "3d8", bonus: 0, tipo: "psíquico" }]
+      },
+      {
+        nome: "3 · Enervation Ray",
+        texto: "Salvaguarda de Constituição CD 14. Falha: 10 (3d6) de dano necrótico e fica envenenado até o fim do próximo turno dele; enquanto envenenado assim, não recupera PV. Sucesso: metade do dano, sem a condição.",
+        rolagens: [{ rotulo: "Dano", dado: "3d6", bonus: 0, tipo: "necrótico" }]
+      },
+      {
+        nome: "4 · Disintegration Ray",
+        texto: "Salvaguarda de Destreza CD 14. Falha: 27 (5d10) de dano de força. Sucesso: metade. Se o alvo for objeto não mágico ou criação de força mágica, um cubo de 10 pés dele vira pó. Passando ou falhando: se o dano reduzir a criatura a 0 PV, ela vira pó.",
+        rolagens: [{ rotulo: "Dano", dado: "5d10", bonus: 0, tipo: "força" }]
       }
     ],
     fonte: "Monster Manual (2025)",
-    notaEncontro: "Os condutores elétricos da arena o curam com Lightning Absorption — números ainda pendentes, referencias/aventura.md §11."
+    notaEncontro: "Undead Fortitude não vale contra dano radiante nem contra crítico: a Lâmina Solar é a resposta direta a ele — referencias/aventura.md §11."
   },
   {
     id: "dracohydra",
     nome: "Dracohydra",
     apelido: "Draconidra",
     quantidade: 1,
-    encontro: "chefe-final",
+    encontro: "draconidra",
     classificacao: "Monstruosidade enorme, caótica e má (tipicamente)",
     ca: 17,
     caObs: "armadura natural",

@@ -18,7 +18,7 @@
   /* A versão entra na chave, no canal e na rota da API: telas de versões
    * diferentes (uma aba antiga que ficou aberta, por exemplo) não disputam o
    * mesmo estado. */
-  var VERSAO = 11;
+  var VERSAO = 13;
   var CHAVE = "ultima-dungeon:estado:v" + VERSAO;
   var NOME_CANAL = "ultima-dungeon:v" + VERSAO;
   var INTERVALO_POLL = 500;
@@ -133,6 +133,15 @@
       bencaosAdquiridas: [],
       /* Contagem de abates da run, por id de inimigo, para o cálculo do loot. */
       abates: {},
+      /* Dano sofrido por cada criatura em campo, por chave
+       * "<encontro>:<idMonstro>:<índice>" — o Ghast nº 3 da Sala do Ritual é
+       * "ritual:ghast:2".
+       *
+       * Guarda o dano acumulado, não o PV restante, por dois motivos: o PV
+       * cheio já vem de data/monstros.js (não precisa ser copiado para cá), e
+       * zerar vira escrever `0` em cada chave — que é o que `mesclar` exige,
+       * já que um `{}` vazio não limparia nada (ver zerarAbates). */
+      danos: {},
       /* Salas com o ouro dobrado nesta run, marcadas à mão pelo mestre. */
       lootDobrado: {},
       /* Bênção que Bram oferece nesta run. Sorteada uma vez por run. */
@@ -524,6 +533,28 @@
       abates[id] = Math.max(0, Math.round(valor) || 0);
       atualizar({ abates: abates });
     },
+    /* Soma dano (delta positivo) ou cura (negativo) numa criatura. `maximo` é
+     * o PV cheio dela: sem ele o dano cresceria sem fim depois de a criatura
+     * já ter caído, e um "+1" depois disso levaria vários cliques para voltar
+     * a mexer no PV visível. */
+    ajustarDano: function (chave, delta, maximo) {
+      var danos = Object.assign({}, estado.danos);
+      var alvo = (danos[chave] || 0) + delta;
+      if (alvo < 0) alvo = 0;
+      if (typeof maximo === "number" && alvo > maximo) alvo = maximo;
+      danos[chave] = alvo;
+      atualizar({ danos: danos });
+    },
+    /* Sem `chaves`, restaura tudo. Com, restaura só aquelas — é como a tela de
+     * Monstros restaura uma sala sem mexer nas outras. Escreve `0` em cada
+     * chave em vez de trocar o objeto: `mesclar` funde, então `{}` não limpa. */
+    zerarDanos: function (chaves) {
+      var danos = {};
+      (chaves || Object.keys(estado.danos)).forEach(function (chave) {
+        danos[chave] = 0;
+      });
+      atualizar({ danos: danos });
+    },
     alternarLootDobrado: function (idEncontro) {
       var dobrado = Object.assign({}, estado.lootDobrado);
       dobrado[idEncontro] = !dobrado[idEncontro];
@@ -570,10 +601,17 @@
     /* TPK: nova run, volta ao acampamento e libera a escolha da pausa. */
     registrarTpk: function () {
       atualizar(function (atual) {
+        /* A dungeon reinicia com o grupo (referencias/aventura.md §4), então o
+         * dano dos monstros vai junto. Cada chave a `0`, nunca `{}`. */
+        var danos = {};
+        Object.keys(atual.danos).forEach(function (chave) {
+          danos[chave] = 0;
+        });
         return {
           run: atual.run + 1,
           mortes: atual.mortes + 1,
           modo: "acampamento",
+          danos: danos,
           pausa: { pendente: true }
         };
       });

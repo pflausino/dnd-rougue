@@ -16,6 +16,7 @@
 var http = require("http");
 var fs = require("fs");
 var path = require("path");
+var acoes = require("./acoes");
 
 var PORTA = Number(process.env.PORTA || 8777);
 var ENDERECO = process.env.ENDERECO || "0.0.0.0";
@@ -294,6 +295,113 @@ function versaoDoPedido(consulta) {
   return achado ? Number(achado[1]) : 0;
 }
 
+/* Qual versão os atalhos mexem quando o pedido não traz `?v=` — e não trazer é
+ * o caso normal: um botão de Steam Deck com `v=13` escrito na mão pararia de
+ * funcionar no próximo bump de VERSAO, e ninguém lembraria do porquê.
+ *
+ * **As telas conectadas mandam, não o estado guardado.** O servidor mantém um
+ * estado por versão e os antigos ficam ali depois de um bump; escolher pelo
+ * maior guardado faria o atalho editar em silêncio uma sessão morta enquanto o
+ * painel aberto não mexia um dedo. O SSE sabe em que versão cada tela está —
+ * é a fonte certa. O estado guardado só decide quando não há ninguém ouvindo. */
+function versaoAtiva() {
+  var deTelas = ouvintes.reduce(function (maior, ouvinte) {
+    return ouvinte.versao > maior ? ouvinte.versao : maior;
+  }, 0);
+  if (deTelas) return deTelas;
+
+  return Object.keys(estados)
+    .map(Number)
+    .reduce(function (maior, v) {
+      return v > maior ? v : maior;
+    }, 0);
+}
+
+function parametros(consulta) {
+  var saida = {};
+  (consulta || "").split("&").forEach(function (par) {
+    if (!par) return;
+    var corte = par.indexOf("=");
+    var chave = decodeURIComponent(corte === -1 ? par : par.slice(0, corte));
+    var valor = corte === -1 ? "" : decodeURIComponent(par.slice(corte + 1).replace(/\+/g, " "));
+    saida[chave] = valor;
+  });
+  return saida;
+}
+
+/* Carimbo monotônico, pelo mesmo motivo de `carimbar()` em state.js: dois
+ * atalhos apertados no mesmo milissegundo precisam de `atualizadoEm`
+ * diferentes, senão a tela descarta o segundo. */
+var ultimoCarimboServidor = 0;
+
+function carimboServidor() {
+  var instante = Date.now();
+  ultimoCarimboServidor = instante > ultimoCarimboServidor ? instante : ultimoCarimboServidor + 1;
+  return ultimoCarimboServidor;
+}
+
+/* Espera antes de resolver uma rolagem sozinho. Tem de caber a subida do
+ * dice-box mais a queda do dado; menor que isso e o número sairia antes de a
+ * mesa ver o dado parar. Espelha ESPERA_RETORNO_MS de webapp/js/monstros.js,
+ * que faz o mesmo pelas rolagens pedidas na tela. */
+var ESPERA_DADO_3D = 5000;
+
+/* A tela do Relógio marca "animando" assim que a física começa; só é preciso
+ * agir se ninguém tocou na rolagem até lá. */
+function aparaRolagemPresa(versao, id) {
+  setTimeout(function () {
+    var atual = estados[versao];
+    if (!atual || !atual.rolagem || atual.rolagem.id !== id) return;
+    if (atual.rolagem.status !== "pendente") return;
+
+    var r = atual.rolagem;
+    var dados = [];
+    for (var i = 0; i < r.qtd; i += 1) {
+      dados.push(1 + Math.floor(Math.random() * r.lados));
+    }
+    var total = dados.reduce(function (a, b) {
+      return a + b;
+    }, 0);
+
+    r.status = "resolvida";
+    r.dados = dados;
+    r.resultado = total + (r.bonus || 0);
+    atual.atualizadoEm = carimboServidor();
+    agendarGravacao();
+    publicar(versao, atual);
+  }, ESPERA_DADO_3D);
+}
+
+function formatarDuracao(ms) {
+  var negativo = ms < 0;
+  var total = Math.floor(Math.abs(ms) / 1000);
+  var partes = [Math.floor(total / 3600), Math.floor((total % 3600) / 60), total % 60];
+  return (negativo ? "-" : "") + partes.map(function (n) {
+    return String(n).padStart(2, "0");
+  }).join(":");
+}
+
+/* Devolvido a cada atalho para o botão poder mostrar o efeito sem uma segunda
+ * chamada — útil num Steam Deck, que consegue exibir a saída do comando. */
+function resumoDoPainel(estado) {
+  if (!estado) return null;
+  var r = estado.relogio;
+  var decorrido = Math.max(0, r.acumuladoMs + (r.rodando && r.iniciadoEm ? Date.now() - r.iniciadoEm : 0));
+  return {
+    run: estado.run,
+    mortes: estado.mortes,
+    ouro: estado.ouro,
+    modo: estado.modo,
+    sala: estado.sala,
+    relogio: {
+      rodando: r.rodando,
+      restante: formatarDuracao(r.duracaoMs - decorrido)
+    },
+    pausaAtiva: estado.pausa.terminaEm !== null,
+    pausaPendente: estado.pausa.pendente
+  };
+}
+
 function lerCorpo(pedido, pronto) {
   var pedacos = [];
   var total = 0;
@@ -398,6 +506,55 @@ var servidor = http.createServer(function (pedido, resposta) {
 
     resposta.writeHead(405, { Allow: "GET, POST, DELETE" });
     return resposta.end();
+  }
+
+  /* Atalhos de mesa. Aceitam GET além de POST de propósito: o alvo é virar
+   * botão de Steam Deck, e um `curl` sem `-X` ou um atalho que só abre a URL
+   * têm de funcionar. Isso é GET que muda estado, o que normalmente não se faz
+   * — aqui passa porque a mesma superfície `/api/estado` já aceita POST sem
+   * autenticação nenhuma (ver README): não há nada a proteger que já não
+   * esteja aberto. Fechar é decisão de proxy, não deste arquivo. */
+  if (caminho === "/api/acoes") {
+    return responderJson(resposta, 200, {
+      ok: true,
+      /* Sem `?v=`, os atalhos agem na versão mais nova que o servidor conhece.
+       * É o que evita ter de reprogramar os botões a cada bump de VERSAO. */
+      versaoPadrao: versaoAtiva(),
+      salas: acoes.ORDEM_SALAS,
+      acoes: acoes.lista()
+    });
+  }
+
+  if (caminho.indexOf("/api/acao/") === 0) {
+    var nome = decodeURIComponent(caminho.slice("/api/acao/".length));
+    var vAcao = versaoDoPedido(consulta) || versaoAtiva();
+    var resultado = acoes.aplicar(nome, estados[vAcao] || null, parametros(consulta));
+
+    if (resultado.erro) {
+      var codigo = resultado.erro.indexOf("desconhecida") !== -1 ? 404 : 409;
+      return responderJson(resposta, codigo, { ok: false, erro: resultado.erro });
+    }
+
+    if (!resultado.semMudanca) {
+      resultado.estado.atualizadoEm = carimboServidor();
+      estados[vAcao] = resultado.estado;
+      agendarGravacao();
+      publicar(vAcao, resultado.estado);
+
+      /* Quem resolve uma rolagem é a tela do Relógio, com a física do dado 3D.
+       * Sem ela aberta ninguém resolveria, e o atalho deixaria um "rolando…"
+       * preso para sempre no log das outras telas. */
+      if (nome === "rolar") aparaRolagemPresa(vAcao, resultado.estado.rolagem.id);
+    }
+
+    return responderJson(resposta, 200, {
+      ok: true,
+      acao: nome,
+      versao: vAcao,
+      semMudanca: Boolean(resultado.semMudanca),
+      /* Resumo curto para o atalho poder mostrar algo de volta. */
+      painel: resumoDoPainel(resultado.estado)
+    });
   }
 
   if (caminho === "/api/saude") {

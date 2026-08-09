@@ -81,12 +81,12 @@ window.ENCONTROS_LOOT = [
     ]
   },
   {
-    id: "arena-monte",
-    nome: "Arena III — Monte Errante",
+    id: "arena-beholder",
+    nome: "Arena III — Contemplador Zumbi",
     inimigos: [
       {
-        id: "shambling-mound",
-        nome: "Monte Errante",
+        id: "beholder-zombie",
+        nome: "Contemplador Zumbi",
         previstos: 1,
         nd: "5",
         faixa: "especial",

@@ -25,6 +25,28 @@
   </header>
 
   <main class="conteudo">
+    <!-- Vidas da sala em que o grupo está, marcada na tela do Mestre. Fica
+         acima do filtro de propósito: é o que o mestre usa durante o combate;
+         os blocos completos continuam logo abaixo, intocados. -->
+    <section class="painel bloco combate" data-combate>
+      <div class="bloco__cabeca">
+        <div class="combate__titulo">
+          <span class="rotulo">Em combate</span>
+          <h2 data-combate-sala>Nenhuma sala marcada</h2>
+        </div>
+        <button class="btn btn--fantasma btn--pequeno" type="button" data-combate-zerar hidden>
+          Restaurar vidas
+        </button>
+      </div>
+
+      <p class="vazio" data-combate-dica>
+        Marque a sala na tela do Mestre e as criaturas dela aparecem aqui, uma
+        linha de vida para cada.
+      </p>
+
+      <div class="combate__grade" data-combate-grade hidden></div>
+    </section>
+
     <div class="monstros__filtro">
       <label class="campo" style="flex:1">
         <span class="rotulo">Buscar</span>
@@ -38,8 +60,10 @@
 
   <script src="js/state.js"></script>
   <script src="js/aviso-conexao.js"></script>
+  <script src="data/salas.js"></script>
   <script src="data/monstros.js"></script>
   <script src="js/monstros.js"></script>
+  <script src="js/combate.js"></script>
   <script src="js/log-rolagens.js"></script>
 </body>
 </html>
