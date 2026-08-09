@@ -284,9 +284,20 @@
    *
    * Estados de outra versão são ignorados. Sem essa trava, uma aba com o código
    * antigo ainda aberta mesclaria o estado novo sobre o formato dela e, na
-   * primeira gravação, apagaria os campos que ela não conhece. */
+   * primeira gravação, apagaria os campos que ela não conhece.
+   *
+   * **Estado mais velho que o daqui também é ignorado**, e isso não é zelo: o
+   * eco do servidor chega atrasado quando o POST sai de uma aba em segundo
+   * plano, porque o navegador estica o `setTimeout` de `ESPERA_ENVIO` para ~1 s
+   * ali. Duas ações seguidas viravam gravação → eco velho → estado de volta ao
+   * que era, sem aviso nenhum. Na mesa aparecia assim: dois cliques em "+50 PO"
+   * chegavam a 100 e voltavam para 50 sozinhos. O carimbo é monotônico e
+   * corrigido pelo relógio do servidor (ver `agora()`), então dá para comparar
+   * entre máquinas. Quem tem o estado mais novo continua publicando, e é para
+   * ele que as outras telas convergem. */
   function receberExterno(novo) {
     if (!novo || novo.versao !== estado.versao) return;
+    if ((novo.atualizadoEm || 0) < (estado.atualizadoEm || 0)) return;
     if (JSON.stringify(novo) === JSON.stringify(estado)) return;
     estado = mesclar(estadoInicial(), novo);
     ultimoCarimbo = Math.max(ultimoCarimbo, estado.atualizadoEm || 0);
