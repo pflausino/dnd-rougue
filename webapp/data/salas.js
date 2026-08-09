@@ -47,9 +47,9 @@ window.SALAS = [
     trilha: "assets/audio/03-arena/batalha.mp3"
   },
   {
-    id: "arena-hobgoblin",
-    nome: "Arena II — Falange Hobgoblin",
-    sub: "6 Hobgoblins e o Capitão",
+    id: "arena-zumbis",
+    nome: "Arena II — Horda de Zumbis",
+    sub: "10 Zumbis e o Capitão hobgoblin",
     trilha: "assets/audio/03-arena/batalha.mp3"
   },
   {

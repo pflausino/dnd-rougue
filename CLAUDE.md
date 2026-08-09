@@ -240,6 +240,28 @@ de estatística abaixo não são tocados por esse arquivo.
   do Relógio aberta; duas cópias divergiriam e a errada só apareceria na mesa.
 - Um TPK zera os danos junto com a run (`referencias/aventura.md` §4: a dungeon
   reinicia com o grupo). *Restaurar vidas* zera só a sala em campo.
+- **Ficha com `mob` inverte a regra de uma linha por criatura**: a linha passa a
+  ser do grupo, com o PV somado, e ganha uma coluna com quantas ainda estão de
+  pé. Hoje só a Arena 2 usa (`{ grupos: 2, porGrupo: 5 }` nos dez zumbis). Três
+  coisas que vão junto:
+  - **`grupos × porGrupo` tem de fechar com `quantidade`.** Nada valida isso em
+    tempo de execução; o sintoma seria a calculadora de loot contar um número de
+    criaturas diferente do que o painel mostra.
+  - **O índice da chave de dano passa a ser o do grupo**, não o da criatura:
+    `arena-zumbis:zombie:0` é o grupo A inteiro. Mudar `grupos` depois de uma
+    sessão começada deixa dano órfão — inofensivo, mas some da tela.
+  - **O contador de "de pé" arredonda para cima**, porque com 1 PV sobrando
+    ainda há uma criatura viva, e é ela que ataca no turno.
+
+## Economia de ouro
+
+`webapp/data/loot.js` e a seção 13 de `referencias/aventura.md` têm de contar a
+mesma coisa. **Trocar monstro de encontro muda o ouro da run**, porque a faixa
+sai do ND: os 6 Hobgoblin Warriors (ND 1/2, faixa baixa) viraram 10 zumbis
+(ND 1/4, também baixa) e a Arena 2 subiu de 51,5 para 77,5 PO de média — a run
+pelo caminho fácil foi de 284,5 para 310,5. Ao mexer num encontro, recalcule
+também os acumulados de quatro runs e o mínimo/máximo, que aparecem em três
+lugares diferentes da seção 13.
 
 ## Projetor na mesa
 
@@ -388,7 +410,7 @@ Não há suíte automatizada. O ciclo usado até agora:
 2. `node servidor/servidor.js` e abrir duas telas (Mestre + a tela afetada) para
    ver a sincronização.
 3. Conferir números contra as referências — as médias de loot, por exemplo,
-   batem com a seção 13 do `aventura.md` (uma run pelo caminho fácil dá 284,5 PO).
+   batem com a seção 13 do `aventura.md` (uma run pelo caminho fácil dá 310,5 PO).
 
 Ao mexer na sincronização, dois testes que pegam o que o olho não pega:
 

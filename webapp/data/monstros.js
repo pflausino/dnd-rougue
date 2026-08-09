@@ -16,7 +16,7 @@ window.GRUPOS_MONSTROS = [
   { id: "lancas", titulo: "Caminho fácil — Corredor das Lanças" },
   { id: "tesouro", titulo: "Caminho difícil — Câmara do Tesouro" },
   { id: "arena-goblin", titulo: "Arena I — Horda Goblin" },
-  { id: "arena-hobgoblin", titulo: "Arena II — Falange Hobgoblin" },
+  { id: "arena-zumbis", titulo: "Arena II — Horda de Zumbis" },
   { id: "arena-beholder", titulo: "Arena III — Contemplador Zumbi" },
   { id: "draconidra", titulo: "Chefe final — Draconidra" }
 ];
@@ -433,54 +433,52 @@ window.MONSTROS = [
     notaEncontro: "Reforços param de entrar quando ele morre; os goblins restantes fogem no fim da rodada — referencias/aventura.md §9."
   },
   {
-    id: "hobgoblin",
-    nome: "Hobgoblin Warrior",
-    quantidade: 6,
-    encontro: "arena-hobgoblin",
-    classificacao: "Fada média (goblinoide), leal e má",
-    ca: 18,
-    iniciativa: "+3 (13)",
-    pv: 11,
-    pvDado: "2d8 + 2",
-    deslocamento: "30 pés",
-    atributos: { for: 13, des: 12, con: 12, int: 10, sab: 10, car: 9 },
-    equipamento: "meia-armadura, escudo, espada longa, arco longo",
-    sentidos: "visão no escuro 60 pés, Percepção passiva 10",
-    idiomas: "Comum, Goblin",
-    nd: "1/2 (100 XP)",
+    id: "zombie",
+    nome: "Zombie",
+    apelido: "Zumbi",
+    quantidade: 10,
+    /* Conduzido como mob: o painel de combate mostra uma barra por grupo, com o
+     * PV dos cinco somado, em vez de dez barras de 15. Ver js/combate.js. */
+    mob: { grupos: 2, porGrupo: 5 },
+    encontro: "arena-zumbis",
+    classificacao: "Morto-vivo médio, neutro e mau",
+    ca: 8,
+    iniciativa: "-2 (8)",
+    pv: 15,
+    pvDado: "2d8 + 6",
+    deslocamento: "20 pés",
+    atributos: { for: 13, des: 6, con: 16, int: 3, sab: 6, car: 5 },
+    salvaguardas: "Wis +0",
+    imunidadesDano: "veneno",
+    imunidadesCondicao: "exaustão, envenenado",
+    sentidos: "visão no escuro 60 pés, Percepção passiva 8",
+    idiomas: "entende Comum mais um outro idioma, mas não fala",
+    nd: "1/4 (50 XP)",
     tracos: [
       {
-        nome: "Pack Tactics",
-        texto: "Tem vantagem numa rolagem de ataque contra uma criatura se pelo menos um aliado do hobgoblin estiver a até 5 pés dela e não estiver incapacitado."
+        nome: "Undead Fortitude",
+        texto: "Se o dano o reduzir a 0 PV, faz uma salvaguarda de Constituição CD 5 + o dano sofrido; passando, fica com 1 PV. Não vale se o dano for radiante ou vier de um acerto crítico.",
+        rolagens: [{ rotulo: "Salvaguarda", dado: "1d20", bonus: 3 }]
       }
     ],
     acoes: [
       {
-        nome: "Longsword",
-        texto: "Ataque corpo a corpo: +3 para acertar, alcance 5 pés. Acerto: 12 (2d10 + 1) de dano cortante.",
+        nome: "Slam",
+        texto: "Ataque corpo a corpo: +3 para acertar, alcance 5 pés. Acerto: 5 (1d8 + 1) de dano contundente.",
         rolagens: [
           { rotulo: "Acerto", dado: "1d20", bonus: 3 },
-          { rotulo: "Dano", dado: "2d10", bonus: 1, tipo: "cortante" }
-        ]
-      },
-      {
-        nome: "Longbow",
-        texto: "Ataque à distância: +3 para acertar, alcance 150/600 pés. Acerto: 5 (1d8 + 1) de dano perfurante mais 7 (3d4) de dano de veneno.",
-        rolagens: [
-          { rotulo: "Acerto", dado: "1d20", bonus: 3 },
-          { rotulo: "Dano", dado: "1d8", bonus: 1, tipo: "perfurante" },
-          { rotulo: "Dano (veneno)", dado: "3d4", bonus: 0, tipo: "veneno" }
+          { rotulo: "Dano", dado: "1d8", bonus: 1, tipo: "contundente" }
         ]
       }
     ],
     fonte: "Monster Manual (2025)",
-    notaEncontro: "4 na linha de frente, 2 como arqueiros; ficam colados nos alvos para ativar Pack Tactics — referencias/aventura.md §10."
+    notaEncontro: "Dez em dois grupos de cinco, conduzidos como mob. Undead Fortitude é o que faz a horda voltar: sem dano radiante nem crítico, cada zumbi derrubado ainda faz a salvaguarda — referencias/aventura.md §10."
   },
   {
     id: "hobgoblin-captain",
     nome: "Hobgoblin Captain",
     quantidade: 1,
-    encontro: "arena-hobgoblin",
+    encontro: "arena-zumbis",
     classificacao: "Fada média (goblinoide), leal e má",
     ca: 17,
     iniciativa: "+4 (14)",

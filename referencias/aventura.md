@@ -36,7 +36,7 @@ Goblins inacessíveis           Mimic + 4 Flying Swords
                        v
                      ARENA
        1. Horda Goblin
-       2. Falange Hobgoblin
+       2. Horda de Zumbis
        3. Contemplador Zumbi (subchefe)
                        |
                        v
@@ -57,7 +57,7 @@ Elementos mostrados:
 - Entrada com símbolo de retorno.
 - Sala inicial com três totens em torno do círculo de invocação.
 - Bifurcação entre os dois caminhos.
-- Arena única dividida visualmente em zonas goblin, hobgoblin e pantanosa. A zona pantanosa foi desenhada para o Monte Errante e não combina mais com o Contemplador Zumbi; o mapa precisa ser refeito nesse trecho.
+- Arena única dividida visualmente em zonas goblin, hobgoblin e pantanosa. A zona do meio agora é da horda de zumbis, não da falange. A zona pantanosa foi desenhada para o Monte Errante e não combina mais com o Contemplador Zumbi; o mapa precisa ser refeito nesse trecho.
 - Dois condutores elétricos na arena.
 - Covil final com pilares e runas elementais.
 - Linha tracejada indicando o retorno à entrada após um TPK.
@@ -220,7 +220,7 @@ Também falta definir se superar o dragão sem matá-lo concede sua recompensa e
 A arena contém três encontros consecutivos no mesmo espaço:
 
 1. Horda Goblin.
-2. Falange Hobgoblin.
+2. Horda de Zumbis.
 3. Contemplador Zumbi como subchefe.
 
 Objetivo de ritmo: produzir escala e desgaste sem administrar dezenas de iniciativas individuais.
@@ -283,47 +283,67 @@ Matar o Goblin Boss antes que todos os reforços entrem.
 
 Estes goblins podem ser apresentados como a mesma força responsável pelas lanças do caminho fácil.
 
-## 10. Arena 2: Falange Hobgoblin
+## 10. Arena 2: Horda de Zumbis
 
 ### Monstros
 
-- 6 Hobgoblin Warriors.
-- 1 Hobgoblin Captain.
+- 10 Zombies, em dois grupos de cinco.
+- 1 Hobgoblin Captain, que continua no comando.
+
+Substituiu os 6 Hobgoblin Warriors. O Capitão ficou: é ele que dispara os
+condutores elétricos da arena ao cair (§11), e sem ele a Arena 2 perderia a fase
+de "queda do líder" que amarra os dois encontros.
 
 ### Objetivo
 
-Romper a formação e derrotar o Capitão.
+Aguentar a pressão dos números e derrubar o Capitão.
+
+### Como conduzir
+
+Os zumbis são conduzidos **como mob, não um a um**: cada grupo de cinco vira uma
+barra só, com os `75` PV somados, e a tela de Monstros mostra ao lado quantos
+ainda estão de pé. É o número que importa na hora de decidir quantos Slams saem
+no turno — dez fichas separadas na tela não acrescentariam nada e custariam
+tempo de mesa.
 
 ### Fases e mecânica especial
 
 #### Fase inicial
 
-- Capitão.
-- 4 hobgoblins formando uma linha defensiva.
-- 2 hobgoblins atuando como arqueiros.
-- O Capitão fica atrás da linha, com a Aura of Authority cobrindo os quatro da frente: dentro da emanação de 10 pés, todos têm vantagem em ataques e salvaguardas.
-- Os hobgoblins tentam ficar colados nos personagens para ativar Pack Tactics, que exige um aliado a até 5 pés do alvo.
+- Capitão atrás.
+- Grupo A avança pela frente; grupo B fica em reserva.
+- O Capitão fica dentro do alcance da Aura of Authority do grupo da frente: na emanação de 10 pés, ele e os zumbis têm vantagem em ataques e salvaguardas.
 
 #### Fase de avanço
 
-- Quando o Capitão chega à metade dos PV, ordena o avanço.
-- Os arqueiros abandonam suas posições.
-- A formação passa a cercar e isolar personagens, mas sem sair da aura do Capitão — o que a mantém compacta e a torna alvo de área.
+- Quando o Capitão chega à metade dos PV, manda o grupo B entrar.
+- Os dois grupos passam a cercar, mas sem sair da aura — o que os mantém compactos e os torna alvo de área.
 
 #### Queda do Capitão
 
 - A Aura of Authority some com ele.
-- Os sobreviventes realizam mais um turno e então recuam.
-- Os sobreviventes que recuam concedem recompensa normalmente.
+- Os zumbis não fogem: são mortos-vivos sem vontade própria. Seguem avançando até o último cair.
+- Os condutores elétricos da Arena 3 ligam (§11).
+
+### Mecânica especial: Undead Fortitude
+
+É o que dá peso a uma horda de ND 1/4. Todo zumbi reduzido a 0 PV faz uma
+salvaguarda de Constituição CD 5 + o dano sofrido e volta com 1 PV se passar —
+a menos que o dano seja radiante ou venha de um acerto crítico. Na prática:
+
+- Golpe pequeno derruba e o zumbi levanta; golpe grande derruba de vez, porque a CD sobe com o dano.
+- A **Lâmina Solar** encerra o traço de uma vez, e é aqui que ela mais aparece na aventura fora do chefe final.
+- Conduzindo como mob, a salvaguarda vale por criatura, não por barra: cada vez que o dano acumulado cruza um múltiplo de 15, role uma vez.
 
 ### Dificuldade pretendida
 
 - Mortal, especialmente após o desgaste da horda goblin.
+- O perigo mudou de qualidade: a falange batia forte e pouco, a horda bate fraco e sempre. Vinte ataques de `+3` por rodada acertam alguém.
 
 ### Tentativas futuras
 
-- O grupo aprende a separar os hobgoblins.
-- Pode impedir Pack Tactics e focar o Capitão para derrubar a aura.
+- O grupo aprende que dano radiante e críticos valem o dobro aqui.
+- Aprende a segurar os zumbis num gargalo, já que o deslocamento deles é `20 pés`.
 - Controle de área e deslocamento forçado ganham grande valor.
 
 ## 11. Subchefe: Contemplador Zumbi
@@ -439,7 +459,7 @@ Aplicações aprovadas:
 
 - Impedir o ritual concede o ouro do Bone Devil.
 - Matar o Goblin Boss e provocar a fuga da horda concede o ouro dos goblins restantes.
-- Matar o Hobgoblin Captain e provocar a retirada da falange concede o ouro dos sobreviventes.
+- Matar o Hobgoblin Captain concede o ouro dele. Os zumbis não recuam — o ouro dos dez sai por criatura derrubada, como sempre.
 - Atravessar eficientemente o corredor concede a recompensa dos Flameskulls mesmo que não consigam atacar.
 
 ### Recompensas por encontro
@@ -455,7 +475,7 @@ Aplicações aprovadas:
 | Caminho difícil | Animated Flying Sword | 4 | 1/4 | Baixa | `1d4+4` | `4d4+16` | 26 |
 | Arena 1 | Goblin Warrior | 12 | 1/4 | Baixa | `1d4+4` | `12d4+48` | 78 |
 | Arena 1 | Goblin Boss | 1 | 1 | Baixa | `1d4+4` | `1d4+4` | 6,5 |
-| Arena 2 | Hobgoblin Warrior | 6 | 1/2 | Baixa | `1d4+4` | `6d4+24` | 39 |
+| Arena 2 | Zombie | 10 | 1/4 | Baixa | `1d4+4` | `10d4+40` | 65 |
 | Arena 2 | Hobgoblin Captain | 1 | 3 | Média | `1d8+8` | `1d8+8` | 12,5 |
 | Subchefe | Beholder Zombie | 1 | 5 | Especial | `1d100+100` | `1d100+100` | 150,5 |
 | Chefe final | Dracohydra | 1 | 11 | Final | - | Sem ouro | 0 |
@@ -478,16 +498,16 @@ Média por run antes de derrotar o Contemplador Zumbi:
 | Sala inicial, incluindo Bone Devil impedido | 123,5 PO |
 | Caminho fácil | 25 PO |
 | Horda Goblin | 84,5 PO |
-| Falange Hobgoblin | 51,5 PO |
-| **Total** | **284,5 PO** |
+| Horda de Zumbis | 77,5 PO |
+| **Total** | **310,5 PO** |
 
 Resultados em quatro runs:
 
-- Média acumulada: **1.138 PO**.
-- Mínimo possível: **836 PO**.
-- Máximo possível: **1.440 PO**.
-- Se derrotarem o Contemplador Zumbi apenas na quarta run: média de **1.288,5 PO**.
-- Se derrotarem o Contemplador Zumbi em todas as quatro runs: média de **1.740 PO**.
+- Média acumulada: **1.242 PO**.
+- Mínimo possível: **916 PO**.
+- Máximo possível: **1.568 PO**.
+- Se derrotarem o Contemplador Zumbi apenas na quarta run: média de **1.392,5 PO**.
+- Se derrotarem o Contemplador Zumbi em todas as quatro runs: média de **1.844 PO**.
 
 ### Regra de repetição não adotada
 
@@ -510,7 +530,8 @@ Foi sugerido que encontros já vencidos pagassem metade nas runs seguintes para 
 - Causa dano radiante em vez de cortante.
 - Causa `+1d8` de dano radiante contra mortos-vivos.
 - É excelente contra Ghasts e Wraith.
-- Continua sendo uma arma forte contra goblins, hobgoblins, Mimic e Bone Devil.
+- Continua sendo uma arma forte contra goblins, o Capitão hobgoblin, o Mimic e o Bone Devil.
+- Contra a horda de zumbis da Arena 2 é decisiva: dano radiante desliga o Undead Fortitude dos dez.
 - Contra o Contemplador Zumbi é a resposta planejada: dano radiante desliga o Undead Fortitude dele.
 - O dano radiante é a resposta planejada para impedir o crescimento das cabeças da Draconidra.
 
@@ -530,7 +551,7 @@ Esses itens podem futuramente compor a loja ou a tabela de melhorias.
 
 As fichas usadas são as do Monster Manual de 2025 (`XMM`), alinhadas com o conjunto de regras revisado de 2024. A única exceção é a Draconidra, que não foi refeita em 2025 e continua na versão de Fizban's Treasury of Dragons.
 
-Quatro criaturas mudaram de nome na virada e os links já apontam para o nome novo: Flying Sword virou **Animated Flying Sword**, Goblin virou **Goblin Warrior**, Hobgoblin virou **Hobgoblin Warrior** e o Hobgoblin Captain saiu do Volo's Guide para o Monster Manual. Os `id` internos do webapp continuam os antigos, porque casam com a calculadora de loot.
+Duas criaturas ainda em uso mudaram de nome na virada e os links já apontam para o nome novo: Flying Sword virou **Animated Flying Sword** e Goblin virou **Goblin Warrior**. O Hobgoblin Captain saiu do Volo's Guide para o Monster Manual. Os `id` internos do webapp continuam os antigos, porque casam com a calculadora de loot.
 
 ### Monstros
 
@@ -543,7 +564,7 @@ Quatro criaturas mudaram de nome na virada e os links já apontam para o nome no
 - [Animated Flying Sword](https://5e.tools/bestiary/animated-flying-sword-xmm.html)
 - [Goblin Warrior](https://5e.tools/bestiary/goblin-warrior-xmm.html)
 - [Goblin Boss](https://5e.tools/bestiary/goblin-boss-xmm.html)
-- [Hobgoblin Warrior](https://5e.tools/bestiary/hobgoblin-warrior-xmm.html)
+- [Zombie](https://5e.tools/bestiary/zombie-xmm.html)
 - [Hobgoblin Captain](https://5e.tools/bestiary/hobgoblin-captain-xmm.html)
 - [Beholder Zombie](https://5e.tools/bestiary/beholder-zombie-xmm.html)
 - [Dracohydra](https://5e.tools/bestiary/dracohydra-ftd.html)
@@ -552,7 +573,6 @@ Quatro criaturas mudaram de nome na virada e os links já apontam para o nome no
 
 Nenhum ND mudou, então a economia de ouro da seção 13 continua válida. O que mudou e afeta a mesa:
 
-- **Hobgoblin Warrior:** Martial Advantage virou Pack Tactics, e a espada longa passou a `2d10 + 1` — o dano fixo por acerto mais que dobrou, sem depender de posicionamento. O arco longo agora soma `3d4` de veneno.
 - **Hobgoblin Captain:** ganhou PV (39 → 58) e trocou Leadership e Martial Advantage por Aura of Authority, uma emanação de 10 pés que dá vantagem em ataques e salvaguardas a ele e aos aliados dentro dela.
 - **Bone Devil:** CA 19 → 16 e PV 142 → 161; o ferrão ficou mais forte e agora impede o alvo de recuperar PV enquanto envenenado.
 - **Flameskull:** perdeu o repertório de mago (`shield`, `blur`, `flaming sphere`) e ficou com `fireball` uma vez por dia, `magic missile` duas e `mage hand` à vontade. Em compensação o Fire Ray subiu para `3d6 + 3` e alcança 60 pés.
@@ -580,7 +600,7 @@ Seleção feita para impressão FDM em uma impressora Bambu Lab. Quando disponí
 - **Flying Sword — 4 miniaturas:** [DnD Flying Sword Construct — D&D Monster Manual](https://makerworld.com/en/models/2257261) — MakerWorld; perfil de `0,12 mm`, 4 paredes e 10% de preenchimento.
 - **Goblin — 12 miniaturas:** [Fast 5 Goblin Supportless Miniature Pack](https://makerworld.com/en/models/1642172-fast-5-goblin-supportless-miniature-pack) — MakerWorld; cinco variantes sem suportes, otimizadas para FDM e bicos de 0,2 ou 0,4 mm.
 - **Goblin Boss — 1 miniatura:** [Goblin King with Crown and Staff](https://makerworld.com/en/models/2518398-goblin-king-with-crown-and-staff) — MakerWorld; perfil de `0,2 mm`, 2 paredes e 15% de preenchimento.
-- **Hobgoblin — 6 miniaturas:** [Dungeons & Dragons — Hobgoblin Warlord](https://makerworld.com/en/models/2066234-dungeons-dragons-d-d-hobgoblin-warlord#profileId-2231363) — MakerWorld; modelo dividido em duas partes, perfil de `0,08 mm`, 2 paredes e 10% de preenchimento.
+- **Zombie — 10 miniaturas:** ainda não escolhida. O modelo do Hobgoblin Warlord saiu da lista com a troca da Arena 2.
 - **Hobgoblin Captain — 1 miniatura:** [D&D Hobgoblin Captain](https://makerworld.com/en/models/2720746-d-d-hobgoblin-captain) — MakerWorld; a página inclui fotografias da impressão real.
 - **Beholder Zombie — 1 miniatura:** ainda não escolhida. O modelo do Shambling Mound saiu da lista com a troca do subchefe.
 - **Dracohydra — 1 miniatura:** [Five-Headed Dragon — RPG Boss](https://makerworld.com/en/models/2722219-five-headed-dragon-rpg-boss) — MakerWorld; modelo gratuito de cinco cabeças usado como Dracohydra, com impressão real em PLA numa Bambu Lab e perfil de `0,2 mm`, 2 paredes e 15% de preenchimento, com duração estimada de 5,1 horas em uma placa.
@@ -598,6 +618,7 @@ Estas ideias apareceram anteriormente, mas foram substituídas e não fazem part
 - Três caminhos opcionais; a versão atual possui apenas caminho fácil e difícil.
 - Subchefe em sala separada; o subchefe agora acontece na própria arena.
 - Shambling Mound (Monte Errante) como subchefe; trocado por um beholder-kin.
+- Falange Hobgoblin (6 Hobgoblin Warriors) na Arena 2; trocada por uma horda de 10 zumbis conduzida como mob. O Capitão ficou.
 - Beholder inteiro como subchefe; ND 13 era um salto grande demais para a posição, e ficou o Beholder Zombie, de ND 5.
 
 ## 17. Principais pendências para o próximo agente
@@ -619,7 +640,7 @@ Prioridade média:
 2. Definir ordem de iniciativa e gatilhos de todas as fases.
 3. Criar cartões curtos de referência para cada encontro.
 4. Definir condições de vitória alternativas além de matar criaturas.
-5. Reavaliar a dificuldade dos encontros com as fichas de 2025: a Falange Hobgoblin ficou bem mais dura (dano da espada longa e Aura of Authority).
+5. Reavaliar a dificuldade da Arena 2 com a horda de zumbis: vinte ataques por rodada contra seis personagens é outro tipo de pressão, e o Undead Fortitude alonga o encontro.
 6. Estabelecer preços para consumíveis e melhorias.
 
 ## 18. Riscos de design
@@ -641,7 +662,7 @@ O próximo passo mais útil é criar a loja roguelike e uma tabela de melhorias 
 
 - A primeira run compre ao menos uma melhoria pequena.
 - Duas ou três runs permitam sobreviver de forma consistente à arena.
-- Quatro runs pelo caminho fácil gerem aproximadamente 1.138 PO.
+- Quatro runs pelo caminho fácil gerem aproximadamente 1.242 PO.
 - A Lâmina Solar continue sendo uma recompensa exclusiva do caminho difícil, não um item da loja.
 - Consumíveis ofereçam uma forma de converter ouro excedente em poder para a tentativa final.
 
