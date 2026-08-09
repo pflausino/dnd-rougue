@@ -241,6 +241,34 @@ de estatística abaixo não são tocados por esse arquivo.
 - Um TPK zera os danos junto com a run (`referencias/aventura.md` §4: a dungeon
   reinicia com o grupo). *Restaurar vidas* zera só a sala em campo.
 
+## Projetor na mesa
+
+Duas telas — [`webapp/projetor.html`](webapp/projetor.html) monta as formas,
+[`webapp/projecao.html`](webapp/projecao.html) é o que vai para o projetor.
+Receita e uso no [README](README.md#projetor-na-mesa); aqui só as armadilhas:
+
+- **A geometria vive num arquivo só**
+  ([`webapp/js/projecao-formas.js`](webapp/js/projecao-formas.js)), porque as
+  duas telas precisam dela: uma desenha, a outra desenha *e* acerta o clique.
+  Duas cópias divergiriam e o sintoma seria clicar num lugar e pegar a forma de
+  outro — só na tela do mestre, sem erro nenhum no console.
+- **Tamanho é fração da altura, posição é fração dos dois eixos.** Não é
+  capricho: a tela do mestre e o projetor têm proporções diferentes, e medir
+  largura pela largura de cada um faria o círculo virar elipse na projeção.
+- **O arraste desenha de um rascunho local, não do estado.** Gravar a cada
+  `pointermove` enche o servidor de POSTs e trava o gesto. O estado recebe uma
+  gravação a cada 60 ms no máximo, mais a final e exata no `pointerup` — sem a
+  final, a forma para no último quadro estrangulado, alguns pixels fora.
+- **`adicionarForma` notifica os assinantes antes de quem chamou guardar o id
+  devolvido**, então o repintar que vem do estado ainda não conhece a seleção
+  nova. Por isso `adicionar()` repinta à mão logo depois. Vale para qualquer
+  ação que devolva id e mexa em seleção.
+- **A tela de Projeção não carrega `aviso-conexao.js`.** É a única sem ele, de
+  propósito: o aviso apareceria projetado no tapete. Quem vê a queda é o mestre,
+  na outra tela.
+- **`projecao.html` não é protegida pelo portão**, para abrir direto num tablet
+  ligado ao projetor. Só `projetor.html` pede senha.
+
 ## Rolagens de dado
 
 A tela de Monstros (`webapp/js/monstros.js`) tem botões de rolagem nos blocos
@@ -304,6 +332,33 @@ de estatística. Quem decide o número é a tela do Relógio, não quem clicou:
   instante antes da física acomodar de verdade. `dados-3d.js` amortece a
   física (menos força, menos altura, `settleTimeout` maior) para reduzir a
   chance, mas não elimina — é física de verdade, não teatro.
+
+## Som do dado
+
+[`webapp/js/som-dados.js`](webapp/js/som-dados.js), tocado pela tela do Relógio
+no instante do lançamento (não do resultado: a física leva ~2 s a assentar, e o
+barulho chegando no fim soaria descolado do que a mesa vê).
+
+- **O `dice-box` não tem som.** O `AudioContext` que aparece nos arquivos dele é
+  do Babylon, para outra coisa; a lista de opções da config não tem nada de
+  áudio. Já foi conferido — não procure de novo.
+- **O ruído é sintetizado, não é arquivo.** Cada impacto é um estouro curto de
+  ruído branco com decaimento cúbico embutido na amostra, passado por um
+  passa-faixa. Evita mais um binário no repositório e mais uma licença para
+  conferir, e nenhuma rolagem sai igual à anterior — um sample repetido a noite
+  toda cansa.
+- **`ctx.resume()` é assíncrono e não muda `state` na mesma volta do laço.**
+  Checar o estado logo depois, de forma síncrona, faz *toda* rolagem sair
+  calada. Foi bug real aqui; o agendamento agora vive dentro do `then`.
+- **Precisa de um toque na aba do Relógio**, como a trilha — mesma política de
+  autoplay, mesma impossibilidade de contornar. Na prática o toque em *Ativar
+  trilha* já destrava os dois. Sem trilha escolhida aquele botão não aparece, e
+  aí é preciso tocar em qualquer lugar da tela uma vez.
+- **Só o Relógio carrega o arquivo**, pelo mesmo motivo da trilha: é a tela que
+  vai na caixa de som, e o notebook do mestre não deve duplicar o áudio.
+- Os fatores de `quicar()` são calibrados para durar ~1 s. A primeira versão
+  morria em 200 ms e dava a impressão de o dado ter parado antes do que a tela
+  mostrava. `VOLUME`, no topo, é o número a mexer se ficar alto demais na TV.
 
 ## Testar
 

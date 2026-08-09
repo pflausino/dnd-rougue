@@ -248,6 +248,16 @@ textarea {
   resize: vertical;
 }
 
+kbd {
+  padding: 0.1rem 0.35rem;
+  font-family: var(--fonte-mono);
+  font-size: 0.85em;
+  color: var(--texto);
+  background: rgba(8, 4, 15, 0.6);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+}
+
 input:focus,
 select:focus,
 textarea:focus {

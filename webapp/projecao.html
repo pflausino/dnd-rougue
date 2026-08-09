@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projeção | A Última Dungeon</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<!-- Sem `data-protegido`: esta janela é arrastada para o projetor, às vezes de
+     outro aparelho, e não mostra nada que a mesa já não esteja vendo na
+     própria mesa. Quem monta as formas é projetor.html, essa sim protegida. -->
+<body class="projecao">
+  <canvas data-projecao-canvas></canvas>
+
+  <!-- Some sozinho depois de uns segundos parado, junto com o cursor: o que
+       sai daqui bate na mesa, e botão projetado no tapete estraga o efeito. -->
+  <div class="projecao__controles" data-projecao-controles>
+    <button class="btn btn--fantasma btn--pequeno" type="button" data-projecao-tela-cheia>
+      Tela cheia
+    </button>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/projecao-formas.js"></script>
+  <script src="js/projecao.js"></script>
+</body>
+</html>

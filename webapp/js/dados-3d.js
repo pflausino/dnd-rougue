@@ -128,6 +128,12 @@ import DiceBox from "../assets/dice-box/dice-box.es.min.js";
       box.clear();
       camada.classList.add("dado-3d--ativo");
 
+      /* Som junto do lançamento, não do resultado: a física leva ~2 s até
+       * assentar, e o barulho chegando no fim soaria descolado do que a mesa
+       * está vendo. Sai calado se ninguém tocou nesta aba ainda — política de
+       * autoplay, a mesma que obriga o botão da trilha. */
+      if (window.SomDados) window.SomDados.tocar(rolagem.qtd, rolagem.lados);
+
       comLimite(
         box.roll({
           qty: rolagem.qtd,

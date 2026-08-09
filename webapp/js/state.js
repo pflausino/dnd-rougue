@@ -125,6 +125,17 @@
         id: null,
         variante: null
       },
+      /* Formas que a tela de Projeção joga na mesa pelo projetor, na ordem em
+       * que foram criadas — a última desenhada é a que fica por cima.
+       *
+       * As posições são frações da largura/altura do canvas e os tamanhos,
+       * frações só da **altura**. A tela do mestre e a do projetor quase nunca
+       * têm a mesma proporção; medindo tudo pela altura, um círculo continua
+       * redondo nas duas e a forma cai no mesmo ponto relativo. */
+      projecao: {
+        fundo: "#ffffff",
+        formas: []
+      },
       /* Bênçãos em posse do grupo, por id, na ordem de aquisição. */
       bencaos: [],
       /* Tudo que já foi comprado alguma vez. Os consumíveis saem de `bencaos`
@@ -659,6 +670,37 @@
        * descarta uma escolha de pausa que ainda não foi feita. */
       if (pausaAtiva()) acoes.encerrarPausa();
       else if (estado.pausa.pendente) acoes.pularPausa();
+    },
+    /* --- projeção na mesa ------------------------------------------------ */
+
+    /* Devolve o id para quem criou já sair arrastando a forma nova. `agora()`
+     * entra no id porque dois cliques no mesmo botão dentro do mesmo
+     * milissegundo precisam de ids diferentes. */
+    adicionarForma: function (forma) {
+      var id = "f" + agora() + "-" + Math.round(Math.random() * 1e6);
+      var lista = estado.projecao.formas.concat([Object.assign({ id: id }, forma)]);
+      atualizar({ projecao: { formas: lista } });
+      return id;
+    },
+    /* `mesclar` funde objetos mas troca arrays inteiros, então a forma alterada
+     * é reconstruída aqui e a lista vai completa. */
+    ajustarForma: function (id, patch) {
+      var lista = estado.projecao.formas.map(function (forma) {
+        return forma.id === id ? Object.assign({}, forma, patch) : forma;
+      });
+      atualizar({ projecao: { formas: lista } });
+    },
+    removerForma: function (id) {
+      var lista = estado.projecao.formas.filter(function (forma) {
+        return forma.id !== id;
+      });
+      atualizar({ projecao: { formas: lista } });
+    },
+    limparProjecao: function () {
+      atualizar({ projecao: { formas: [] } });
+    },
+    definirFundoProjecao: function (cor) {
+      atualizar({ projecao: { fundo: cor } });
     },
     reiniciarTudo: function () {
       estado = estadoInicial();
