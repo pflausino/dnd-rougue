@@ -68,8 +68,19 @@
     }
 
     window.clearTimeout(desarmarConsumo.timer);
-    D.acoes.removerBencao(bencaoAberta.id);
-    recado(bencaoAberta.nome + " foi consumida.");
+    var consumida = bencaoAberta;
+    D.acoes.removerBencao(consumida.id);
+
+    /* Bênção cujo efeito o app sabe aplicar (hoje só o Relógio Místico, com
+     * `minutosBonus`) é aplicada aqui, no consumo. O resto do catálogo é regra
+     * de mesa e continua na mão do mestre. */
+    var extra = "";
+    if (consumida.minutosBonus) {
+      D.relogio.esticar(consumida.minutosBonus);
+      extra = " A sessão ganhou " + consumida.minutosBonus + " minutos.";
+    }
+
+    recado(consumida.nome + " foi consumida." + extra);
     el.modalBencao.close();
   });
 

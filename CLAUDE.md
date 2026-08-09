@@ -306,6 +306,26 @@ Terceiro modo da tela do Relógio, ao lado do cronômetro puro e da tabela:
   caixa medida a olho trazia pedaço da vizinha). O gerador não está versionado,
   como o dos ícones — refazer é mais rápido que manter.
 
+## Bênçãos com efeito no app
+
+O catálogo (`webapp/data/bencaos.js`) é quase todo regra de mesa: o app registra
+posse e o mestre aplica. Duas exceções na estrutura, ambas do Relógio Místico:
+
+- **`unico: true` é conferido contra `bencaosAdquiridas`, não `bencaos`.** É a
+  diferença entre "só se compra uma vez" e nada: `bencaos` perde o item no
+  consumo, então contra ele a vitrine reporia a mercadoria no instante em que o
+  grupo a usasse. `bencaosAdquiridas` é o histórico que sobrevive ao consumo — e
+  a um TPK, que é o desejado: o limite é da sessão, não da run.
+- **`minutosBonus` é aplicado no consumo**, em `webapp/js/jogadores.js`, e é o
+  único efeito de bênção que o app executa sozinho. O cronômetro da mesa vive
+  aqui dentro; pedir para o mestre somar meia hora à mão abriria a chance de
+  somar duas vezes ou nenhuma. Ao acrescentar outra bênção assim, o campo já é
+  genérico — não crie um `if` por item.
+- **Estica `duracaoMs`, não `acumuladoMs`.** `relogio.esticar()` existe por isso.
+  Devolver tempo com `ajustar(-30)` também somaria meia hora ao restante, mas
+  faria o "Decorrido" andar para trás na tela projetada, e ninguém lê isso como
+  "ganhamos tempo".
+
 ## Economia de ouro
 
 `webapp/data/loot.js` e a seção 13 de `referencias/aventura.md` têm de contar a

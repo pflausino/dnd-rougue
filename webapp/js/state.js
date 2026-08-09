@@ -511,6 +511,15 @@
     definirDuracao: function (minutos) {
       var ms = Math.max(MINUTO, Math.round(minutos) * MINUTO);
       atualizar({ relogio: { duracaoMs: ms } });
+    },
+    /* Estica a sessão sem mexer no tempo já decorrido — é o que o Relógio
+     * Místico concede. Devolver tempo por `ajustar(-30)` também somaria meia
+     * hora ao restante, mas faria o "Decorrido" andar para trás na tela
+     * projetada, o que ninguém consegue ler como "ganhamos tempo". */
+    esticar: function (minutos) {
+      var ms = Math.max(0, Math.round(minutos)) * MINUTO;
+      if (!ms) return;
+      atualizar({ relogio: { duracaoMs: estado.relogio.duracaoMs + ms } });
     }
   };
 

@@ -315,7 +315,7 @@ conferir e corrigir ali quando tiver o livro à mão.
 
 ### O Véu Entre Vidas (Íria)
 
-Vende as nove bênçãos do catálogo, ao preço cheio. Diferente de Bram, não há
+Vende as dez bênçãos do catálogo, ao preço cheio. Diferente de Bram, não há
 balcões: todos os cards aparecem já na entrada.
 
 Os Pergaminhos de Experiência formam uma escada — o de nível 5 exige que o grupo
@@ -324,7 +324,16 @@ bloqueado mostra "Exige &lt;pergaminho anterior&gt;" e não tem botão. O
 pré-requisito olha o histórico de compras (`bencaosAdquiridas`), não o
 inventário, para que consumir uma bênção nunca retranque a seguinte.
 
-Bênçãos permanentes já em posse não podem ser recompradas; consumíveis podem.
+Bênçãos permanentes já em posse não podem ser recompradas; consumíveis podem — a
+exceção é o **Relógio Místico**, de compra única (`unico` em
+[`webapp/data/bencaos.js`](webapp/data/bencaos.js)). Depois de comprado, o card
+mostra "Íria só tinha um" e não volta, nem depois de consumido, nem depois de um
+TPK: o limite é da sessão.
+
+O Relógio Místico é também a única bênção cujo efeito o app aplica sozinho.
+Consumi-lo na tela dos Jogadores acrescenta **30 minutos à duração da sessão** —
+o cronômetro do Relógio vai de 04:00:00 para 04:30:00 e o tempo já decorrido não
+muda.
 
 Toda compra debita o ouro do grupo, nas duas lojas, e o botão fica travado quando
 o ouro não cobre o preço.
