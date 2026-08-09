@@ -76,7 +76,7 @@
 
   /* Preço da rolagem no baú de itens mágicos de Bram. O item em si é sorteado
    * na mesa, à mão; o app apenas cobra o ouro. */
-  var PRECO_BAU = 300;
+  var PRECO_BAU = 500;
 
   /* Desconto nas bênçãos de Bram quando o grupo já tem acesso à loja de Íria. */
   var DESCONTO_BENCAO = 0.25;

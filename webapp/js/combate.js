@@ -42,11 +42,26 @@
     return Math.floor((qtd * (lados + 1)) / 2 + (rolagem.bonus || 0));
   }
 
-  function monstrosDaSala(idSala) {
-    if (!idSala) return [];
-    return window.MONSTROS.filter(function (monstro) {
-      return monstro.encontro === idSala;
-    });
+  /* As fases em campo, na ordem do fluxo. Uma sala comum dá uma fase só; uma
+   * sala de palco (as três arenas) dá as três de uma vez, porque na mesa os
+   * inimigos entram em sequência sem pausa e o mestre precisa de todos à mão —
+   * marcar a fase 2 no meio do combate para achar a vida do zumbi custaria o
+   * tempo que o painel existe para poupar. */
+  function fasesEmCampo(idSala) {
+    if (!idSala || !window.salasDoPalco) return [];
+    return window.salasDoPalco(idSala)
+      .map(function (sala) {
+        return {
+          sala: sala,
+          titulo: sala.palco ? sala.palco.fase : null,
+          monstros: window.MONSTROS.filter(function (monstro) {
+            return monstro.encontro === sala.id;
+          })
+        };
+      })
+      .filter(function (fase) {
+        return fase.monstros.length > 0;
+      });
   }
 
   /* --- montagem ----------------------------------------------------------- */
@@ -257,35 +272,81 @@
     });
   }
 
-  /* Só remonta quando a sala muda; o resto é atualização no lugar. */
-  var salaMontada = null;
+  /* Cabeçalho de fase dentro do palco. Só aparece quando há mais de uma: numa
+   * sala comum ele seria uma linha repetindo o título logo acima. */
+  function tituloDeFase(fase, atual) {
+    var faixa = document.createElement("div");
+    faixa.className = "combate-fase";
+    faixa.dataset.fase = fase.sala.id;
+    faixa.classList.toggle("combate-fase--atual", fase.sala.id === atual);
+
+    var nome = document.createElement("span");
+    nome.textContent = fase.titulo;
+    faixa.appendChild(nome);
+
+    /* O selo existe em todas as faixas e só fica escondido nas outras: assim
+     * mudar de fase é alternar `hidden`, sem remontar o painel. */
+    var selo = document.createElement("span");
+    selo.className = "selo selo--ativo";
+    selo.textContent = "em campo";
+    selo.hidden = fase.sala.id !== atual;
+    faixa.appendChild(selo);
+
+    return faixa;
+  }
+
+  /* Remonta quando o *conjunto* montado muda, não a cada troca de sala: andar
+   * da fase 1 para a 2 dentro da arena mostra as mesmas criaturas, e remontar
+   * ali perderia a rolagem do scroll no meio do combate — que é exatamente
+   * quando o mestre não pode perder o lugar. */
+  var montado = null;
 
   function renderizar(estado) {
     var idSala = estado.sala;
-    var doGrupo = monstrosDaSala(idSala);
+    var fases = fasesEmCampo(idSala);
     var sala = idSala && window.salaPorId ? window.salaPorId(idSala) : null;
+    var chaveMontagem = fases
+      .map(function (fase) {
+        return fase.sala.id;
+      })
+      .join(",");
 
-    if (idSala !== salaMontada) {
-      salaMontada = idSala;
+    if (chaveMontagem !== montado) {
+      montado = chaveMontagem;
       celulas = {};
       el.grade.innerHTML = "";
-      doGrupo.forEach(function (monstro) {
-        el.grade.appendChild(fichaDeCombate(monstro));
+      fases.forEach(function (fase) {
+        if (fases.length > 1 && fase.titulo) el.grade.appendChild(tituloDeFase(fase, idSala));
+        fase.monstros.forEach(function (monstro) {
+          el.grade.appendChild(fichaDeCombate(monstro));
+        });
+      });
+    } else {
+      /* Mesmo conjunto, outra fase marcada: só o realce muda de lugar. */
+      el.grade.querySelectorAll("[data-fase]").forEach(function (faixa) {
+        faixa.classList.toggle("combate-fase--atual", faixa.dataset.fase === idSala);
+        var selo = faixa.querySelector(".selo");
+        if (selo) selo.hidden = faixa.dataset.fase !== idSala;
       });
     }
 
-    var temCombate = doGrupo.length > 0;
+    var temCombate = fases.length > 0;
     el.grade.hidden = !temCombate;
     el.dica.hidden = temCombate;
     el.zerar.hidden = !temCombate;
-    el.sala.textContent = sala ? sala.nome : "Nenhuma sala marcada";
+    el.sala.textContent = sala
+      ? sala.palco
+        ? sala.palco.nome + " — " + fases.length + " fases"
+        : sala.nome
+      : "Nenhuma sala marcada";
 
     if (temCombate) atualizarVidas(estado);
   }
 
   el.zerar.addEventListener("click", function () {
-    /* Restaura só a sala em campo: o dano das outras salas continua onde
-     * estava, porque `mesclar` funde e as chaves não escritas ficam. */
+    /* Restaura só o que está montado — na arena, as três fases de uma vez, que
+     * é como o combate acontece. O dano das outras salas continua onde estava,
+     * porque `mesclar` funde e as chaves não escritas ficam. */
     D.acoes.zerarDanos(Object.keys(celulas));
   });
 

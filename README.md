@@ -287,7 +287,7 @@ Três balcões, em subtelas:
 | Balcão | O que faz |
 |---|---|
 | Equipamentos | Os 55 produtos de `referencias/loja.md`, por categoria, com preço e botão de compra. |
-| Baú de Itens Mágicos | Cobra 300 PO pela rolagem. O item é sorteado na mesa, pelo mestre. |
+| Baú de Itens Mágicos | Cobra 500 PO pela rolagem. O item é sorteado na mesa, pelo mestre. |
 | Bênção | A bênção sorteada para a run, com 25% de desconto se o grupo já tem acesso à Íria. |
 
 A bênção é sorteada uma vez por run e fica no estado, então todas as telas veem a
@@ -377,6 +377,25 @@ automaticamente.
 Interruptores que o mestre liga conforme o grupo progride. Hoje: **Acesso à loja
 de Íria**, que libera O Véu Entre Vidas e dá os 25% de desconto nas bênçãos de
 Bram. O bloco também mostra a bênção da run e permite sortear outra.
+
+## A arena num quadro só
+
+As três fases da arena entram em sequência, sem pausa entre elas. Marcar a fase
+seguinte no meio do combate só para achar a vida de um zumbi custaria o tempo que
+o painel existe para poupar — então as três salas declaram o mesmo `palco` em
+[`webapp/data/salas.js`](webapp/data/salas.js) e o painel de combate junta todas
+num quadro só, com uma divisória por fase e um selo *em campo* na que o mestre
+marcou.
+
+O dano continua guardado por sala de origem
+(`arena-beholder:beholder-zombie:0`), então bater no subchefe enquanto a fase 1
+está marcada funciona e o número sobrevive à troca de fase. E trocar de fase
+**não remonta o painel** — as criaturas são as mesmas, e remontar perderia a
+rolagem do scroll no meio do combate.
+
+Só o painel junta. Relógio, trilha e a calculadora de loot continuam vendo três
+salas separadas, que é o que permite saber em qual fase o grupo está e pagar o
+ouro por fase. *Restaurar vidas*, na arena, restaura as três de uma vez.
 
 ## Hordas conduzidas como mob
 

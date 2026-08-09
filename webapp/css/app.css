@@ -1803,6 +1803,29 @@ html[data-travado] body {
   font-size: 1.05rem;
 }
 
+/* Divisória de fase dentro de um palco (as três arenas num quadro só). Fica
+   discreta: é referência de leitura, não um controle. A fase em campo ganha a
+   borda acesa para o olho achar onde o grupo está sem ler os títulos. */
+.combate-fase {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-tenue);
+  border-left: 2px solid var(--borda);
+}
+
+.combate-fase--atual {
+  color: var(--texto);
+  border-left-color: var(--brilho-forte);
+}
+
 .combate-ficha__nota {
   margin: -0.2rem 0 0;
   font-size: 0.76rem;
