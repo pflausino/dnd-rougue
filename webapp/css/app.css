@@ -1825,9 +1825,21 @@ html[data-travado] body {
   background: rgba(8, 4, 15, 0.4);
 }
 
+/* Linha de mob: o rótulo é "Grupo A" em vez de "#3", os PV são do grupo todo e
+   entra uma coluna a mais com quantas criaturas ainda estão de pé. */
+.combate-vida--mob {
+  grid-template-columns: 4.4rem 5.2rem 4.6rem 1fr auto;
+}
+
 .combate-vida__num {
   font-size: 0.72rem;
   color: var(--texto-tenue);
+}
+
+.combate-vida__pe {
+  font-size: 0.78rem;
+  white-space: nowrap;
+  color: var(--lilas);
 }
 
 .combate-vida__pv {

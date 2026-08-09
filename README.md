@@ -49,6 +49,7 @@ agente ficam fora do alcance de quem tiver a URL.
 | Jogadores | [`webapp/jogadores.html`](webapp/jogadores.html) | Tela pública da mesa. |
 | Relógio | [`webapp/relogio.html`](webapp/relogio.html) | Cronômetro da sessão, sala atual e trilha; só exibe, quem controla é o Mestre. |
 | Loot | [`webapp/loot.html`](webapp/loot.html) | Mestre: contagem de abates e fechamento do ouro da run. |
+| Monstros | [`webapp/monstros.html`](webapp/monstros.html) | Mestre: painel de combate da sala marcada e as fichas completas. |
 | Projetor | [`webapp/projetor.html`](webapp/projetor.html) | Mestre: monta as formas que marcam áreas na mesa física. |
 | Projeção | [`webapp/projecao.html`](webapp/projecao.html) | A janela que vai para o projetor: só o canvas. |
 | A Última Provisão | [`webapp/bram.html`](webapp/bram.html) | Jogadores, no acampamento. |
@@ -376,6 +377,23 @@ automaticamente.
 Interruptores que o mestre liga conforme o grupo progride. Hoje: **Acesso à loja
 de Íria**, que libera O Véu Entre Vidas e dá os 25% de desconto nas bênçãos de
 Bram. O bloco também mostra a bênção da run e permite sortear outra.
+
+## Hordas conduzidas como mob
+
+O painel de combate da tela de Monstros dá uma linha de vida por criatura — cinco
+Ghasts, cinco linhas. Fichas com `mob` em
+[`webapp/data/monstros.js`](webapp/data/monstros.js) fogem disso: a linha passa a
+ser do **grupo**, com o PV das criaturas somado, e ao lado quantas ainda estão de
+pé, derivado do dano.
+
+Hoje só a Arena 2 usa: 10 zumbis em `{ grupos: 2, porGrupo: 5 }` viram duas
+barras de `75` PV, cada uma mostrando "5 de pé", "4 de pé"… Dez barras de 15 não
+diriam nada a mais e custariam tempo de mesa.
+
+O contador arredonda **para cima**: com 1 PV sobrando ainda há uma criatura em pé,
+e é ela que ataca no turno. Ele importa porque as regras continuam sendo por
+criatura, não por barra — quantos Slams saem, e quantas salvaguardas de Undead
+Fortitude rolar quando o dano acumulado cruza um múltiplo de 15.
 
 ## Projetor na mesa
 

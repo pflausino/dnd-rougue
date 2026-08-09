@@ -66,16 +66,16 @@ window.ENCONTROS_LOOT = [
     ]
   },
   {
-    id: "arena-hobgoblin",
-    nome: "Arena II — Falange Hobgoblin",
+    id: "arena-zumbis",
+    nome: "Arena II — Horda de Zumbis",
     inimigos: [
       {
-        id: "hobgoblin",
-        nome: "Hobgoblin Warrior",
-        previstos: 6,
-        nd: "1/2",
+        id: "zombie",
+        nome: "Zumbi",
+        previstos: 10,
+        nd: "1/4",
         faixa: "baixa",
-        nota: "Os que recuam após a morte do Capitão contam."
+        nota: "Dois grupos de cinco, conduzidos como mob."
       },
       { id: "hobgoblin-captain", nome: "Hobgoblin Captain", previstos: 1, nd: "3", faixa: "media" }
     ]

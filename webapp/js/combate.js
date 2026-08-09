@@ -5,6 +5,10 @@
  * rolagens por *tipo* de criatura, porque o ataque do Ghast é o mesmo nos
  * cinco.
  *
+ * Fichas com `mob` fogem dessa regra: a linha passa a ser do grupo, com o PV
+ * das criaturas somado, e ao lado quantas ainda estão de pé. É para horda
+ * grande demais para rastrear uma a uma — ver `pelotoes`.
+ *
  * O dano vive no estado compartilhado (`estado.danos`), então some do painel
  * do mestre e volta igual depois de um F5 no meio do combate. O que está
  * gravado é o dano sofrido, não o PV restante — ver o comentário em state.js.
@@ -52,21 +56,58 @@
    * combate, que é justamente quando o mestre não quer perder o lugar. */
   var celulas = {};
 
-  function linhaDeVida(monstro, indice) {
+  /* Uma linha de vida por criatura — cinco Ghasts, cinco linhas — exceto quando
+   * a ficha traz `mob`: aí o mestre conduz por grupo, e a linha é do grupo
+   * inteiro, com o PV das criaturas somado. O `unidade` guarda o PV de uma só,
+   * que é o que permite derivar quantas ainda estão de pé a partir do dano do
+   * grupo. Sem esse número o mob vira uma barra sem sentido de mesa: Slam e
+   * Undead Fortitude são por criatura, não por barra. */
+  function pelotoes(monstro) {
+    var lista = [];
+    var i;
+    if (monstro.mob) {
+      for (i = 0; i < monstro.mob.grupos; i += 1) {
+        lista.push({
+          rotulo: "Grupo " + String.fromCharCode(65 + i),
+          maximo: monstro.mob.porGrupo * monstro.pv,
+          unidade: monstro.pv
+        });
+      }
+      return lista;
+    }
+    for (i = 0; i < monstro.quantidade; i += 1) {
+      lista.push({
+        /* Sozinha na sala, a criatura não precisa de número. */
+        rotulo: monstro.quantidade > 1 ? "#" + (i + 1) : "—",
+        maximo: monstro.pv,
+        unidade: 0
+      });
+    }
+    return lista;
+  }
+
+  function linhaDeVida(monstro, indice, pelotao) {
     var chave = chaveDe(monstro.encontro, monstro.id, indice);
 
     var linha = document.createElement("div");
     linha.className = "combate-vida";
+    if (pelotao.unidade) linha.classList.add("combate-vida--mob");
 
     var rotulo = document.createElement("span");
     rotulo.className = "combate-vida__num";
-    /* Sozinha na sala, a criatura não precisa de número. */
-    rotulo.textContent = monstro.quantidade > 1 ? "#" + (indice + 1) : "—";
+    rotulo.textContent = pelotao.rotulo;
     linha.appendChild(rotulo);
 
     var pv = document.createElement("span");
     pv.className = "combate-vida__pv mono";
     linha.appendChild(pv);
+
+    var pe = null;
+    if (pelotao.unidade) {
+      pe = document.createElement("span");
+      pe.className = "combate-vida__pe mono";
+      linha.appendChild(pe);
+    }
 
     var barra = document.createElement("span");
     barra.className = "combate-vida__barra";
@@ -88,13 +129,20 @@
       botao.addEventListener("click", function () {
         /* Escrever só em resposta ao clique: render que grava fecha laço entre
          * as telas abertas (ver CLAUDE.md). */
-        D.acoes.ajustarDano(chave, item.delta, monstro.pv);
+        D.acoes.ajustarDano(chave, item.delta, pelotao.maximo);
       });
       botoes.appendChild(botao);
     });
     linha.appendChild(botoes);
 
-    celulas[chave] = { linha: linha, pv: pv, enche: enche, maximo: monstro.pv };
+    celulas[chave] = {
+      linha: linha,
+      pv: pv,
+      pe: pe,
+      enche: enche,
+      maximo: pelotao.maximo,
+      unidade: pelotao.unidade
+    };
     return linha;
   }
 
@@ -150,7 +198,11 @@
     cabeca.className = "combate-ficha__cabeca";
 
     var titulo = document.createElement("h3");
-    titulo.textContent = monstro.nome + (monstro.quantidade > 1 ? " ×" + monstro.quantidade : "");
+    var sufixo = monstro.quantidade > 1 ? " ×" + monstro.quantidade : "";
+    if (monstro.mob) {
+      sufixo += " · " + monstro.mob.grupos + " grupos de " + monstro.mob.porGrupo;
+    }
+    titulo.textContent = monstro.nome + sufixo;
     cabeca.appendChild(titulo);
 
     var selo = document.createElement("span");
@@ -175,9 +227,9 @@
 
     var vidas = document.createElement("div");
     vidas.className = "combate-ficha__vidas";
-    for (var i = 0; i < monstro.quantidade; i += 1) {
-      vidas.appendChild(linhaDeVida(monstro, i));
-    }
+    pelotoes(monstro).forEach(function (pelotao, i) {
+      vidas.appendChild(linhaDeVida(monstro, i, pelotao));
+    });
     ficha.appendChild(vidas);
 
     return ficha;
@@ -192,6 +244,9 @@
       var restante = Math.max(0, celula.maximo - dano);
 
       celula.pv.textContent = restante + " / " + celula.maximo;
+      /* Arredonda para cima: com 1 PV sobrando ainda há uma criatura de pé, e
+       * é ela que ataca no turno. */
+      if (celula.pe) celula.pe.textContent = Math.ceil(restante / celula.unidade) + " de pé";
       celula.enche.style.width = (restante / celula.maximo) * 100 + "%";
       celula.linha.classList.toggle("combate-vida--caida", restante === 0);
       /* Abaixo de um terço o mestre precisa notar sem ler o número. */
