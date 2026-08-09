@@ -502,6 +502,17 @@ Receita e armadilhas no [README](README.md#produção). Duas que importam ao mex
 - **`/opt/proxy/Caddyfile` é compartilhado.** Acrescente o bloco, nunca
   substitua o arquivo, e rode `caddy validate` antes de `caddy reload` — erro de
   sintaxe ali derruba os outros sites.
+- **`encode` mata o `Range`, e só em produção.** Os MP3 da trilha têm rota
+  própria sem `encode` no bloco do Caddy. Com `Accept-Encoding: gzip` — que todo
+  navegador manda — o Caddy respondia `200` sem `Content-Range` no lugar do
+  `206` do servidor; o `<audio>` pedia a faixa, não recebia cabeçalho de faixa e
+  ficava em `stalled`, **sem erro no console e sem nada no log**. A trilha
+  simplesmente não tocava em `dungeon.pflausino.xyz`, enquanto no servidor local
+  funcionava sempre, porque lá não há proxy. Foi bug real.
+  **`curl` não reproduz sozinho:** ele só manda `Accept-Encoding` se pedirem, e
+  sem esse cabeçalho o `206` volta certinho. Teste que pega:
+  `curl -I -H "Range: bytes=0-" -H "Accept-Encoding: gzip" <url do mp3>` — tem
+  de ser `206` com `Content-Range`.
 - **`sudo` no VPS pede senha.** Não precisa: o usuário está no grupo `docker` e é
   dono de `/opt/apps` e `/opt/proxy`. Se um passo exigir root, o caminho está
   errado.
