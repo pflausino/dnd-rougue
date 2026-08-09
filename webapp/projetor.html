@@ -29,7 +29,11 @@
     <section class="painel bloco projetor__palco">
       <div class="bloco__cabeca">
         <h2>Prévia</h2>
-        <span class="selo" data-projetor-contagem>0 formas</span>
+        <div class="linha">
+          <span class="selo selo--alerta" data-projetor-escondido hidden>Escondido da mesa</span>
+          <span class="selo" data-projetor-contagem>0 formas</span>
+          <button class="btn btn--pequeno" type="button" data-projetor-alternar>Esconder da mesa</button>
+        </div>
       </div>
 
       <!-- A prévia é uma miniatura da tela de Projeção, nas mesmas
@@ -43,7 +47,8 @@
       <p class="dica" data-projetor-dica>
         Acrescente uma forma, arraste pelo meio, use a alça do canto para o
         tamanho e a de cima para o ângulo. <kbd>Shift</kbd> ao girar trava de
-        15 em 15 graus; <kbd>Delete</kbd> apaga a forma marcada.
+        15 em 15 graus; <kbd>Delete</kbd> apaga a forma marcada;
+        <kbd>H</kbd> esconde e mostra tudo na mesa.
       </p>
     </section>
 
@@ -65,6 +70,18 @@
             <span class="dica">Outra cor</span>
             <input type="color" data-projetor-cor-livre value="#ff2d2d">
           </label>
+        </div>
+
+        <!-- Efeito e contorno valem para a forma marcada, não para todas: a
+             mesa costuma ter uma área "ativa" pulsando e as outras paradas. -->
+        <div class="campo">
+          <span class="rotulo">Efeito da forma marcada</span>
+          <div class="linha" data-projetor-efeitos></div>
+          <div class="linha">
+            <button class="btn btn--fantasma btn--pequeno" type="button" data-projetor-contorno>
+              Só contorno
+            </button>
+          </div>
         </div>
 
         <div class="campo">

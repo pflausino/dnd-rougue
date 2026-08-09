@@ -391,6 +391,21 @@ alça do canto muda o tamanho e a de cima gira — `Shift` ao girar trava de 15 
 15 graus, `Delete` apaga a forma marcada, `Esc` desmarca. A cor da forma e a do
 fundo saem de paletas prontas ou de um seletor livre.
 
+**Esconder da mesa** (`H`) é o interruptor geral do que sai no projetor. Com ele
+ligado a projeção mostra só o fundo, e a prévia do mestre continua mostrando as
+formas apagadas — dá para montar a marcação da próxima sala sem a mesa ver e
+revelar tudo de uma vez. Enquanto está escondido, um selo vermelho avisa na tela
+do Projetor; sem ele o erro fácil é montar a marcação, esquecer que escondeu e
+ficar esperando a mesa reagir a uma coisa que ninguém está vendo.
+
+Cada forma tem ainda um **efeito** — *Parado*, *Pulsar* ou *Piscar* — e um modo
+**só contorno**, que projeta a borda em vez da área cheia e deixa ver o que está
+no tapete por baixo. Efeito e contorno valem para a forma marcada, não para
+todas: o normal na mesa é uma área "ativa" pulsando e as outras paradas. Os dois
+efeitos usam o mesmo período (1,6 s) e tiram a fase de `Dungeon.agora()`, o
+relógio corrigido pelo servidor — é o que mantém a prévia e a projeção piscando
+juntas mesmo em máquinas diferentes.
+
 Quatro coisas que valem saber:
 
 - **Nada é medido em pés.** Não há grade nem calibragem: o tamanho se acerta no

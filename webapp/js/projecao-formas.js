@@ -40,6 +40,43 @@
     { id: "retangulo", nome: "Retângulo" }
   ];
 
+  var EFEITOS = [
+    { id: "nenhum", nome: "Parado" },
+    { id: "pulsar", nome: "Pulsar" },
+    { id: "piscar", nome: "Piscar" }
+  ];
+
+  /* Um período só para os dois efeitos: com formas pulsando e piscando na mesma
+   * mesa, tempos diferentes viram bagunça visual. */
+  var PERIODO_MS = 1600;
+
+  /* Espessura do contorno em fração da altura do canvas — pela altura, como
+   * todo tamanho aqui, para a linha sair igual na prévia e na projeção. */
+  var ESPESSURA_CONTORNO = 0.012;
+
+  /* O instante vem de `Dungeon.agora()` nas duas telas, que é o relógio do
+   * servidor. É o que mantém a prévia e a projeção piscando em fase; com
+   * `Date.now()` de cada máquina elas descasariam. */
+  function pulso(efeito, instante) {
+    if (efeito === "pulsar") {
+      var f = 0.5 + 0.5 * Math.sin((2 * Math.PI * instante) / PERIODO_MS);
+      return { alfa: 0.45 + 0.55 * f, escala: 0.96 + 0.08 * f };
+    }
+    if (efeito === "piscar") {
+      return { alfa: instante % PERIODO_MS < PERIODO_MS / 2 ? 1 : 0, escala: 1 };
+    }
+    return { alfa: 1, escala: 1 };
+  }
+
+  /* Quem desenha só precisa repintar sozinho se houver forma animada — sem
+   * isto, as telas rodariam um requestAnimationFrame a sessão inteira à toa. */
+  function temAnimacao(projecao) {
+    if (!projecao || projecao.visivel === false) return false;
+    return (projecao.formas || []).some(function (forma) {
+      return forma.efeito && forma.efeito !== "nenhum";
+    });
+  }
+
   function radianos(graus) {
     return ((graus || 0) * Math.PI) / 180;
   }
@@ -56,30 +93,62 @@
     };
   }
 
-  function desenharForma(ctx, forma, largura, altura) {
+  function desenharForma(ctx, forma, largura, altura, instante) {
     var c = caixa(forma, largura, altura);
+    var efeito = pulso(forma.efeito, instante || 0);
+    if (efeito.alfa <= 0) return;
+
     ctx.save();
+    ctx.globalAlpha *= efeito.alfa;
     ctx.translate(c.cx, c.cy);
     ctx.rotate(c.giro);
-    ctx.fillStyle = forma.cor;
-    if (forma.tipo === "circulo") {
-      ctx.beginPath();
-      ctx.ellipse(0, 0, Math.abs(c.w) / 2, Math.abs(c.h) / 2, 0, 0, Math.PI * 2);
-      ctx.fill();
+    ctx.scale(efeito.escala, efeito.escala);
+
+    var rx = Math.abs(c.w) / 2;
+    var ry = Math.abs(c.h) / 2;
+    if (forma.contorno) {
+      ctx.strokeStyle = forma.cor;
+      ctx.lineWidth = Math.max(2, altura * ESPESSURA_CONTORNO);
+      if (forma.tipo === "circulo") {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      } else {
+        ctx.strokeRect(-rx, -ry, rx * 2, ry * 2);
+      }
     } else {
-      ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+      ctx.fillStyle = forma.cor;
+      if (forma.tipo === "circulo") {
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillRect(-rx, -ry, rx * 2, ry * 2);
+      }
     }
     ctx.restore();
   }
 
-  /* Pinta o fundo em toda a área e as formas por cima, na ordem da lista. */
-  function desenhar(ctx, largura, altura, projecao) {
+  /* Pinta o fundo em toda a área e as formas por cima, na ordem da lista.
+   *
+   * `opcoes.esmaecer` é o que separa as duas telas quando o mestre esconde
+   * tudo: a projeção não desenha forma nenhuma, e a prévia continua mostrando
+   * as formas apagadas, para ele seguir arrumando o que ainda não está no ar. */
+  function desenhar(ctx, largura, altura, projecao, opcoes) {
+    var op = opcoes || {};
+    var escondido = projecao && projecao.visivel === false;
+
     ctx.clearRect(0, 0, largura, altura);
     ctx.fillStyle = (projecao && projecao.fundo) || "#ffffff";
     ctx.fillRect(0, 0, largura, altura);
+    if (escondido && !op.esmaecer) return;
+
+    ctx.save();
+    if (escondido) ctx.globalAlpha = 0.28;
     ((projecao && projecao.formas) || []).forEach(function (forma) {
-      desenharForma(ctx, forma, largura, altura);
+      desenharForma(ctx, forma, largura, altura, op.instante);
     });
+    ctx.restore();
   }
 
   /* Leva um ponto do canvas para o espaço da forma, desfazendo o giro. É o
@@ -142,6 +211,8 @@
     CORES: CORES,
     FUNDOS: FUNDOS,
     TIPOS: TIPOS,
+    EFEITOS: EFEITOS,
+    temAnimacao: temAnimacao,
     caixa: caixa,
     desenhar: desenhar,
     desenharForma: desenharForma,

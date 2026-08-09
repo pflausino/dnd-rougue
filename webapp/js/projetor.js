@@ -28,9 +28,13 @@
     corLivre: document.querySelector("[data-projetor-cor-livre]"),
     fundos: document.querySelector("[data-projetor-fundos]"),
     fundoLivre: document.querySelector("[data-projetor-fundo-livre]"),
+    efeitos: document.querySelector("[data-projetor-efeitos]"),
+    contorno: document.querySelector("[data-projetor-contorno]"),
+    alternar: document.querySelector("[data-projetor-alternar]"),
     apagar: document.querySelector("[data-projetor-apagar]"),
     limpar: document.querySelector("[data-projetor-limpar]"),
     contagem: document.querySelector("[data-projetor-contagem]"),
+    escondido: document.querySelector("[data-projetor-escondido]"),
     dica: document.querySelector("[data-projetor-dica]")
   };
 
@@ -104,21 +108,58 @@
     });
   }
 
-  function pintar() {
+  /* Mexer em `canvas.width`/`height` realoca o buffer e zera o contexto — caro,
+   * e a animação passa por aqui 60 vezes por segundo. Só toca quando o tamanho
+   * mudou de fato. */
+  function ajustarTamanho(tamanho) {
     var escala = window.devicePixelRatio || 1;
-    var tamanho = tamanhoCanvas();
-    el.canvas.width = Math.round(tamanho.largura * escala);
-    el.canvas.height = Math.round(tamanho.altura * escala);
+    var largura = Math.round(tamanho.largura * escala);
+    var altura = Math.round(tamanho.altura * escala);
+    if (el.canvas.width !== largura || el.canvas.height !== altura) {
+      el.canvas.width = largura;
+      el.canvas.height = altura;
+    }
     ctx.setTransform(escala, 0, 0, escala, 0, 0);
+  }
+
+  function pintar() {
+    var tamanho = tamanhoCanvas();
+    ajustarTamanho(tamanho);
 
     var projecao = D.get().projecao;
-    Formas.desenhar(ctx, tamanho.largura, tamanho.altura, {
-      fundo: projecao.fundo,
-      formas: formasAtuais()
-    });
+    Formas.desenhar(
+      ctx,
+      tamanho.largura,
+      tamanho.altura,
+      { fundo: projecao.fundo, visivel: projecao.visivel, formas: formasAtuais() },
+      /* `esmaecer` é o que mantém as formas visíveis aqui enquanto a projeção
+       * está escondida — o mestre monta a próxima marcação sem a mesa ver. */
+      { instante: D.agora(), esmaecer: true }
+    );
 
     var alvo = formaSelecionada();
     if (alvo) desenharAlcas(alvo, tamanho);
+  }
+
+  /* Mesma lógica da tela de Projeção: quadro a quadro só com forma animada.
+   * Durante um gesto o laço fica de fora — quem repinta é o `pointermove`, e
+   * dois repintadores na mesma prévia brigariam pelo rascunho. */
+  var quadro = null;
+
+  function laco() {
+    quadro = null;
+    if (gesto) return;
+    pintar();
+    if (Formas.temAnimacao(D.get().projecao)) quadro = window.requestAnimationFrame(laco);
+  }
+
+  function acompanhar() {
+    if (quadro !== null || gesto) return;
+    if (!Formas.temAnimacao(D.get().projecao)) {
+      pintar();
+      return;
+    }
+    quadro = window.requestAnimationFrame(laco);
   }
 
   function formaSelecionada() {
@@ -134,11 +175,18 @@
   function sincronizarControles() {
     var projecao = D.get().projecao;
     var total = projecao.formas.length;
+    var alvo = formaSelecionada();
+    var escondido = projecao.visivel === false;
+
     el.contagem.textContent = total + (total === 1 ? " forma" : " formas");
-    el.apagar.disabled = !formaSelecionada();
+    el.apagar.disabled = !alvo;
     el.limpar.disabled = !total;
     el.fundoLivre.value = projecao.fundo;
     el.dica.hidden = total > 0;
+
+    el.alternar.textContent = escondido ? "Mostrar na mesa" : "Esconder da mesa";
+    el.alternar.classList.toggle("btn--primario", escondido);
+    el.escondido.hidden = !escondido;
 
     el.cores.querySelectorAll("[data-cor]").forEach(function (botao) {
       botao.setAttribute("aria-pressed", String(botao.dataset.cor === corAtual));
@@ -146,6 +194,15 @@
     el.fundos.querySelectorAll("[data-fundo]").forEach(function (botao) {
       botao.setAttribute("aria-pressed", String(botao.dataset.fundo === projecao.fundo));
     });
+
+    /* Efeito e contorno são por forma: sem uma marcada não há o que ajustar. */
+    el.efeitos.querySelectorAll("[data-efeito]").forEach(function (botao) {
+      botao.disabled = !alvo;
+      var atual = (alvo && alvo.efeito) || "nenhum";
+      botao.setAttribute("aria-pressed", String(!!alvo && botao.dataset.efeito === atual));
+    });
+    el.contorno.disabled = !alvo;
+    el.contorno.setAttribute("aria-pressed", String(!!alvo && !!alvo.contorno));
   }
 
   function montarPaletas() {
@@ -156,6 +213,15 @@
       botao.dataset.tipo = tipo.id;
       botao.textContent = "+ " + tipo.nome;
       el.tipos.appendChild(botao);
+    });
+
+    Formas.EFEITOS.forEach(function (efeito) {
+      var botao = document.createElement("button");
+      botao.type = "button";
+      botao.className = "btn btn--fantasma btn--pequeno";
+      botao.dataset.efeito = efeito.id;
+      botao.textContent = efeito.nome;
+      el.efeitos.appendChild(botao);
     });
 
     Formas.CORES.forEach(function (cor) {
@@ -191,11 +257,13 @@
       largura: TAMANHO_NOVO,
       altura: TAMANHO_NOVO,
       giro: 0,
-      cor: corAtual
+      cor: corAtual,
+      efeito: "nenhum",
+      contorno: false
     });
     /* `adicionarForma` já notificou os assinantes *antes* de `selecionada`
      * receber o id, então o repintar de lá não desenhou as alças. Repinta. */
-    pintar();
+    acompanhar();
     sincronizarControles();
   }
 
@@ -251,7 +319,7 @@
       alvo = Formas.formaEm(formasAtuais(), ponto, tamanho.largura, tamanho.altura);
       if (!alvo) {
         selecionada = null;
-        pintar();
+        acompanhar();
         sincronizarControles();
         return;
       }
@@ -306,7 +374,7 @@
     if (evento && el.canvas.hasPointerCapture(evento.pointerId)) {
       el.canvas.releasePointerCapture(evento.pointerId);
     }
-    pintar();
+    acompanhar();
     sincronizarControles();
   }
 
@@ -329,6 +397,20 @@
     aplicarCor(el.corLivre.value);
   });
 
+  el.efeitos.addEventListener("click", function (evento) {
+    var botao = evento.target.closest("[data-efeito]");
+    if (botao && selecionada) D.acoes.ajustarForma(selecionada, { efeito: botao.dataset.efeito });
+  });
+
+  el.contorno.addEventListener("click", function () {
+    var alvo = formaSelecionada();
+    if (alvo) D.acoes.ajustarForma(alvo.id, { contorno: !alvo.contorno });
+  });
+
+  el.alternar.addEventListener("click", function () {
+    D.acoes.alternarProjecao();
+  });
+
   el.fundos.addEventListener("click", function (evento) {
     var botao = evento.target.closest("[data-fundo]");
     if (botao) D.acoes.definirFundoProjecao(botao.dataset.fundo);
@@ -349,13 +431,28 @@
     selecionada = null;
   });
 
+  /* Sem isto, apagar uma forma enquanto o campo de cor está focado também
+   * mexeria no campo. O teste de `matches` é defensivo de propósito: sem nada
+   * focado o alvo do keydown pode ser o próprio `document`, que não tem o
+   * método — e aí o atalho inteiro morria num TypeError silencioso. */
+  function emCampo(alvo) {
+    return !!alvo && typeof alvo.matches === "function" && alvo.matches("input, textarea");
+  }
+
   document.addEventListener("keydown", function (evento) {
-    /* Sem isto, apagar uma forma enquanto o campo de cor está focado também
-     * mexeria no campo. */
-    if (evento.target.matches("input, textarea")) return;
+    if (emCampo(evento.target)) return;
+    /* Com modificador não é atalho nosso: Cmd+H esconde a janela no macOS e
+     * Ctrl+H é histórico do navegador. */
+    if (evento.ctrlKey || evento.metaKey || evento.altKey) return;
+    /* Atalho de mesa: esconder tudo é o que se faz com pressa, no meio do
+     * combate, sem procurar o botão. */
+    if (evento.key === "h" || evento.key === "H") {
+      D.acoes.alternarProjecao();
+      return;
+    }
     if (evento.key === "Escape") {
       selecionada = null;
-      pintar();
+      acompanhar();
       sincronizarControles();
       return;
     }
@@ -372,7 +469,7 @@
   D.assinar(function () {
     /* Uma forma apagada em outra tela não pode continuar selecionada aqui. */
     if (selecionada && !formaSelecionada()) selecionada = null;
-    pintar();
+    acompanhar();
     sincronizarControles();
   });
 })();
