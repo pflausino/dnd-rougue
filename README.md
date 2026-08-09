@@ -49,6 +49,8 @@ agente ficam fora do alcance de quem tiver a URL.
 | Jogadores | [`webapp/jogadores.html`](webapp/jogadores.html) | Tela pública da mesa. |
 | Relógio | [`webapp/relogio.html`](webapp/relogio.html) | Cronômetro da sessão, sala atual e trilha; só exibe, quem controla é o Mestre. |
 | Loot | [`webapp/loot.html`](webapp/loot.html) | Mestre: contagem de abates e fechamento do ouro da run. |
+| Projetor | [`webapp/projetor.html`](webapp/projetor.html) | Mestre: monta as formas que marcam áreas na mesa física. |
+| Projeção | [`webapp/projecao.html`](webapp/projecao.html) | A janela que vai para o projetor: só o canvas. |
 | A Última Provisão | [`webapp/bram.html`](webapp/bram.html) | Jogadores, no acampamento. |
 | O Véu Entre Vidas | [`webapp/iria.html`](webapp/iria.html) | Jogadores, no acampamento, depois da Pedra de Íria. |
 
@@ -374,6 +376,41 @@ automaticamente.
 Interruptores que o mestre liga conforme o grupo progride. Hoje: **Acesso à loja
 de Íria**, que libera O Véu Entre Vidas e dá os 25% de desconto nas bênçãos de
 Bram. O bloco também mostra a bênção da run e permite sortear outra.
+
+## Projetor na mesa
+
+Duas telas para marcar áreas na mesa física com um projetor apontado para o
+tapete: [`webapp/projetor.html`](webapp/projetor.html), onde o mestre monta as
+formas, e [`webapp/projecao.html`](webapp/projecao.html), a janela que se arrasta
+para o projetor e não mostra nada além do canvas. Elas conversam pelo mesmo
+estado compartilhado das outras telas, então o mestre pode montar do notebook e
+projetar de outro aparelho.
+
+Formas disponíveis: **círculo** e **retângulo**. Arraste pelo meio para mover, a
+alça do canto muda o tamanho e a de cima gira — `Shift` ao girar trava de 15 em
+15 graus, `Delete` apaga a forma marcada, `Esc` desmarca. A cor da forma e a do
+fundo saem de paletas prontas ou de um seletor livre.
+
+Quatro coisas que valem saber:
+
+- **Nada é medido em pés.** Não há grade nem calibragem: o tamanho se acerta no
+  olho, arrastando até bater com o tapete. Foi escolha consciente, não pendência.
+- **Posição e tamanho são frações, não pixels.** `x`/`y` são frações da largura e
+  da altura do canvas; `largura`/`altura` são frações **só da altura**. A tela do
+  mestre e o projetor quase nunca têm a mesma proporção, e medir tamanho pela
+  altura nos dois é o que mantém o círculo redondo em vez de virar elipse na
+  projeção.
+- **A prévia desenha de um rascunho local enquanto se arrasta.** Gravar estado a
+  cada `pointermove` viraria uma enxurrada de POSTs. O estado recebe no máximo
+  uma gravação a cada 60 ms, mais a final ao soltar o botão — um arraste inteiro
+  sai em 1 ou 2 POSTs.
+- **A tela de Projeção não tem o aviso de conexão caída.** As outras têm; ela
+  não, de propósito — o aviso apareceria projetado no tapete. Quem percebe a
+  queda é o mestre, pelo aviso da tela do Projetor.
+
+A senha cobre só `projetor.html`. `projecao.html` fica aberta para poder ser
+aberta direto num tablet ou num segundo computador ligado ao projetor, e ela não
+mostra nada que a mesa já não esteja vendo na própria mesa.
 
 ## Loot da run
 

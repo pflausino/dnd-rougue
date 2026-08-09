@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR" data-protegido>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projetor | A Última Dungeon</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/app.css">
+  <!-- No <head>, fora do bloco do fim da página: a trava tem de entrar antes
+       do corpo pintar, senão a tela pisca antes de pedir a senha. -->
+  <script src="js/portao.js"></script>
+</head>
+<body>
+  <header class="topo">
+    <div class="topo__titulo">
+      <span class="marca">A Última Dungeon</span>
+      <h1>Projetor — marcações na mesa</h1>
+    </div>
+    <nav class="nav">
+      <a href="index.html">Painel</a>
+      <a href="mestre.html">Mestre</a>
+      <a href="monstros.html">Monstros</a>
+      <a href="projetor.html" aria-current="page">Projetor</a>
+      <a href="projecao.html" target="_blank" rel="noopener">Abrir projeção ↗</a>
+    </nav>
+  </header>
+
+  <main class="conteudo projetor">
+    <section class="painel bloco projetor__palco">
+      <div class="bloco__cabeca">
+        <h2>Prévia</h2>
+        <span class="selo" data-projetor-contagem>0 formas</span>
+      </div>
+
+      <!-- A prévia é uma miniatura da tela de Projeção, nas mesmas
+           coordenadas. A proporção 16:9 é só do quadro aqui; a projeção usa a
+           proporção real da janela dela, e as formas se ajustam porque tudo é
+           medido em fração da altura. -->
+      <div class="projetor__quadro">
+        <canvas data-projetor-canvas></canvas>
+      </div>
+
+      <p class="dica" data-projetor-dica>
+        Acrescente uma forma, arraste pelo meio, use a alça do canto para o
+        tamanho e a de cima para o ângulo. <kbd>Shift</kbd> ao girar trava de
+        15 em 15 graus; <kbd>Delete</kbd> apaga a forma marcada.
+      </p>
+    </section>
+
+    <section class="painel bloco projetor__controles">
+      <div class="bloco__cabeca">
+        <h2>Formas</h2>
+      </div>
+
+      <div class="pilha">
+        <div class="campo">
+          <span class="rotulo">Acrescentar</span>
+          <div class="linha" data-projetor-tipos></div>
+        </div>
+
+        <div class="campo">
+          <span class="rotulo">Cor da forma</span>
+          <div class="amostras" data-projetor-cores></div>
+          <label class="linha">
+            <span class="dica">Outra cor</span>
+            <input type="color" data-projetor-cor-livre value="#ff2d2d">
+          </label>
+        </div>
+
+        <div class="campo">
+          <span class="rotulo">Fundo do canvas</span>
+          <div class="amostras" data-projetor-fundos></div>
+          <label class="linha">
+            <span class="dica">Outra cor</span>
+            <input type="color" data-projetor-fundo-livre value="#ffffff">
+          </label>
+        </div>
+
+        <div class="linha">
+          <button class="btn btn--fantasma" type="button" data-projetor-apagar>Apagar marcada</button>
+          <button class="btn btn--perigo" type="button" data-projetor-limpar>Limpar tudo</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/state.js"></script>
+  <script src="js/aviso-conexao.js"></script>
+  <script src="js/projecao-formas.js"></script>
+  <script src="js/projetor.js"></script>
+</body>
+</html>

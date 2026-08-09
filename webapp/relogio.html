@@ -73,6 +73,9 @@
   <script src="data/salas.js"></script>
   <script src="js/relogio.js"></script>
   <script src="js/trilha.js"></script>
+  <!-- Antes do módulo do dado: scripts clássicos rodam primeiro, então
+       window.SomDados já existe quando dados-3d.js sobe. -->
+  <script src="js/som-dados.js"></script>
   <script type="module" src="js/dados-3d.js"></script>
 </body>
 </html>
