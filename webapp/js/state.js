@@ -134,6 +134,11 @@
        * redondo nas duas e a forma cai no mesmo ponto relativo. */
       projecao: {
         fundo: "#ffffff",
+        /* Interruptor geral do que sai no projetor. Escondido, a tela de
+         * Projeção mostra só o fundo e a do Projetor segue mostrando as formas
+         * apagadas — o mestre arruma a próxima marcação fora da vista da mesa
+         * e revela quando quiser. */
+        visivel: true,
         formas: []
       },
       /* Bênçãos em posse do grupo, por id, na ordem de aquisição. */
@@ -701,6 +706,9 @@
     },
     definirFundoProjecao: function (cor) {
       atualizar({ projecao: { fundo: cor } });
+    },
+    alternarProjecao: function () {
+      atualizar({ projecao: { visivel: estado.projecao.visivel === false } });
     },
     reiniciarTudo: function () {
       estado = estadoInicial();

@@ -22,10 +22,11 @@
   var ctx = null;
   var mestre = null;
 
-  /* Volume geral — o número a mexer se ficar alto ou baixo demais na TV. Fica
-   * abaixo de 1 de propósito: isto entra por cima da trilha, e o dado é
-   * pontuação, não evento principal. */
-  var VOLUME = 0.45;
+  /* Volume geral — o número a mexer se ficar alto ou baixo demais na TV.
+   *
+   * Pode passar de 1 sem medo de estourar: o compressor logo abaixo segura os
+   * picos. O que limita é o gosto, não a matemática. */
+  var VOLUME = 2.4;
 
   /* Teto de impactos por rolagem. Sem ele, um `20d6` viraria ruído branco e um
    * pico de CPU no meio da animação. Com os quiques mais longos cabe mais
@@ -39,13 +40,25 @@
     mestre = ctx.createGain();
     mestre.gain.value = VOLUME;
 
+    /* Trava os picos para o volume poder subir sem distorcer. Um punhado de
+     * dados soma vários impactos no mesmo instante e, sem isto, a soma passaria
+     * de 1 e viraria estalo sujo. O ataque não é instantâneo de propósito: o
+     * "toc" do dado *é* o transiente, e um limitador rápido demais o achataria
+     * justamente onde ele importa. */
+    var limite = ctx.createDynamicsCompressor();
+    limite.threshold.value = -6;
+    limite.knee.value = 4;
+    limite.ratio.value = 10;
+    limite.attack.value = 0.003;
+    limite.release.value = 0.15;
+
     /* Corta o agudo mais áspero do ruído: em caixa de TV, sem isto o impacto
      * vira "chiado" em vez de "toc". */
     var suave = ctx.createBiquadFilter();
     suave.type = "lowpass";
     suave.frequency.value = 7000;
 
-    mestre.connect(suave).connect(ctx.destination);
+    mestre.connect(limite).connect(suave).connect(ctx.destination);
     return ctx;
   }
 
@@ -95,13 +108,13 @@
    * usava 0.6/0.55 e morria em 200 ms — a física do dado leva ~2 s até assentar,
    * e o som acabando cedo demais dava a impressão de que o dado tinha parado
    * antes do que a mesa via na tela. */
-  function quicar(inicio, frequenciaBase, orcamento) {
+  function quicar(inicio, frequenciaBase, orcamento, escala) {
     var t = inicio;
-    var ganho = 0.6 + Math.random() * 0.25;
+    var ganho = (0.6 + Math.random() * 0.25) * escala;
     var intervalo = 0.19 + Math.random() * 0.07;
     var usados = 0;
 
-    while (ganho > 0.04 && usados < orcamento) {
+    while (ganho > 0.04 * escala && usados < orcamento) {
       impacto(t, ganho, frequenciaBase * (0.8 + Math.random() * 0.45));
       t += intervalo;
       intervalo *= 0.78;
@@ -148,10 +161,16 @@
     var agora = ctx.currentTime;
     var gastos = 0;
 
+    /* Sem isto, dez dados somam dez impactos no mesmo instante e estouram — foi
+     * o que a medição pegou em `10d6`. Fontes independentes somam por volta de
+     * √n em amplitude; dividir por `n^0.35` fica um pouco abaixo disso, então a
+     * mão cheia de dados ainda soa maior que um dado só, sem passar do teto. */
+    var escala = 1 / Math.pow(quantos, 0.35);
+
     for (var d = 0; d < quantos && gastos < MAX_IMPACTOS; d += 1) {
       /* Os dados não caem juntos: um atraso pequeno e aleatório por dado é o
        * que separa "punhado de dados" de "um dado só mais alto". */
-      gastos += quicar(agora + 0.02 + Math.random() * 0.16, frequencia, orcamento);
+      gastos += quicar(agora + 0.02 + Math.random() * 0.16, frequencia, orcamento, escala);
     }
   }
 

@@ -18,7 +18,12 @@ import DiceBox from "../assets/dice-box/dice-box.es.min.js";
   var D = window.Dungeon;
   if (!D) return;
 
-  var TEMPO_VISIVEL_MS = 3200;
+  /* Quanto o dado fica na tela depois de parar. Conta a partir do fim da
+   * física, então o tempo total na tela é isto mais os ~2 s da queda. Precisa
+   * dar para a mesa inteira olhar para a TV e ler a face sem correria — 3,2 s
+   * era pouco. Uma rolagem nova sempre interrompe a anterior, então alongar
+   * aqui não atrapalha quem rola em sequência. */
+  var TEMPO_VISIVEL_MS = 8000;
 
   /* dice-box monta o worker de física por um Worker de Blob URL; se algo no
    * caminho travar (ambiente sem WebGL, extensão de automação interceptando
@@ -26,7 +31,12 @@ import DiceBox from "../assets/dice-box/dice-box.es.min.js";
    * nem rejeitam — ficam pendentes pra sempre. Sem um limite próprio, essa
    * tela trava esperando o dado por toda a sessão. */
   var LIMITE_INIT_MS = 6000;
-  var LIMITE_ROLL_MS = 6000;
+  /* Bem acima do `settleTimeout` do próprio dice-box (5 s): este limite é rede
+   * de segurança contra promessa que nunca volta, não um prazo de animação.
+   * Com 6 s ele disparava antes de a física assentar — o dado sumia no meio da
+   * queda e o resultado vinha do caminho de erro. Vale principalmente na
+   * primeira rolagem, que ainda está carregando tema e malha. */
+  var LIMITE_ROLL_MS = 12000;
 
   function comLimite(promessa, ms) {
     return new Promise(function (resolve, reject) {

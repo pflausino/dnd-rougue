@@ -24,13 +24,20 @@
   /* O canvas tem dois tamanhos: o de CSS (o que ocupa na tela) e o de buffer
    * (quantos pixels ele realmente pinta). Sem multiplicar pelo
    * devicePixelRatio, a borda do círculo sai serrilhada num projetor de
-   * resolução alta. */
+   * resolução alta.
+   *
+   * Mexer em `width`/`height` realoca o buffer e zera o contexto — caro, e com
+   * forma animada isto roda 60 vezes por segundo. Só toca quando mudou. */
   function ajustarTamanho() {
     var escala = window.devicePixelRatio || 1;
     var largura = el.canvas.clientWidth;
     var altura = el.canvas.clientHeight;
-    el.canvas.width = Math.round(largura * escala);
-    el.canvas.height = Math.round(altura * escala);
+    var bufferL = Math.round(largura * escala);
+    var bufferA = Math.round(altura * escala);
+    if (el.canvas.width !== bufferL || el.canvas.height !== bufferA) {
+      el.canvas.width = bufferL;
+      el.canvas.height = bufferA;
+    }
     ctx.setTransform(escala, 0, 0, escala, 0, 0);
     return { largura: largura, altura: altura };
   }
@@ -38,10 +45,35 @@
   function pintar() {
     var tamanho = ajustarTamanho();
     var estado = D.get();
-    Formas.desenhar(ctx, tamanho.largura, tamanho.altura, estado.projecao);
+    Formas.desenhar(ctx, tamanho.largura, tamanho.altura, estado.projecao, {
+      /* `agora()` e não `Date.now()`: é o relógio do servidor, e é ele que
+       * mantém esta tela pulsando em fase com a prévia do Projetor, mesmo em
+       * máquinas diferentes. */
+      instante: D.agora()
+    });
     /* O fundo do canvas vaza para a página: numa janela com barras (proporção
      * diferente da do canvas) o entorno fica da mesma cor, sem moldura. */
     document.body.style.background = estado.projecao.fundo;
+  }
+
+  /* Só roda quadro a quadro se houver forma animada. Parado, a tela repinta
+   * apenas quando o estado muda — um requestAnimationFrame ligado a sessão
+   * inteira num projetor não paga o que custa. */
+  var quadro = null;
+
+  function laco() {
+    quadro = null;
+    pintar();
+    if (Formas.temAnimacao(D.get().projecao)) quadro = window.requestAnimationFrame(laco);
+  }
+
+  function acompanhar() {
+    if (quadro !== null) return;
+    if (!Formas.temAnimacao(D.get().projecao)) {
+      pintar();
+      return;
+    }
+    quadro = window.requestAnimationFrame(laco);
   }
 
   function mostrarControles() {
@@ -63,6 +95,6 @@
   document.addEventListener("keydown", mostrarControles);
   window.addEventListener("resize", pintar);
 
-  D.assinar(pintar);
+  D.assinar(acompanhar);
   mostrarControles();
 })();

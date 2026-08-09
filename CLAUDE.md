@@ -268,6 +268,25 @@ Receita e uso no [README](README.md#projetor-na-mesa); aqui só as armadilhas:
   na outra tela.
 - **`projecao.html` não é protegida pelo portão**, para abrir direto num tablet
   ligado ao projetor. Só `projetor.html` pede senha.
+- **`canvas.width`/`height` só mudam quando o tamanho mudou de fato.** Escrever
+  neles realoca o buffer e zera o contexto; com forma animada isso passaria 60
+  vezes por segundo. Era assim na primeira versão e foi corrigido.
+- **O laço de animação só existe se houver forma animada**
+  (`ProjecaoFormas.temAnimacao`), e na tela do Projetor ele fica de fora durante
+  um gesto — quem repinta ali é o `pointermove`, e dois repintadores brigariam
+  pelo rascunho. Ao terminar o gesto, chame `acompanhar()`, não `pintar()`, ou a
+  animação não volta.
+- **`requestAnimationFrame` não dispara em aba escondida.** Não é bug: a janela
+  da projeção fica visível no projetor. Mas isso trava qualquer teste de
+  automação que espere quadro — foi o que fez uma leitura de pixels estourar o
+  timeout do CDP aqui. Confira `document.visibilityState` antes de suspeitar do
+  código.
+- **Guarda de teclado com `matches` precisa ser defensiva.** Sem nada focado, o
+  alvo do `keydown` pode ser o próprio `document`, que não tem o método — o
+  atalho inteiro morria num TypeError silencioso. Foi bug real; ver `emCampo`.
+- **A fase dos efeitos sai de `agora()`, não de `Date.now()`.** É o relógio
+  corrigido pelo servidor, e é o que mantém a prévia e a projeção piscando
+  juntas em máquinas diferentes.
 
 ## Rolagens de dado
 
