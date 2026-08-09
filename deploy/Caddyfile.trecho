@@ -21,6 +21,20 @@ dungeon.pflausino.xyz {
 		}
 	}
 
+	# Os MP3 da trilha também saem sem `encode`, e por um motivo que só aparece
+	# em produção. Com `Accept-Encoding: gzip` no pedido — que todo navegador
+	# manda, e o `curl` só manda se pedirem — o Caddy devolve `200` sem
+	# `Content-Range` no lugar do `206` que o servidor produziu. O `<audio>`
+	# pede a faixa, não recebe cabeçalho de faixa nenhum e trava em `stalled`,
+	# calado: a trilha simplesmente não toca, sem erro no console. No servidor
+	# local não há proxy, então lá sempre funcionou.
+	#
+	# MP3 já é formato comprimido; tirá-lo do `encode` não custa banda nenhuma.
+	@trilha path /webapp/assets/audio/*
+	handle @trilha {
+		reverse_proxy dungeon:8777
+	}
+
 	handle {
 		encode zstd gzip
 		reverse_proxy dungeon:8777

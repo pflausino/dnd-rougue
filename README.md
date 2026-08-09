@@ -195,6 +195,11 @@ Quatro detalhes que não são opcionais:
   `flush_interval -1`. Comprimido ou bufferizado, o fluxo de eventos só chega
   quando enche um bloco: as telas param de sincronizar e o aviso de conexão
   pisca sem motivo.
+- **A trilha também tem rota própria, sem `encode`.** Com `Accept-Encoding:
+  gzip`, que todo navegador manda, o Caddy responde `200` sem `Content-Range` no
+  lugar do `206` do servidor — o `<audio>` trava calado e a trilha não toca, só
+  em produção. MP3 já é comprimido, então nada se perde tirando a rota do
+  `encode`.
 - **`ARQUIVO_ESTADO` aponta para `estado/`**, montado fora do `:ro` e ignorado
   pelo git, para um `git pull` não levar a sessão embora.
 
