@@ -1,7 +1,8 @@
 /* Salas da dungeon, na ordem do fluxo de referencias/aventura.md (seção 2).
  *
  * `trilha` é o MP3 que a tela do Relógio toca em loop enquanto o grupo está
- * ali. Caminho relativo a webapp/, porque é de lá que relogio.html sai.
+ * ali. Caminho relativo a webapp/, porque é de lá que relogio.html sai. O nome
+ * do arquivo é livre — quem manda é este campo, não uma convenção de pasta.
  *
  * `trilha: null` é sala sem faixa gerada ainda: o nome aparece na tela e o som
  * fica em silêncio. Ao gerar o áudio, largue o arquivo em
@@ -23,7 +24,9 @@ window.SALAS = [
     id: "acampamento",
     nome: "Acampamento",
     sub: "Entre as runs",
-    trilha: null
+    /* `ambiente`, e não `batalha` como as outras: aqui o grupo compra, conta o
+     * ouro e respira entre as runs. */
+    trilha: "assets/audio/00-acampamento/ambiente.mp3"
   },
   {
     id: "ritual",
