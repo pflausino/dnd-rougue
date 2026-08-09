@@ -37,6 +37,17 @@ window.BENCAOS = [
     icone: "../loja/assets/bencaos/contrato-fortuna.png"
   },
   {
+    id: "moeda-apostador",
+    tipo: "Consumível",
+    tipoNota: "É consumida ao ser apostada antes de uma sala.",
+    nome: "Moeda do Apostador",
+    preco: 300,
+    lema: "Duas vidas na mesa, o dobro na mão — ou nada.",
+    efeito: "Antes de entrar em uma sala, o grupo aposta a moeda somada a uma quantia de PO à escolha e indica 2 personagens. Enquanto a sala não for vencida, nenhum dos dois pode sofrer dano de qualquer origem. Se a sala for limpa sem que isso aconteça, o valor apostado dobra; se qualquer um dos dois sofrer dano, a aposta é perdida ali mesmo.",
+    restricao: "Os personagens apostados continuam agindo e sendo alvo normalmente — a bênção decide o resultado da aposta, não protege ninguém de dano de verdade.",
+    icone: "../loja/assets/bencaos/moeda-apostador.png"
+  },
+  {
     id: "coroa-provocacao",
     tipo: "Consumível",
     tipoNota: "A coroa é consumida ao elevar a sala; a alteração resultante é permanente.",
