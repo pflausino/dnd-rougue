@@ -48,7 +48,7 @@ Tudo em [`webapp/js/state.js`](webapp/js/state.js), a única fonte de estado:
 - **Servido por `file://` a quarta via não liga** (`REMOTO` é falso) e o painel
   se comporta como antes. Com servidor, ele é a autoridade e o `localStorage`
   passa a ser cache local.
-- A chave, o canal e a rota da API carregam a versão do formato (`...:estado:v12`).
+- A chave, o canal e a rota da API carregam a versão do formato (`...:estado:v14`).
   **Ao mudar o formato, suba `VERSAO`** — isso isola abas antigas e descarta a
   sessão anterior, que é o comportamento desejado. O servidor guarda um estado
   por versão, seguindo a mesma trava.
@@ -75,6 +75,15 @@ Armadilhas já pagas, não repita:
   para de bater e o laço volta.
 - **`receberExterno` grava no `localStorage`.** Sem isso um F5 volta ao último
   estado que *aquela* tela gravou, descartando o que as outras fizeram.
+- **`receberExterno` recusa estado com `atualizadoEm` menor que o de casa.**
+  Não é zelo: numa aba em segundo plano o navegador estica `setTimeout` para
+  ~1 s, então o POST de `ESPERA_ENVIO` sai atrasado e o eco do servidor chega
+  *depois* da ação seguinte. Sem a comparação, o eco velho vencia e o estado
+  voltava sozinho — dois cliques em "+50 PO" chegavam a 100 e caíam para 50; a
+  cabeça cortada renascia. Foi bug real e antigo, achado ao testar a hidra. A
+  comparação de conteúdo logo abaixo **não** cobria isso: ela só descarta eco
+  *igual*. Teste que pega: duas ações com ~200 ms entre elas e a aba fora de
+  foco; depois de 3 s o valor tem de ser o segundo.
 - **`state.js` não toca no DOM.** O aviso de conexão caída vive em
   [`webapp/js/aviso-conexao.js`](webapp/js/aviso-conexao.js) justamente por isso;
   ele entra depois de `state.js` nas sete páginas.
@@ -260,6 +269,43 @@ de estatística abaixo não são tocados por esse arquivo.
   - **O contador de "de pé" arredonda para cima**, porque com 1 PV sobrando
     ainda há uma criatura viva, e é ela que ataca no turno.
 
+## Cabeças da hidra
+
+Terceiro modo da tela do Relógio, ao lado do cronômetro puro e da tabela:
+[`webapp/js/relogio.js`](webapp/js/relogio.js) mostra,
+[`webapp/js/hidra.js`](webapp/js/hidra.js) controla (na tela do Mestre) e
+[`webapp/data/hidra.js`](webapp/data/hidra.js) tem os retratos.
+
+- **É um campo só, `exibicao.id`, com `"hidra"` reservado** (`EXIBICAO_HIDRA` em
+  `state.js`). A hidra não sai de `data/tabelas.js`, então `exibicaoPorId` não a
+  acha — quem monta o seletor e o selo do Mestre trata esse caso à mão. Dois
+  campos separados deixariam projetar tabela e hidra ao mesmo tempo, e a tela
+  não tem espaço para as duas.
+- **O estado guarda só `{ n, viva }`; a arte sai do número**, em roda
+  (`arteHidra`). Assim a cabeça nº 6 nasce com retrato sem ninguém escolher, e
+  `state.js` não precisa conhecer caminho de imagem.
+- **Os números nunca se repetem na sessão** — `proxima` não recua nem quando uma
+  cabeça é removida. É o que deixa o mestre dizer "a cabeça 7" sem ambiguidade.
+- **Cortar e ressuscitar são o mesmo clique.** Na mesa a mesma cabeça cai e
+  volta várias vezes no mesmo combate; dois botões separados seriam dois alvos
+  para errar.
+- **O número de colunas da grade vem do JS** (`colunasDe`), não de
+  `auto-fit`: a tela é projetada e não pode rolar, então a grade fecha em mais
+  colunas conforme as cabeças nascem em vez de crescer para baixo. Conferido até
+  22 cabeças sem rolagem. Ao mexer, o teste é o de sempre —
+  `document.documentElement.scrollHeight <= innerHeight`.
+- **O painel só é remontado quando o conjunto de cabeças muda**, pela mesma
+  razão de `combate.js`: cortar é troca de classe, e remontar recarregaria as
+  imagens a cada golpe.
+- **O X é `::after`, não elemento.** O que muda no clique é só a classe.
+- **O TPK devolve a hidra inteira**, junto com os danos — e por isso a
+  transição também está em [`servidor/acoes.js`](servidor/acoes.js), com a
+  cópia à mão que aquele arquivo avisa no topo.
+- Os recortes em `webapp/assets/hidra/` saíram de uma folha de arte com fundo
+  transparente, separados por componente conexa (as cabeças quase se encostam;
+  caixa medida a olho trazia pedaço da vizinha). O gerador não está versionado,
+  como o dos ícones — refazer é mais rápido que manter.
+
 ## Economia de ouro
 
 `webapp/data/loot.js` e a seção 13 de `referencias/aventura.md` têm de contar a
@@ -421,7 +467,7 @@ Não há suíte automatizada. O ciclo usado até agora:
 
 Ao mexer na sincronização, dois testes que pegam o que o olho não pega:
 
-- **Simular a outra máquina com `curl`.** `GET /api/estado?v=10`, mudar um campo,
+- **Simular a outra máquina com `curl`.** `GET /api/estado?v=14`, mudar um campo,
   `POST` de volta: a tela aberta tem de reagir sem F5. É o único jeito fácil de
   exercitar o caminho do servidor em vez do `BroadcastChannel`, que atende as
   abas do mesmo navegador e mascara um SSE quebrado.

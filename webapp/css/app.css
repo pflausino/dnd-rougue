@@ -1453,8 +1453,8 @@ html[data-travado] body {
   text-shadow: 0 0 40px rgba(157, 92, 240, 0.4);
 }
 
-/* Com uma tabela projetada o espaço é do conteúdo; a sala vira uma linha. */
-.relogio--com-exibicao .sala-atual__nome {
+/* Com um painel em cartaz o espaço é do conteúdo; a sala vira uma linha. */
+.relogio--compacto .sala-atual__nome {
   font-size: clamp(1.1rem, 2.4vw, 1.6rem);
 }
 
@@ -1518,14 +1518,14 @@ html[data-travado] body {
   animation: pulso 1.4s ease-in-out infinite;
 }
 
-/* Com uma tabela projetada, o cronômetro cede o palco. */
-.relogio--com-exibicao {
+/* Com uma tabela ou a hidra em cartaz, o cronômetro cede o palco. */
+.relogio--compacto {
   justify-content: flex-start;
   gap: 0.8rem;
   padding-top: 2rem;
 }
 
-.relogio--com-exibicao .relogio__digitos {
+.relogio--compacto .relogio__digitos {
   font-size: clamp(2.6rem, 8vw, 5rem);
 }
 
@@ -1579,6 +1579,126 @@ html[data-travado] body {
 
 .tabela--projetada__faixa {
   color: var(--ouro);
+}
+
+/* --- cabeças da hidra ---------------------------------------------------- */
+
+/* Painel do Relógio no lugar da tabela. Tudo é medido em vh porque esta tela é
+ * projetada: as cabeças nascem durante o combate e nada pode empurrar o
+ * conteúdo para fora da viewport. */
+.hidra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: min(1200px, 94vw);
+  /* `min-height: 0` deixa a grade encolher dentro do flex da tela; sem isso a
+   * altura mínima do conteúdo venceria o teto e apareceria rolagem. */
+  min-height: 0;
+}
+
+.hidra__contagem {
+  font-family: var(--fonte-display);
+  font-size: clamp(1.1rem, 2.6vw, 1.8rem);
+  color: var(--lilas);
+  letter-spacing: 0.04em;
+}
+
+.hidra--morta .hidra__contagem {
+  color: var(--sangue);
+  animation: pulso 1.6s ease-in-out infinite;
+}
+
+/* `--colunas` vem do JS: a grade fecha em mais colunas conforme as cabeças
+ * nascem, em vez de crescer para baixo. */
+.hidra__grade {
+  display: grid;
+  grid-template-columns: repeat(var(--colunas, 5), 1fr);
+  grid-auto-rows: 1fr;
+  gap: clamp(0.4rem, 1.4vw, 1rem);
+  width: 100%;
+  max-height: 58vh;
+}
+
+.cabeca {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  margin: 0;
+  min-height: 0;
+  padding: 0.4rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-g);
+  background: radial-gradient(circle at 50% 45%, rgba(123, 63, 191, 0.22), transparent 70%);
+  transition: border-color var(--transicao), background var(--transicao);
+}
+
+/* `contain` e não `cover`: os recortes têm fundo transparente e formatos
+ * diferentes entre si — cortar a arte comeria chifre e mandíbula. */
+.cabeca__arte {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.6));
+  transition: filter var(--transicao), opacity var(--transicao);
+}
+
+.cabeca__num {
+  font-size: clamp(0.75rem, 1.6vw, 1.05rem);
+  font-weight: 700;
+  color: var(--texto-fraco);
+}
+
+/* Cortada: cinza e apagada, com o X por cima. O X é pseudo-elemento para não
+ * entrar no DOM a cada golpe — o que muda no clique é só a classe. */
+.cabeca--cortada {
+  border-color: rgba(178, 58, 77, 0.5);
+  background: rgba(8, 4, 15, 0.5);
+}
+
+.cabeca--cortada .cabeca__arte {
+  filter: grayscale(1) brightness(0.45);
+  opacity: 0.7;
+}
+
+.cabeca--cortada .cabeca__num {
+  color: var(--sangue);
+}
+
+.cabeca--cortada::after {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  background:
+    linear-gradient(to bottom right, transparent calc(50% - 3px), var(--sangue) calc(50% - 3px), var(--sangue) calc(50% + 3px), transparent calc(50% + 3px)),
+    linear-gradient(to bottom left, transparent calc(50% - 3px), var(--sangue) calc(50% - 3px), var(--sangue) calc(50% + 3px), transparent calc(50% + 3px));
+  filter: drop-shadow(0 0 8px rgba(178, 58, 77, 0.8));
+  pointer-events: none;
+}
+
+/* Mesmas cabeças na tela do Mestre, em miniatura e clicáveis. Herdam
+ * `.cabeca`; aqui só o que muda por serem botão. */
+.hidra-controle {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 0.4rem;
+}
+
+.hidra-controle .cabeca {
+  aspect-ratio: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--raio);
+  color: inherit;
+  font: inherit;
+}
+
+.hidra-controle .cabeca:hover {
+  border-color: var(--borda-forte);
 }
 
 .relogio__rodape {

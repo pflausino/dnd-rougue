@@ -24,7 +24,10 @@
     exibicaoInstrucao: document.querySelector("[data-exibicao-instrucao]"),
     exibicaoCabeca: document.querySelector("[data-exibicao-cabeca]"),
     exibicaoCorpo: document.querySelector("[data-exibicao-corpo]"),
-    exibicaoNota: document.querySelector("[data-exibicao-nota]")
+    exibicaoNota: document.querySelector("[data-exibicao-nota]"),
+    hidra: document.querySelector("[data-hidra]"),
+    hidraGrade: document.querySelector("[data-hidra-grade]"),
+    hidraContagem: document.querySelector("[data-hidra-contagem]")
   };
 
   /* A pausa aparece em segundo plano: o cronômetro da sessão, congelado
@@ -50,6 +53,83 @@
     el.salaNome.textContent = sala.nome;
   }
 
+  /* --- cabeças da hidra ---------------------------------------------------- */
+
+  /* Quantas colunas a grade usa para as cabeças caberem sem rolagem — a tela é
+   * projetada. Poucas cabeças ficam grandes; conforme nascem, a grade fecha em
+   * mais colunas em vez de crescer para baixo. */
+  function colunasDe(quantas) {
+    if (quantas <= 3) return Math.max(1, quantas);
+    if (quantas <= 8) return 4;
+    if (quantas <= 15) return 5;
+    return 6;
+  }
+
+  var cartas = {};
+  var montadas = "";
+
+  function montarCabecas(cabecas) {
+    cartas = {};
+    el.hidraGrade.innerHTML = "";
+    el.hidraGrade.style.setProperty("--colunas", colunasDe(cabecas.length));
+
+    cabecas.forEach(function (cabeca) {
+      var carta = document.createElement("figure");
+      carta.className = "cabeca";
+
+      var arte = document.createElement("img");
+      arte.className = "cabeca__arte";
+      arte.src = window.arteHidra(cabeca.n);
+      /* Decorativa: quem identifica a cabeça é o número ao lado. */
+      arte.alt = "";
+      carta.appendChild(arte);
+
+      var numero = document.createElement("figcaption");
+      numero.className = "cabeca__num mono";
+      numero.textContent = cabeca.n;
+      carta.appendChild(numero);
+
+      el.hidraGrade.appendChild(carta);
+      cartas[cabeca.n] = carta;
+    });
+  }
+
+  function renderizarHidra(estado) {
+    var ativa = estado.exibicao.id === D.EXIBICAO_HIDRA;
+    el.hidra.hidden = !ativa;
+    if (!ativa) {
+      /* Zera a assinatura para a volta ao painel remontar as cartas: enquanto
+       * ele esteve fora, o mestre pode ter cortado meia hidra. */
+      montadas = "";
+      return;
+    }
+
+    var cabecas = estado.hidra.cabecas;
+    var assinatura = cabecas
+      .map(function (cabeca) {
+        return cabeca.n;
+      })
+      .join(",");
+
+    /* Remonta só quando o conjunto muda. Cortar uma cabeça é troca de classe:
+     * remontar recarregaria as imagens e a grade piscaria a cada golpe. */
+    if (assinatura !== montadas) {
+      montarCabecas(cabecas);
+      montadas = assinatura;
+    }
+
+    var vivas = 0;
+    cabecas.forEach(function (cabeca) {
+      if (cabeca.viva) vivas += 1;
+      cartas[cabeca.n].classList.toggle("cabeca--cortada", !cabeca.viva);
+    });
+
+    el.hidraContagem.textContent = vivas
+      ? vivas + " de " + cabecas.length + " de pé"
+      : "Sem cabeças";
+    el.hidra.classList.toggle("hidra--morta", vivas === 0);
+  }
+
   /* Evita remontar a tabela a cada segundo. */
   var projetado = "";
 
@@ -59,7 +139,6 @@
     var assinatura = exibicao ? exibicao.id + ":" + estado.exibicao.variante : "";
 
     el.exibicao.hidden = !exibicao;
-    el.raiz.classList.toggle("relogio--com-exibicao", Boolean(exibicao));
 
     if (!exibicao || assinatura === projetado) {
       projetado = assinatura;
@@ -121,6 +200,11 @@
     renderizarSala(atual);
     renderizarPausa(atual);
     renderizarExibicao(atual);
+    renderizarHidra(atual);
+
+    /* Com qualquer painel em cartaz o cronômetro cede o palco — o espaço passa
+     * a ser do conteúdo. */
+    el.raiz.classList.toggle("relogio--compacto", Boolean(atual.exibicao.id));
   }
 
   D.assinar(renderizar);

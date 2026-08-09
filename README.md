@@ -47,7 +47,7 @@ agente ficam fora do alcance de quem tiver a URL.
 | Painel | [`webapp/index.html`](webapp/index.html) | Escolhe qual tela abrir. |
 | Mestre | [`webapp/mestre.html`](webapp/mestre.html) | Mestre: relógio, run, ouro, mecânicas, pausas e o que projetar. |
 | Jogadores | [`webapp/jogadores.html`](webapp/jogadores.html) | Tela pública da mesa. |
-| Relógio | [`webapp/relogio.html`](webapp/relogio.html) | Cronômetro da sessão, sala atual e trilha; só exibe, quem controla é o Mestre. |
+| Relógio | [`webapp/relogio.html`](webapp/relogio.html) | Cronômetro da sessão, sala atual, trilha e o painel que o Mestre projetar (tabela ou hidra); só exibe, quem controla é o Mestre. |
 | Loot | [`webapp/loot.html`](webapp/loot.html) | Mestre: contagem de abates e fechamento do ouro da run. |
 | Monstros | [`webapp/monstros.html`](webapp/monstros.html) | Mestre: painel de combate da sala marcada e as fichas completas. |
 | Projetor | [`webapp/projetor.html`](webapp/projetor.html) | Mestre: monta as formas que marcam áreas na mesa física. |
@@ -74,7 +74,8 @@ de lá. Se o servidor estiver sem estado — primeira tela da sessão, ou servid
 reiniciado sem o arquivo — a tela semeia o dele com o que tem em cache, desde que
 não seja um estado intocado (uma tela recém-aberta nunca apaga uma sessão em
 andamento). O eco do próprio envio é descartado comparando o conteúdo, então não
-há laço de gravações.
+há laço de gravações — e estado que chegue mais **velho** que o de casa é
+recusado pelo carimbo, senão um eco atrasado desfaria a ação seguinte.
 
 Instantes vêm de `Dungeon.agora()`, que é `Date.now()` corrigido pela diferença
 com o relógio do servidor. Sem isso, um dispositivo com o relógio atrasado
@@ -88,7 +89,7 @@ sozinho e o aviso some. Sem esse aviso a queda é invisível: cada tela continua
 mostrando o que tinha e ninguém percebe que pararam de conversar.
 
 A chave e o canal levam a versão do formato no nome
-(`ultima-dungeon:estado:v10`), e estados de outra versão são ignorados. Assim uma
+(`ultima-dungeon:estado:v14`), e estados de outra versão são ignorados. Assim uma
 aba antiga que ficou aberta não corrompe o estado novo — ela apenas fica surda
 até recarregar. Mudar o formato do estado exige subir `VERSAO` em
 [`webapp/js/state.js`](webapp/js/state.js), o que descarta a sessão anterior.
@@ -100,10 +101,10 @@ O servidor guarda **um estado por versão**, espelhando essa mesma trava: subir
 
 | Rota | O que faz |
 |---|---|
-| `GET /api/eventos?v=10` | SSE. Manda o estado atual na conexão e a cada mudança. |
-| `GET /api/estado?v=10` | Estado atual, ou `null` se o servidor não tem nenhum. |
-| `POST /api/estado?v=10` | Grava o estado enviado no corpo e publica para as outras telas. |
-| `DELETE /api/estado?v=10` | Descarta a sessão daquela versão. |
+| `GET /api/eventos?v=14` | SSE. Manda o estado atual na conexão e a cada mudança. |
+| `GET /api/estado?v=14` | Estado atual, ou `null` se o servidor não tem nenhum. |
+| `POST /api/estado?v=14` | Grava o estado enviado no corpo e publica para as outras telas. |
+| `DELETE /api/estado?v=14` | Descarta a sessão daquela versão. |
 | `GET /api/saude` | Diagnóstico: quantas telas ligadas e quais versões em memória. |
 
 ## Atalhos de mesa
@@ -365,12 +366,34 @@ Duas coisas que valem saber na hora de usar:
 ### Exibir no Relógio
 
 Escolhe o que projetar além do cronômetro. Com algo selecionado, os dígitos
-encolhem e a tabela ocupa o centro da tela. A primeira exibição é a **tabela de
-raridade aleatória de itens mágicos** de
-[`referencias/tabelas.md`](referencias/tabelas.md), nas versões **Básico** ou
-**Avançado** — só a coluna escolhida aparece. Novas exibições entram em
-[`webapp/data/tabelas.js`](webapp/data/tabelas.js) e surgem no controle
-automaticamente.
+encolhem e o conteúdo ocupa o centro da tela. São três modos:
+
+- **Só o cronômetro** — o padrão.
+- **Tabela de raridade** — a tabela de raridade aleatória de itens mágicos de
+  [`referencias/tabelas.md`](referencias/tabelas.md), nas versões **Básico** ou
+  **Avançado**; só a coluna escolhida aparece. Novas tabelas entram em
+  [`webapp/data/tabelas.js`](webapp/data/tabelas.js) e surgem aqui sozinhas.
+- **Hidra** — as cabeças da Draconidra, abaixo.
+
+### Hidra
+
+Rastreia as cabeças da Dracohydra no chefe final. Começa com **cinco**, mas o
+traço *Multiple Heads* faz o número mudar durante o combate: uma cabeça morre ao
+sofrer 30 de dano num turno e, no fim dele, nascem **duas** no lugar — a menos
+que ela tenha sofrido dano radiante.
+
+No **Mestre**, cada cabeça é um botão: clicar corta, clicar de novo traz de
+volta (elas renascem, então cortar e curar são o mesmo gesto). Ao lado, **+1** e
+**+2 cabeças** para os nascimentos, **− última** para desfazer um clique errado
+e **Reiniciar** para voltar às cinco. No **Relógio** as mesmas cabeças aparecem
+grandes, com o número embaixo; as cortadas ficam cinza com um X vermelho.
+
+Um TPK devolve a hidra inteira, junto com o resto da run. Passando de cinco, a
+arte se repete em roda — a de nº 6 usa o retrato da primeira.
+
+Os cinco retratos vivem em `webapp/assets/hidra/`, recortados de uma folha de
+arte única. A cor é enfeite: o *Bite* escolhe o tipo de dano na hora, entre os
+do *Prismatic Breath* — não existe "a cabeça de fogo" na ficha.
 
 ### Mecânicas
 
@@ -488,6 +511,7 @@ limpa os contadores e as salas dobradas para a próxima run.
 | `referencias/aventura.md` (seção 13) | [`webapp/data/loot.js`](webapp/data/loot.js) | Inimigos, ND e faixas de ouro. |
 | `referencias/aventura.md` (seção 2) | [`webapp/data/salas.js`](webapp/data/salas.js) | Salas do fluxo e a trilha de cada uma. |
 | `referencias/aventura.md` (seção 15) | [`webapp/data/monstros.js`](webapp/data/monstros.js) | Blocos de estatística dos 13 monstros e as rolagens de cada ação. |
+| — (arte, sem referência em `.md`) | [`webapp/data/hidra.js`](webapp/data/hidra.js) | Retratos das cabeças da hidra, em `webapp/assets/hidra/`. |
 
 Ao mudar uma referência, atualize o arquivo de dados correspondente — e
 vice-versa.
